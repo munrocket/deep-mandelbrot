@@ -9,9 +9,19 @@
 <body>
   <div>
     <span>Iterations:</span>
-    <input id="iterations" type="number" onchange="draw(mandelbrot, target)" size="8" value="255">
+    <input id="iterations" type="number" onchange="draw(mandelbrot, target)" size="5" value="255">
+    <span> Color sheme:</span>
+    <select id="colorizing" onchange="draw(mandelbrot, target)">
+      <option selected="selected">black&white</option>
+      <option value="1">rgb cycle</option>
+    </select>
+    <span> Color step:</span>
+    <input id="colorStep" type="number" onchange="draw(mandelbrot, target)" size="2" value="25">
   </div>
   <canvas id="canvas" width="900" height="600"></canvas>  
+  <div>
+    <span id="currentPos"></span>
+  </div>
   <script src="mandelbrot.js"></script>
 </body>
 </html>
