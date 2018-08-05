@@ -7,7 +7,11 @@
   <title>Mandelbrot set</title>
 </head>
 <body>
-  <canvas id="picture" width="900" height="600"></canvas>  
+  <div>
+    <span>Iterations:</span>
+    <input id="iterations" type="number" onchange="draw(mandelbrot, target)" size="8" value="255">
+  </div>
+  <canvas id="canvas" width="900" height="600"></canvas>  
   <script src="mandelbrot.js"></script>
 </body>
 </html>
