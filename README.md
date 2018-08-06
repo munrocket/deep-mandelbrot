@@ -1,8 +1,9 @@
-# mandelbrot-set
+# Mandelbrot Set
 Tiny version of famous fractal in [web page](http://htmlpreview.github.io/?https://github.com/munrocket/mandelbrot-set/blob/master/main.html)
 
-![](https://i.imgur.com/6Nr1KXJ.png)
-
+### Features
 - [X] Zooming
-- [X] Optimization with only 3 multiplication in cycle
-- [X] 2 color sheme
+- [X] Optimization (only 3 multiplication in cycle)
+- [X] 2 color scheme
+
+![](https://i.imgur.com/6Nr1KXJ.png)

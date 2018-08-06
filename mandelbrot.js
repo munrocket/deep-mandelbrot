@@ -29,9 +29,9 @@ function mandelbrot(imageData, width, height, target) {
 }
 
 function colorize(index, i, iterations, imageData) {
-  let sheme = document.getElementById("colorizing").selectedIndex;
+  let scheme = document.getElementById("colorizing").selectedIndex;
   let colorStep = document.getElementById("colorStep").value;
-  switch (sheme) {
+  switch (scheme) {
     case 1:
       if (i == iterations) {
         imageData.data[index] = 0; imageData.data[index + 1] = 0; imageData.data[index + 2] = 0;
