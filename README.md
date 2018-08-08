@@ -6,4 +6,4 @@ Simple version of famous fractal in [web page](http://htmlpreview.github.io/?htt
 - [X] Optimization (only 3 multiplication in cycle)
 - [X] 2 color scheme
 
-![](https://i.imgur.com/6Nr1KXJ.png)
+![](https://i.imgur.com/s1xeMoy.png)

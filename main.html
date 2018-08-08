@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Mandelbrot set</title>
-  <!-- <script src="https://cdn.jsdelivr.net/npm/navigo@7.1.2/lib/navigo.min.js"></script> -->
 </head>
 <body>
   <div>
@@ -13,13 +12,16 @@
     <input id="iterations" type="number" onchange="draw(mandelbrot, target)" style="width: 70px" value="255" step="500">
     <span> Color scheme:</span>
     <select id="colorizing" onchange="draw(mandelbrot, target)">
-      <option selected="selected">black&white</option>
+      <option value="0" selected="selected">black&white</option>
       <option value="1">rgb cycle</option>
     </select>
-    <span> Color step:</span>
+    <span> rgb step:</span>
     <input id="colorStep" type="number" onchange="draw(mandelbrot, target)" style="width: 70px" value="25">
+    <button type="button" onclick="savePng()">Save PNG</button>
   </div>
   <canvas id="canvas" width="900" height="600"></canvas>
   <script src="mandelbrot.js"></script>
+  <script src="pageEvents.js"></script>
+  <script src="22.js"></script>
 </body>
 </html>
