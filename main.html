@@ -9,19 +9,25 @@
 <body>
   <div>
     <span>Iterations:</span>
-    <input id="iterations" type="number" onchange="draw(mandelbrot, target)" style="width: 70px" value="255" step="500">
+    <input id="iterations" type="number" onchange="draw(mandelbrot)" style="width: 70px" value="255" step="500">
     <span> Color scheme:</span>
-    <select id="colorizing" onchange="draw(mandelbrot, target)">
-      <option value="0" selected="selected">black&white</option>
-      <option value="1">rgb cycle</option>
+    <select id="colorizing" onchange="draw(mandelbrot)">
+      <option value="0" selected="selected">hsv cycle</option>
+      <option value="1">black&white</option>
+      <option value="2">black&white</option>
     </select>
-    <span> rgb step:</span>
-    <input id="colorStep" type="number" onchange="draw(mandelbrot, target)" style="width: 70px" value="25">
+    <span> Smooth</span>
+    <select id="smooth" onchange="draw(mandelbrot)">
+      <option value="0" selected="selected">none</option>
+      <option value="1">Spectral Analysis</option>
+      <option value="2">Hubbard-Douady potential</option>
+    </select>
+    <span> Color step:</span>
+    <input id="colorStep" type="number" onchange="draw(mandelbrot)" style="width: 70px" value="25">
     <button type="button" onclick="savePng()">Save PNG</button>
   </div>
   <canvas id="canvas" width="900" height="600"></canvas>
   <script src="mandelbrot.js"></script>
   <script src="pageEvents.js"></script>
-  <script src="22.js"></script>
 </body>
 </html>

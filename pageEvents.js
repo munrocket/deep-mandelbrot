@@ -40,7 +40,7 @@ multiEventListener(window, 'mouseup touchend', function(e) {
       } else {
         target.dIm = target.dRe / ratio;
       }
-      draw(mandelbrot, target);
+      draw(mandelbrot);
     }
   }
 })

@@ -5,5 +5,6 @@ Simple version of famous fractal in [web page](http://htmlpreview.github.io/?htt
 - [X] Zoom in / zoom out
 - [X] Optimization (only 3 multiplication in cycle)
 - [X] 2 color scheme
+- [X] Smooth algorithm
 
 ![](https://i.imgur.com/s1xeMoy.png)
