@@ -8,19 +8,17 @@
 </head>
 <body>
   <div>
-    <span>Iterations:</span>
-    <input id="iterations" type="number" onchange="draw(mandelbrot)" style="width: 70px" value="255" step="500">
+    <span>maxIteration:</span>
+    <input id="maxIteration" type="number" onchange="draw(mandelbrot)" style="width: 70px" value="255" step="500">
     <span> Color scheme:</span>
     <select id="colorizing" onchange="draw(mandelbrot)">
       <option value="0" selected="selected">hsv cycle</option>
       <option value="1">black&white</option>
-      <option value="2">black&white</option>
     </select>
     <span> Smooth</span>
     <select id="smooth" onchange="draw(mandelbrot)">
       <option value="0" selected="selected">none</option>
       <option value="1">Spectral Analysis</option>
-      <option value="2">Hubbard-Douady potential</option>
     </select>
     <span> Color step:</span>
     <input id="colorStep" type="number" onchange="draw(mandelbrot)" style="width: 70px" value="25">

@@ -2,10 +2,10 @@
 
 function getMousePos(e) {
   let rect = canvas.getBoundingClientRect();
-  let pos = { Re: target.Re - target.dRe + 2 * target.dRe * (e.clientX - rect.left) / canvas.width,
-              Im: target.Im + target.dIm - 2 * target.dIm * (e.clientY - rect.top) / canvas.height };
-  if (target.Re - target.dRe > pos.Re || pos.Re > target.Re + target.dRe) return null;
-  if (target.Im - target.dIm > pos.Im || pos.Im > target.Im + target.dIm) return null;
+  let pos = { x: target.x - target.dx + 2 * target.dx * (e.clientX - rect.left) / canvas.width,
+              y: target.y + target.dy - 2 * target.dy * (e.clientY - rect.top) / canvas.height };
+  if (target.x - target.dx > pos.x || pos.x > target.x + target.dx) return null;
+  if (target.y - target.dy > pos.y || pos.y > target.y + target.dy) return null;
   return pos;
 }
 
@@ -24,21 +24,21 @@ multiEventListener(window, 'mouseup touchend', function(e) {
   let pos = getMousePos(e);
   if (pos && savedMousePos) {
     if (e.button == 2) {
-      target.dRe *= 20;
-      target.dIm *= 20;
+      target.dx *= 20;
+      target.dy *= 20;
       draw(mandelbrot, target);
     } else if (e.button == 0) {
-      target.Re = (savedMousePos.Re + pos.Re) / 2;
-      target.Im = (savedMousePos.Im + pos.Im) / 2;
-      let diffRe = Math.abs(savedMousePos.Re - pos.Re) / 2;
-      let diffIm = Math.abs(savedMousePos.Im - pos.Im) / 2;
-      target.dRe = (diffRe / target.dRe > 0.05) ? diffRe : target.dRe / 20;
-      target.dIm = (diffIm / target.dIm > 0.05) ? diffIm : target.dIm / 20;
+      target.x = (savedMousePos.x + pos.x) / 2;
+      target.y = (savedMousePos.y + pos.y) / 2;
+      let dx = Math.abs(savedMousePos.x - pos.x) / 2;
+      let dy = Math.abs(savedMousePos.y - pos.y) / 2;
+      target.dx = (dx / target.dx > 0.05) ? dx : target.dx / 20;
+      target.dy = (dy / target.dy > 0.05) ? dy : target.dy / 20;
       let ratio = canvas.width / canvas.height;
-      if (ratio > target.dRe / target.dIm) {
-        target.dRe = ratio * target.dIm;
+      if (ratio > target.dx / target.dy) {
+        target.dx = ratio * target.dy;
       } else {
-        target.dIm = target.dRe / ratio;
+        target.dy = target.dx / ratio;
       }
       draw(mandelbrot);
     }
@@ -48,7 +48,7 @@ multiEventListener(window, 'mouseup touchend', function(e) {
 function savePng() {
   var a  = document.createElement('a');
   a.href = canvas.toDataURL('png');
-  a.download = `mandelbrot_${target.Re}_${target.Im})_${Math.floor(1.5 / target.dRe)}x.png`;
+  a.download = `mandelbrot_${target.x}_${target.y})_${Math.floor(1.5 / target.dx)}x.png`;
   a.click();
 }
 
