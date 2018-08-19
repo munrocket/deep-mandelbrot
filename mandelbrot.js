@@ -8,46 +8,51 @@ function mandelbrot(target, width, height) {
   for (let j = 0; j < height; j++) {
     for (let i = 0; i < width; i++) {
 
-      let iteration = 0, x = 0, y = 0, xx = 0, yy = 0;
+      let iteration = 0, x = 0, y = 0, dx = 1, dy = 0, xx = 0, yy = 0, xy = 0, temp = 0;
       let p = target.x - target.dx + 2 * target.dx * i / width;
       let q = target.y + target.dy - 2 * target.dy * j / height;
 
       while (xx + yy < 4 && iteration++ < maxIteration) {
-        y = (x + y) * (x + y) - xx - yy + q;
         x = xx - yy + p;
-        yy = y*y;
-        xx = x*x;
+        y = xy + xy + q;
+        yy = y * y;
+        xx = x * x;
+        xy = x * y;
+        if(smooth == 2) {
+          temp = 2 * (x * dx - y * dy) + 1;
+          dy = 2 * (x * dy + y * dx);
+          dx = temp;
+        }
       }
 
-      colorizeNextPixel(iteration - 1, xx + yy);
+      colorizeNextPixel(iteration - 1, xx + yy, dx * dx + dy * dy);
     }
   }
 }
 
 let abs = Math.abs;
 let log2 = Math.log(2);
-function colorizeNextPixel(iteration, rr) {
-  switch (colorScheme) {
-    case 0:
-      if (iteration == maxIteration) {
-        image.data[pixelColor++] = 0; image.data[pixelColor++] = 0; image.data[pixelColor++] = 0;
-      } else {
-        color = (smooth) ? iteration + 2 - Math.log(Math.log(rr) / 2) / log2 : iteration;
+function colorizeNextPixel(iteration, rr, drdr) {
+  if (iteration == maxIteration) {
+    image.data[pixelColor++] = 0; image.data[pixelColor++] = 0; image.data[pixelColor++] = 0;
+  } else {
+    switch (smooth) {
+      case 0: color = iteration; break;
+      case 1: color = iteration + 1 - Math.log(Math.log(rr) / log2 * 2); break;
+      case 2: color = log2 - Math.log(Math.sqrt(rr / drdr) * Math.log(rr) / target.dy);
+    }
+    switch (colorScheme) {
+      case 0:
         let t = (colorStep * color / 256) % 6;
         image.data[pixelColor++] = (2 - abs(t-5) + abs(t-4) + abs(t-2) - abs(t-1)) * 127.5;
         image.data[pixelColor++] = (abs(t-4) - abs(t-3) - abs(t-1) + abs(t)) * 127.5;
         image.data[pixelColor++] = (abs(t-6) - abs(t-5) - abs(t-3) + abs(t-2)) * 127.5;
-      }
-      break;
-    case 1:
-      if (iteration == maxIteration) {
-        image.data[pixelColor++] = 0; image.data[pixelColor++] = 0; image.data[pixelColor++] = 0;
-      } else {
-        color = (smooth) ? iteration + 2 - Math.log(Math.log(rr) / log2 * 2) : iteration;
+        break;
+      case 1:
         color = 256 * (maxIteration - (color * colorStep) % maxIteration) / maxIteration;
         image.data[pixelColor++] = color;  image.data[pixelColor++] = color;  image.data[pixelColor++] = color;
-      }
-      break;
+        break;
+    }
   }
   image.data[pixelColor++] = 255;
 }
