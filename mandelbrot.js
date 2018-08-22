@@ -1,77 +1,106 @@
 'use strict';
 
-let canvas, savedMousePos, image, maxIteration, color, colorScheme, colorStep, pixelColor, smooth;
-let target = { x: -0.5, y: 0, dx: 1.5, dy: 1 };
+let fractal, maxIteration, preventEscape, escapeSqr, palette, colorAlgo, colorStep;
+let canvas, image, pixelColorId, savedMousePos, target = { x: -0.5, y: 0, dx: 3, dy: 2 };
 
 function mandelbrot(target, width, height) {
-  pixelColor = 0;
+  pixelColorId = 0;
   for (let j = 0; j < height; j++) {
     for (let i = 0; i < width; i++) {
 
-      let iteration = 0, x = 0, y = 0, dx = 1, dy = 0, xx = 0, yy = 0, xy = 0, temp = 0;
-      let p = target.x - target.dx + 2 * target.dx * i / width;
-      let q = target.y + target.dy - 2 * target.dy * j / height;
+      let iteration = 0, x = 0, y = 0, xx = 0, xy = 0, yy = 0;
+      let temp = 0, dx = 0, dy = 0;
+      let cx = target.x - target.dx + 2 * target.dx * i / width;
+      let cy = target.y + target.dy - 2 * target.dy * j / height;
 
-      while (xx + yy < 4 && iteration++ < maxIteration) {
-        x = xx - yy + p;
-        y = xy + xy + q;
-        yy = y * y;
+      while (iteration++ < maxIteration && (!preventEscape || xx + yy < escapeSqr)) {
+        x = xx - yy + cx;
+        y = xy + xy + cy;
         xx = x * x;
+        yy = y * y;
         xy = x * y;
-        if(smooth == 2) {
-          temp = 2 * (x * dx - y * dy) + 1;
-          dy = 2 * (x * dy + y * dx);
-          dx = temp;
-        }
+
+        temp = 2 * (x * dx - y * dy) + 1;
+        dy = 2 * (x * dy + y * dx);
+        dx = temp;
+
+        // if(iteration > 100 && iteration > maxIteration / 2 && (dx * dx + dy * dy) < 0.70) {
+        //   iteration = maxIteration ;
+        //   break;
+        // }
+        // if(xx + 2 * x + 1 + yy < 1/16) {
+        //   iteration = maxIteration ;
+        //   break;
+        // }
       }
 
-      colorizeNextPixel(iteration - 1, xx + yy, dx * dx + dy * dy);
+      colorizeNextPixel(iteration - 1, xx + yy, x, y, dx, dy);
     }
   }
 }
 
+let color;
 let abs = Math.abs;
 let log2 = Math.log(2);
-function colorizeNextPixel(iteration, rr, drdr) {
-  if (iteration == maxIteration) {
-    image.data[pixelColor++] = 0; image.data[pixelColor++] = 0; image.data[pixelColor++] = 0;
+let logE = Math.log(escapeSqr);
+
+function colorizeNextPixel(iteration, rr, x, y, dx, dy) {
+  if (preventEscape && iteration == maxIteration) {
+   image.data[pixelColorId++] = 0; image.data[pixelColorId++] = 0; image.data[pixelColorId++] = 0;
   } else {
-    switch (smooth) {
+    switch (colorAlgo) {
       case 0: color = iteration; break;
-      case 1: color = iteration + 1 - Math.log(Math.log(rr) / log2 * 2); break;
-      case 2: color = log2 - Math.log(Math.sqrt(rr / drdr) * Math.log(rr) / target.dy);
+      case 1: color = iteration + 1 + Math.log(logE / Math.log(rr)) / log2; break;
+      case 2: color = log2 - Math.log(Math.sqrt(rr / (dx*dx + dy*dy)) * Math.log(rr) / target.dy); break;
+      case 3: color = (Math.atan2(y, x) + Math.PI) * 32 / Math.PI; break;
+      case 4: color = (Math.atan2(dy, dx) + Math.PI) * 32 / Math.PI; break;
     }
-    switch (colorScheme) {
+    switch (palette) {
       case 0:
         let t = (colorStep * color / 256) % 6;
-        image.data[pixelColor++] = (2 - abs(t-5) + abs(t-4) + abs(t-2) - abs(t-1)) * 127.5;
-        image.data[pixelColor++] = (abs(t-4) - abs(t-3) - abs(t-1) + abs(t)) * 127.5;
-        image.data[pixelColor++] = (abs(t-6) - abs(t-5) - abs(t-3) + abs(t-2)) * 127.5;
+        image.data[pixelColorId++] = (2 - abs(t-5) + abs(t-4) + abs(t-2) - abs(t-1)) * 110 + 50;
+        image.data[pixelColorId++] = (abs(t-4) - abs(t-3) - abs(t-1) + abs(t)) * 110 + 50;
+        image.data[pixelColorId++] = (abs(t-6) - abs(t-5) - abs(t-3) + abs(t-2)) * 110 + 100;
         break;
       case 1:
         color = 256 * (maxIteration - (color * colorStep) % maxIteration) / maxIteration;
-        image.data[pixelColor++] = color;  image.data[pixelColor++] = color;  image.data[pixelColor++] = color;
+        image.data[pixelColorId++] = color;  image.data[pixelColorId++] = color;  image.data[pixelColorId++] = color;
         break;
     }
   }
-  image.data[pixelColor++] = 255;
+  image.data[pixelColorId++] = 255;
 }
 
-function draw(mandelbrot) {
-  canvas = (canvas) ? canvas : document.getElementById('canvas');
+function draw(fractal) {
   let context = canvas.getContext('2d');
-  colorStep = document.getElementById('colorStep').value;
-  colorScheme = document.getElementById('colorizing').selectedIndex;
-  maxIteration = document.getElementById('maxIteration').value;
-  smooth = document.getElementById('smooth').selectedIndex;
-  image = (image) ? image : context.createImageData(canvas.width, canvas.height);
-  mandelbrot(target, canvas.width, canvas.height);
+  fractal(target, canvas.width, canvas.height);
   context.putImageData(image, 0, 0);
   context.font='10px Verdana';
-  context.fillStyle = (!colorScheme) ? '#777' : '#FFF';
+  context.fillStyle = (!palette) ? '#777' : '#FFF';
   context.fillText(`(${target.x}, ${target.y}) with ${Math.floor(1.5 / target.dx)}x zoom`, 5, canvas.height - 5);
 }
 
+function updateSettings() {
+  switch (document.getElementById('fractal').selectedIndex) {
+    case 0: fractal = mandelbrot; break;
+    case 1: fractal = mandelbrotApprox; break;
+    case 2: if (fractal != drop) { fractal = drop; target = { x: 0, y: 0, dx: 3, dy: 2 } }; break;
+    case 3: if (fractal != eye) { fractal = eye; target = { x: 0, y: 0, dx: 3, dy: 2 } }; break;
+    case 4: if (fractal != circle) { fractal = circle; target = { x: 0, y: 0, dx: 6, dy: 4 } }; break;
+    case 5: if (fractal != strap) { fractal = strap; target = { x: 0, y: 0, dx: 3, dy: 2 } }; break;
+  }
+  maxIteration = parseInt(document.getElementById('maxIteration').value);
+  preventEscape = document.getElementById('preventEscape').checked;
+  escapeSqr = Math.pow(document.getElementById('escapeRadius').value, 2);
+  logE = Math.log(escapeSqr);
+  palette = document.getElementById('palette').selectedIndex;
+  colorAlgo = document.getElementById('colorAlgo').selectedIndex;
+  colorStep = document.getElementById('colorStep').value;
+  canvas = (canvas) ? canvas : document.getElementById('canvas');
+  image = (image) ? image : canvas.getContext('2d').createImageData(canvas.width, canvas.height);
+}
+
 window.onload = function() {
-  draw(mandelbrot);
+  updateSettings();
+  draw(fractal);
 };

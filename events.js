@@ -26,7 +26,7 @@ multiEventListener(window, 'mouseup touchend', function(e) {
     if (e.button == 2) {
       target.dx *= 20;
       target.dy *= 20;
-      draw(mandelbrot, target);
+      draw(fractal);
     } else if (e.button == 0) {
       target.x = (savedMousePos.x + pos.x) / 2;
       target.y = (savedMousePos.y + pos.y) / 2;
@@ -40,7 +40,9 @@ multiEventListener(window, 'mouseup touchend', function(e) {
       } else {
         target.dy = target.dx / ratio;
       }
-      draw(mandelbrot);
+      draw(fractal);
+    } else if (e.button == 1 && document.getElementById('fractal').selectedIndex < 1) {
+      
     }
   }
 })

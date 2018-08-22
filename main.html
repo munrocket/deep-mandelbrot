@@ -8,25 +8,53 @@
 </head>
 <body>
   <div>
-    <span>maxIteration:</span>
-    <input id="maxIteration" type="number" onchange="draw(mandelbrot)" style="width: 70px" value="255" step="500">
-    <span> Color scheme:</span>
-    <select id="colorizing" onchange="draw(mandelbrot)">
-      <option value="0" selected="selected">hsv cycle</option>
-      <option value="1">black&white</option>
+    <span>Fractal</span>
+    <select id="fractal" onchange="updateSettings(); draw(fractal)">
+      <option value="0">mandelbrot</option>
+      <option value="1">mandelbrotApprox</option>
+      <option value="2">drop</option>
+      <option value="3">eye</option>
+      <option value="4">circle</option>
+      <option value="5">strap</option>
     </select>
-    <span> Smooth</span>
-    <select id="smooth" onchange="draw(mandelbrot)">
-      <option value="0" selected="selected">none</option>
-      <option value="1">Exponential smoothing</option>
-      <option value="2">Hubbard-Douady potential</option>
-    </select>
-    <span> Color step:</span>
-    <input id="colorStep" type="number" onchange="draw(mandelbrot)" style="width: 70px" value="25">
+    <span>Max iteration:</span>
+    <input id="maxIteration" type="number" onchange="updateSettings(); draw(fractal)" style="width: 70px" value="200" step="500">
+    <span> Escape radius:</span>
+    <input id="escapeRadius" type="number" onchange="updateSettings(); draw(fractal)" style="width: 70px" value="4">
+    <span> Prevent escape:</span>
+    <input id="preventEscape" type="checkbox" onchange="updateSettings(); draw(fractal)" checked>
     <button type="button" onclick="savePng()">Save PNG</button>
   </div>
-  <canvas id="canvas" width="900" height="600"></canvas>
+  <div>
+    <span> Color palette:</span>
+    <select id="palette" onchange="updateSettings(); draw(fractal)">
+      <option value="0" selected="selected">hsv, cycle</option>
+      <option value="1">grey, repeat</option>
+    </select>
+    <span> Color method</span>
+    <select id="colorAlgo" onchange="updateSettings(); draw(fractal)">
+      <option value="0" selected="selected">escape time</option>
+      <option value="1">smooth escape time</option>
+      <option value="2">some distance estimator</option>
+      <option value="3">escape angle</option>
+      <option value="3">derivative angle</option>
+    </select>
+    <span> Color step:</span>
+    <input id="colorStep" type="number" onchange="updateSettings(); draw(fractal)" style="width: 70px" value="24">
+  </div>
+
+  <canvas id="canvas" width="900" height="600"></canvas><br/>
+
+  <button type="button" onclick="draw(fractal)">goto</button>
+  <span></span>
+  <input id="x" type="number" onchange="target.x = this.value" style="width: 40px" value="-0.5">
+  <span></span>
+  <input id="y" type="number" onchange="target.y = this.value" style="width: 40px" value="0">
+  <span></span>
+  <input id="zoom" type="number" onchange="target.dy = 1/this.value; target.dx = 3/2*target.dy" style="width: 40px" value="1">
+
   <script src="mandelbrot.js"></script>
-  <script src="pageEvents.js"></script>
+  <script src="events.js"></script>
+  <script src="ugandanKnuckles.js"></script>
 </body>
 </html>
