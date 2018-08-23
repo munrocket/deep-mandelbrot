@@ -14,8 +14,10 @@
       <option value="1">mandelbrotApprox</option>
       <option value="2">drop</option>
       <option value="3">eye</option>
-      <option value="4">circle</option>
-      <option value="5">strap</option>
+      <option value="4">necklace</option>
+      <option value="5">mandelpinski</option>
+      <option value="6">circle</option>
+      <option value="7">strap</option>
     </select>
     <span>Max iteration:</span>
     <input id="maxIteration" type="number" onchange="updateSettings(); draw(fractal)" style="width: 70px" value="200" step="500">
@@ -37,7 +39,9 @@
       <option value="1">smooth escape time</option>
       <option value="2">some distance estimator</option>
       <option value="3">escape angle</option>
-      <option value="3">derivative angle</option>
+      <option value="4">derivative angle</option>
+      <option value="5">derivative norm</option>
+      <option value="6">2 derivative norm</option>
     </select>
     <span> Color step:</span>
     <input id="colorStep" type="number" onchange="updateSettings(); draw(fractal)" style="width: 70px" value="24">

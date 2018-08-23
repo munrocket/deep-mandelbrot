@@ -2,7 +2,7 @@
 
 //series approximation
 function mandelbrotApprox(target, width, height) {
-  
+
   let ox = [target.x], oy = [target.y];
   let oxox = [ox[0] * ox[0]], oyoy = [oy[0] * oy[0]], oxoy = ox[0] * oy[0];
   for (let i = 0; i < maxIteration - 1; i++) {
@@ -18,7 +18,7 @@ function mandelbrotApprox(target, width, height) {
     for (let i = 0; i < width; i++) {
       let vx = -target.dx + 2 * target.dx * i / width;
       let vy = target.dy - 2 * target.dy * j / height;
-      
+
       let dx = vx, dy = vy, rr = 0, n = -1;
       let zx, zy, dxdx, dydy, oxdx, oydy, oxn, oyn;
       while (n++ < ox.length && rr < escapeSqr) {
@@ -46,7 +46,7 @@ function drop(target, width, height) {
       let cy = target.y + target.dy - 2 * target.dy * j / height;
       temp = cx * cx + cy * cy;
       cx = cx / temp;
-      cy = cy / temp;
+      cy = -cy / temp;
 
       while (iteration++ < maxIteration && (!preventEscape || xx + yy < escapeSqr)) {
         x = xx - yy + cx;
@@ -79,7 +79,7 @@ function eye(target, width, height) {
       let cy = target.y + target.dy - 2 * target.dy * j / height;
       temp = cx * cx + cy * cy;
       cx = cx / temp;
-      cy = cy / temp;
+      cy = -cy / temp;
 
       while (iteration++ < maxIteration && (!preventEscape || xx + yy < escapeSqr)) {
         temp = (xx - 3 * yy) * x + cx;
@@ -87,6 +87,90 @@ function eye(target, width, height) {
         x = temp;
         xx = x * x;
         yy = y * y;
+
+        if (colorAlgo > 1) {
+          temp = 2 * (x * dx - y * dy) + 1;
+          dy = 2 * (x * dy + y * dx);
+          dx = temp;
+        }
+      }
+
+      colorizeNextPixel(iteration - 1, xx + yy, x, y, dx, dy);
+    }
+  }
+}
+
+//julia z -> z^4 - 0.1 * c /z^4 at point (-2,2)
+function necklace(target, width, height) {
+  pixelColorId = 0;
+  for (let j = 0; j < height; j++) {
+    for (let i = 0; i < width; i++) {
+
+      let iteration = 0, x = 0, y = 0, xx = 0, xy = 0, yy = 0;
+      let temp = 0, dx = 0, dy = 0;
+      let cx = target.y + target.dy - 2 * target.dy * j / height;
+      let cy = target.x - target.dx + 2 * target.dx * i / width;
+
+      if (true) {
+        x = cx; y = cy;
+        xx = cx*cx; xy = cx*cy; yy = cy*cy;
+        cx = -2; cy = 2;
+      }
+
+      while (iteration++ < maxIteration && (!preventEscape || xx + yy < escapeSqr)) {
+        temp = (xx - 3 * yy) * x;
+        y = 3 * xx * y - yy * y;
+        x = temp;
+
+        temp = xx * xx - 6 * xy * xy + yy * yy - 0.1 * (cx * x + cy * y) / (x*x + y*y);
+        y = 4 * (xx - yy) * xy - 0.1 * (cy * x - cx * y) / (x*x + y*y);
+        x = temp;
+
+        xx = x * x;
+        yy = y * y;
+        xy = x * y;
+
+        if (colorAlgo > 1) {
+          temp = 2 * (x * dx - y * dy) + 1;
+          dy = 2 * (x * dy + y * dx);
+          dx = temp;
+        }
+      }
+
+      colorizeNextPixel(iteration - 1, xx + yy, x, y, dx, dy);
+    }
+  }
+}
+
+//julia z -> z^4 + 0.1/z^4
+function mandelpinski(target, width, height) {
+  pixelColorId = 0;
+  for (let j = 0; j < height; j++) {
+    for (let i = 0; i < width; i++) {
+
+      let iteration = 0, x = 0, y = 0, xx = 0, xy = 0, yy = 0;
+      let temp = 0, dx = 0, dy = 0;
+      let cx = target.y + target.dy - 2 * target.dy * j / height;
+      let cy = target.x - target.dx + 2 * target.dx * i / width;
+
+      if (true) {
+        x = cx; y = cy;
+        xx = cx*cx; xy = cx*cy; yy = cy*cy;
+        cx = 100; cy = 0;
+      }
+
+      while (iteration++ < maxIteration && (!preventEscape || xx + yy < escapeSqr)) {
+        // temp = (xx - 3 * yy) * x;
+        // y = 3 * xx * y - yy * y;
+        // x = temp;
+
+        temp = xx * xx - 6 * xy * xy + yy * yy + 0.001 * (cx * x + cy * y) / (x*x + y*y);
+        y = 4 * (xx - yy) * xy + 0.001 * (cy * x - cx * y) / (x*x + y*y);
+        x = temp;
+
+        xx = x * x;
+        yy = y * y;
+        xy = x * y;
 
         if (colorAlgo > 1) {
           temp = 2 * (x * dx - y * dy) + 1;
@@ -145,7 +229,75 @@ function strap(target, width, height) {
       let cy = -(target.x - target.dx + 2 * target.dx * i / width);
       temp = cx * cx + cy * cy;
       cx = cx / temp - 3/4;
-      cy = cy / temp;
+      cy = -cy / temp;
+
+      while (iteration++ < maxIteration && (!preventEscape || xx + yy < escapeSqr)) {
+        x = xx - yy + cx;
+        y = xy + xy + cy;
+        xx = x * x;
+        yy = y * y;
+        xy = x * y;
+
+        if (colorAlgo > 1) {
+          temp = 2 * (x * dx - y * dy) + 1;
+          dy = 2 * (x * dy + y * dx);
+          dx = temp;
+        }
+      }
+
+      colorizeNextPixel(iteration - 1, xx + yy, x, y, dx, dy);
+    }
+  }
+}
+
+function sin(target, width, height) {
+  pixelColorId = 0;
+  for (let j = 0; j < height; j++) {
+    for (let i = 0; i < width; i++) {
+
+      let iteration = 0, x = 0, y = 0, xx = 0, xy = 0, yy = 0;
+      let temp = 0, dx = 0, dy = 0;
+      let cx = (target.y + target.dy - 2 * target.dy * j / height) - 0.5;
+      let cy = -(target.x - target.dx + 2 * target.dx * i / width);
+      temp = cx * cx - cy * cy;
+      cy = 2 * cx * cy;
+      cx = temp;
+
+      while (iteration++ < maxIteration && (!preventEscape || xx + yy < escapeSqr)) {
+        temp = x * cx - y * cy;
+        y = x * cy + y * cx;
+        x = temp;
+
+        
+
+        xx = x * x;
+        yy = y * y;
+
+        if (colorAlgo > 1) {
+          temp = 2 * (x * dx - y * dy) + 1;
+          dy = 2 * (x * dy + y * dx);
+          dx = temp;
+        }
+      }
+
+      colorizeNextPixel(iteration - 1, xx + yy, x, y, dx, dy);
+    }
+  }
+}
+
+//z -> z^2 + c + 0.02 / c
+function lol(target, width, height) {
+  pixelColorId = 0;
+  for (let j = 0; j < height; j++) {
+    for (let i = 0; i < width; i++) {
+
+      let iteration = 0, x = 0, y = 0, xx = 0, xy = 0, yy = 0;
+      let temp = 0, dx = 0, dy = 0;
+      let cx = target.x - target.dx + 2 * target.dx * i / width + 1.25;
+      let cy = target.y + target.dy - 2 * target.dy * j / height;
+      temp = cx * cx + cy * cy;
+      cx = cx + 0.02 * cx / temp;
+      cy = cy - 0.02 * cy / temp;
 
       while (iteration++ < maxIteration && (!preventEscape || xx + yy < escapeSqr)) {
         x = xx - yy + cx;
