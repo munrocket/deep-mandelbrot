@@ -13,12 +13,12 @@ function mandelbrot(target, width, height) {
       let cx = target.x - target.dx + 2 * target.dx * i / width;
       let cy = target.y + target.dy - 2 * target.dy * j / height;
 
-      // if (!preventEscape || 256 * (cx*cx + cy*cy) * (cx*cx + cy*cy) - 96 * (cx*cx + cy*cy) + 32 * cx - 3 < 0) {
-      //   colorizeNextPixel(maxIteration-1, xx + yy, x, y, dx, dy);
-      //   continue;
-      // }
+      let cn = cx*cx + cy*cy;
+      if (!preventEscape || 256 * cn * cn - 96 * cn + 32 * cx - 3 < 0) {
+        colorizeNextPixel(maxIteration-1, xx + yy, x, y, dx, dy);
+        continue;
+      }
 
-      let q = 0;
       while (iteration++ < maxIteration && (!preventEscape || xx + yy < escapeSqr)) {
         x = xx - yy + cx;
         y = xy + xy + cy;
@@ -30,12 +30,12 @@ function mandelbrot(target, width, height) {
         dy = 2 * (x * dy + y * dx);
         dx = temp;
 
-        temp = 2 * (x * d2x - y * d2y + dx * dx - dy * dy);
-        d2y = 2 * (x * d2y + y * d2x + 2 * dx * dy);
-        d2x = temp;
+        // temp = 2 * (x * d2x - y * d2y + dx * dx - dy * dy);
+        // d2y = 2 * (x * d2y + y * d2x + 2 * dx * dy);
+        // d2x = temp;
       }
 
-      colorizeNextPixel(iteration - 1, xx + yy, x, y, dx, dy, d2x, d2y);
+      colorizeNextPixel(iteration - 1, xx + yy, x, y, dx, dy)//, d2x, d2y);
     }
   }
 }
@@ -45,7 +45,7 @@ let abs = Math.abs;
 let log2 = Math.log(2);
 let logE = Math.log(escapeSqr);
 
-function colorizeNextPixel(iteration, rr, x, y, dx, dy, d2x, d2y) {
+function colorizeNextPixel(iteration, rr, x, y, dx, dy){//, d2x, d2y) {
   if (preventEscape && iteration == maxIteration) {
    image.data[pixelColorId++] = 0; image.data[pixelColorId++] = 0; image.data[pixelColorId++] = 0;
   } else {
@@ -56,7 +56,7 @@ function colorizeNextPixel(iteration, rr, x, y, dx, dy, d2x, d2y) {
       case 3: color = (Math.atan2(y, x) + Math.PI) * 32 / Math.PI; break;
       case 4: color = (Math.atan2(dy, dx) + Math.PI) * 32 / Math.PI; break;
       case 5: color = Math.log(dx*dx + dy*dy)/2; break;
-      case 6: color = Math.log(d2x*d2x + d2y*d2y); break;
+      //case 6: color = Math.log(d2x*d2x + d2y*d2y); break;
       default: alert("error");
     }
     switch (palette) {
@@ -94,7 +94,9 @@ function updateSettings() {
     case 4: if (fractal != necklace) { fractal = necklace; target = { x: 0, y: 0, dx: 3, dy: 2 } }; break;
     case 5: if (fractal != mandelpinski) { fractal = mandelpinski; target = { x: 0, y: 0, dx: 3, dy: 2 } }; break;
     case 6: if (fractal != circle) { fractal = circle; target = { x: 0, y: 0, dx: 6, dy: 4 } }; break;
-    case 7: if (fractal != strap) { fractal = strap; target = { x: 0, y: 0, dx: 3, dy: 2 } }; break;
+    case 7: if (fractal != bug) { fractal = bug; target = { x: 0, y: 0, dx: 3, dy: 2 } }; break;
+    case 8: if (fractal != test) { fractal = test; target = { x: 0, y: 0, dx: 3, dy: 2 } }; break;
+    default: window.alert("error");
   }
   maxIteration = parseInt(document.getElementById('maxIteration').value);
   preventEscape = document.getElementById('preventEscape').checked;

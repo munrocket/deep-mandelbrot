@@ -17,7 +17,8 @@
       <option value="4">necklace</option>
       <option value="5">mandelpinski</option>
       <option value="6">circle</option>
-      <option value="7">strap</option>
+      <option value="7">bug</option>
+      <option value="8">test</option>
     </select>
     <span>Max iteration:</span>
     <input id="maxIteration" type="number" onchange="updateSettings(); draw(fractal)" style="width: 70px" value="200" step="500">
@@ -41,7 +42,6 @@
       <option value="3">escape angle</option>
       <option value="4">derivative angle</option>
       <option value="5">derivative norm</option>
-      <option value="6">2 derivative norm</option>
     </select>
     <span> Color step:</span>
     <input id="colorStep" type="number" onchange="updateSettings(); draw(fractal)" style="width: 70px" value="24">
@@ -57,8 +57,9 @@
   <span></span>
   <input id="zoom" type="number" onchange="target.dy = 1/this.value; target.dx = 3/2*target.dy" style="width: 40px" value="1">
 
-  <script src="mandelbrot.js"></script>
-  <script src="events.js"></script>
-  <script src="ugandanKnuckles.js"></script>
+  <script src="src/mandelbrot.js"></script>
+  <script src="src/events.js"></script>
+  <script src="lib/complex.js"></script>
+  <script src="src/spaghettiMonster.js"></script>
 </body>
 </html>

@@ -217,87 +217,19 @@ function circle(target, width, height) {
   }
 }
 
-//z -> z^2 + 1/(conj(c) - 0.5) - 3/4
-function strap(target, width, height) {
-  pixelColorId = 0;
-  for (let j = 0; j < height; j++) {
-    for (let i = 0; i < width; i++) {
-
-      let iteration = 0, x = 0, y = 0, xx = 0, xy = 0, yy = 0;
-      let temp = 0, dx = 0, dy = 0;
-      let cx = (target.y + target.dy - 2 * target.dy * j / height) - 0.5;
-      let cy = -(target.x - target.dx + 2 * target.dx * i / width);
-      temp = cx * cx + cy * cy;
-      cx = cx / temp - 3/4;
-      cy = -cy / temp;
-
-      while (iteration++ < maxIteration && (!preventEscape || xx + yy < escapeSqr)) {
-        x = xx - yy + cx;
-        y = xy + xy + cy;
-        xx = x * x;
-        yy = y * y;
-        xy = x * y;
-
-        if (colorAlgo > 1) {
-          temp = 2 * (x * dx - y * dy) + 1;
-          dy = 2 * (x * dy + y * dx);
-          dx = temp;
-        }
-      }
-
-      colorizeNextPixel(iteration - 1, xx + yy, x, y, dx, dy);
-    }
-  }
-}
-
-function sin(target, width, height) {
-  pixelColorId = 0;
-  for (let j = 0; j < height; j++) {
-    for (let i = 0; i < width; i++) {
-
-      let iteration = 0, x = 0, y = 0, xx = 0, xy = 0, yy = 0;
-      let temp = 0, dx = 0, dy = 0;
-      let cx = (target.y + target.dy - 2 * target.dy * j / height) - 0.5;
-      let cy = -(target.x - target.dx + 2 * target.dx * i / width);
-      temp = cx * cx - cy * cy;
-      cy = 2 * cx * cy;
-      cx = temp;
-
-      while (iteration++ < maxIteration && (!preventEscape || xx + yy < escapeSqr)) {
-        temp = x * cx - y * cy;
-        y = x * cy + y * cx;
-        x = temp;
-
-        
-
-        xx = x * x;
-        yy = y * y;
-
-        if (colorAlgo > 1) {
-          temp = 2 * (x * dx - y * dy) + 1;
-          dy = 2 * (x * dy + y * dx);
-          dx = temp;
-        }
-      }
-
-      colorizeNextPixel(iteration - 1, xx + yy, x, y, dx, dy);
-    }
-  }
-}
-
 //z -> z^2 + c + 0.02 / c
-function lol(target, width, height) {
+function bug(target, width, height) {
   pixelColorId = 0;
   for (let j = 0; j < height; j++) {
     for (let i = 0; i < width; i++) {
 
       let iteration = 0, x = 0, y = 0, xx = 0, xy = 0, yy = 0;
       let temp = 0, dx = 0, dy = 0;
-      let cx = target.x - target.dx + 2 * target.dx * i / width + 1.25;
+      let cx = target.x - target.dx + 2 * target.dx * i / width;
       let cy = target.y + target.dy - 2 * target.dy * j / height;
       temp = cx * cx + cy * cy;
-      cx = cx + 0.02 * cx / temp;
-      cy = cy - 0.02 * cy / temp;
+      cx = cx + 0.03 * cx / temp - 0.9;
+      cy = cy - 0.03 * cy / temp;
 
       while (iteration++ < maxIteration && (!preventEscape || xx + yy < escapeSqr)) {
         x = xx - yy + cx;
@@ -314,6 +246,31 @@ function lol(target, width, height) {
       }
 
       colorizeNextPixel(iteration - 1, xx + yy, x, y, dx, dy);
+    }
+  }
+}
+
+//sin(z*c^2?)
+function test(target, width, height) {
+  pixelColorId = 0;
+  for (let j = 0; j < height; j++) {
+    for (let i = 0; i < width; i++) {
+
+      let iteration = 0, temp = 0;
+      let z = Complex(0, 0), dz = Complex(0,0);
+      let cx = target.x - target.dx + 2 * target.dx * i / width;
+      let cy = target.y + target.dy - 2 * target.dy * j / height;
+      let c = Complex(cx,cy);
+
+      while (iteration++ < maxIteration && (!preventEscape || z.abs < escapeSqr)) {
+        z = Complex.square(z).add(c);
+
+        if (colorAlgo > 1) {
+          dz = z.multiply(dz).multiply(2);
+        }
+      }
+
+      colorizeNextPixel(iteration - 1, z.abs, z.real, z.imag, dz.real, dz.imag);
     }
   }
 }
