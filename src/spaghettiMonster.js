@@ -2,7 +2,6 @@
 
 //series approximation
 function mandelbrotApprox(target, width, height) {
-
   let ox = [target.x], oy = [target.y];
   let oxox = [ox[0] * ox[0]], oyoy = [oy[0] * oy[0]], oxoy = ox[0] * oy[0];
   for (let i = 0; i < maxIteration - 1; i++) {
@@ -33,6 +32,36 @@ function mandelbrotApprox(target, width, height) {
     }
   }
 }
+//   let X = Big(0), Y = Big(0), XX = Big(0), YY = Big(0), XY = Big(0);
+//   let ox = [], oy = [], CX = Big(target.x), CY = Big(target.y);
+//   for (let i = 0; i < maxIteration; i++) {
+//     X = XX.minus(YY).plus(CX);
+//     Y = XY.plus(XY).plus(CY);
+//     XX = X.times(X);
+//     YY = Y.times(Y);
+//     XY = X.times(Y);
+//     ox.push(Number(X));
+//     oy.push(Number(Y));
+//   }
+//   pixelColorId = 0;
+//   for (let j = 0; j < height; j++) {
+//     for (let i = 0; i < width; i++) {
+//       let vx = target.dx + 2 * target.dx * i / width;
+//       let vy = target.dy - 2 * target.dy * j / height;
+
+//       let dx = vx, dy = vy, rr = 0, n = -1;
+//       let zx, zy, dxdx, dydy, xdx, ydy, x, y;
+//       while (n++ < ox.length && rr < escapeSqr) {
+//         x = ox[n]; y = oy[n]; dxdx = dx * dx; dydy = dy * dy; xdx = x * dx; ydy = y * dy;
+//         dy = x * dy + y * dx + dx * dy; dy = dy + dy + vy;
+//         dx = xdx - ydy; dx = dx + dx + dxdx - dydy + vx;
+//         zx = x + dx; zy = y + dy;
+//         rr = x * x + xdx + xdx + dxdx + y * y + ydy + ydy + dydy;
+//       }
+
+//       colorizeNextPixel(n - 1, rr, zx, zy, dx, dy);
+//     }
+//   }
 
 //z -> z^2 + 1/c
 function drop(target, width, height) {
@@ -263,10 +292,10 @@ function test(target, width, height) {
       let c = Complex(cx,cy);
 
       while (iteration++ < maxIteration && (!preventEscape || z.abs < escapeSqr)) {
-        z = Complex.square(z).add(c);
+        z = Complex.square(z).plus(c);
 
         if (colorAlgo > 1) {
-          dz = z.multiply(dz).multiply(2);
+          dz = z.timestiply(dz).timestiply(2);
         }
       }
 

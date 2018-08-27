@@ -12,7 +12,7 @@ Simple version of famous fractal in [web page](http://htmlpreview.github.io/?htt
 - [X] Series approximation for deep zooms
 - [ ] Fast big float
 
-![](https://i.imgur.com/260LNbm.png)
+![](https://i.imgur.com/BQWzSYr.png)
 
 ### References
 
