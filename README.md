@@ -8,9 +8,8 @@ Simple version of famous fractal in [web page](http://htmlpreview.github.io/?htt
 - [X] 2 color pallete
 - [X] 5 colorizing algorithm
 - [X] Optimization with algebra
-- [X] External libraries for complex number only for testing purpose
-- [X] Series approximation for deep zooms
-- [ ] Fast big float
+- [X] Perturbation theory
+- [X] Double float
 
 ![](https://i.imgur.com/BQWzSYr.png)
 

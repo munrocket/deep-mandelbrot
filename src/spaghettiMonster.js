@@ -1,7 +1,8 @@
 'use strict';
 
-//series approximation
-function mandelbrotApprox(target, width, height) {
+//perturbation theory
+function mandelbrotPerturb(target, width, height) {
+  
   let ox = [target.x], oy = [target.y];
   let oxox = [ox[0] * ox[0]], oyoy = [oy[0] * oy[0]], oxoy = ox[0] * oy[0];
   for (let i = 0; i < maxIteration - 1; i++) {
@@ -11,13 +12,12 @@ function mandelbrotApprox(target, width, height) {
     oyoy.push(oy[i+1] * oy[i+1]);
     oxoy = ox[i+1] * oy[i+1];
   }
-
-  pixelColorId = 0;
+   pixelColorId = 0;
   for (let j = 0; j < height; j++) {
     for (let i = 0; i < width; i++) {
       let vx = -target.dx + 2 * target.dx * i / width;
       let vy = target.dy - 2 * target.dy * j / height;
-
+      
       let dx = vx, dy = vy, rr = 0, n = -1;
       let zx, zy, dxdx, dydy, oxdx, oydy, oxn, oyn;
       while (n++ < ox.length && rr < escapeSqr) {
@@ -27,41 +27,33 @@ function mandelbrotApprox(target, width, height) {
         zx = oxn + dx; zy = oyn + dy;
         rr = oxox[n] + oxdx + oxdx + dxdx + oyoy[n] + oydy + oydy + dydy;
       }
-
       colorizeNextPixel(n - 1, rr, zx, zy, dx, dy);
     }
   }
 }
-//   let X = Big(0), Y = Big(0), XX = Big(0), YY = Big(0), XY = Big(0);
-//   let ox = [], oy = [], CX = Big(target.x), CY = Big(target.y);
-//   for (let i = 0; i < maxIteration; i++) {
-//     X = XX.minus(YY).plus(CX);
-//     Y = XY.plus(XY).plus(CY);
-//     XX = X.times(X);
-//     YY = Y.times(Y);
-//     XY = X.times(Y);
-//     ox.push(Number(X));
-//     oy.push(Number(Y));
-//   }
-//   pixelColorId = 0;
-//   for (let j = 0; j < height; j++) {
-//     for (let i = 0; i < width; i++) {
-//       let vx = target.dx + 2 * target.dx * i / width;
-//       let vy = target.dy - 2 * target.dy * j / height;
 
-//       let dx = vx, dy = vy, rr = 0, n = -1;
-//       let zx, zy, dxdx, dydy, xdx, ydy, x, y;
-//       while (n++ < ox.length && rr < escapeSqr) {
-//         x = ox[n]; y = oy[n]; dxdx = dx * dx; dydy = dy * dy; xdx = x * dx; ydy = y * dy;
-//         dy = x * dy + y * dx + dx * dy; dy = dy + dy + vy;
-//         dx = xdx - ydy; dx = dx + dx + dxdx - dydy + vx;
-//         zx = x + dx; zy = y + dy;
-//         rr = x * x + xdx + xdx + dxdx + y * y + ydy + ydy + dydy;
-//       }
+// with double.js
+function mandelbrotDouble(target, width, height) {
+  pixelColorId = 0;
+  for (let j = 0; j < height; j++) {
+    for (let i = 0; i < width; i++) {
 
-//       colorizeNextPixel(n - 1, rr, zx, zy, dx, dy);
-//     }
-//   }
+      let iteration = 0, X = [0, 0], Y = [0, 0], XX = [0, 0], XY = [0, 0], YY = [0, 0];
+      let CX = sum22(sum11(target.x, -target.dx), div21(mul11(target.dx, 2 * i), width));
+      let CY = sub22(sum11(target.y, target.dy), div21(mul11(target.dy, 2 * j), height));
+
+      while (iteration++ < maxIteration && (!preventEscape || lt21(sum22(XX, YY), escapeSqr))) {
+        X = sum22(sub22(XX, YY), CX);
+        Y = sum22(mul21pow2(XY, 2), CY);
+        XX = sqr2(X);
+        YY = sqr2(Y);
+        XY = mul22(X, Y);
+      }
+
+      colorizeNextPixel(iteration - 1, toNumber(sum22(XX, YY)), toNumber(X), toNumber(Y));
+    }
+  }
+}
 
 //z -> z^2 + 1/c
 function drop(target, width, height) {
@@ -279,27 +271,33 @@ function bug(target, width, height) {
   }
 }
 
-//sin(z*c^2?)
 function test(target, width, height) {
   pixelColorId = 0;
   for (let j = 0; j < height; j++) {
     for (let i = 0; i < width; i++) {
 
-      let iteration = 0, temp = 0;
-      let z = Complex(0, 0), dz = Complex(0,0);
+      let iteration = 0, x = 0, y = 0, x1, y1, x2, y2, u, v, p, q;
+      let temp = 0, dx = 0, dy = 0;
       let cx = target.x - target.dx + 2 * target.dx * i / width;
       let cy = target.y + target.dy - 2 * target.dy * j / height;
-      let c = Complex(cx,cy);
 
-      while (iteration++ < maxIteration && (!preventEscape || z.abs < escapeSqr)) {
-        z = Complex.square(z).plus(c);
-
-        if (colorAlgo > 1) {
-          dz = z.timestiply(dz).timestiply(2);
-        }
+      while (iteration++ < maxIteration && (!preventEscape || x * x + y * y < escapeSqr)) {
+        x1 = x * x - y * y + cx;
+        y1 = 2 * x * y + cy;
+        x2 = x1 * x1 - y1 * y1 + cx;
+        y2 = 2 * x1 * y1 + cy;
+        u = x * x2 - y * y2 - x1 * x1 + y1 * y1;
+        v = x * y2 + x2 * y - 2 * x1 * y1;
+        p = x + x2 - 2 * x1;
+        q = y + y2 - 2 * y1;
+        temp = p * p + q * q;
+        p = p / temp;
+        q = -q / temp;
+        x = u * p - v * q;
+        y = u * q + v * p;
       }
 
-      colorizeNextPixel(iteration - 1, z.abs, z.real, z.imag, dz.real, dz.imag);
+      colorizeNextPixel(iteration - 1, x * x + y * y, x, y, 0, 0);
     }
   }
 }

@@ -15,7 +15,7 @@ function mandelbrot(target, width, height) {
 
       let cc = cx*cx + cy*cy;
       if (!preventEscape || 256 * cc * cc - 96 * cc + 32 * cx - 3 < 0) {
-        colorizeNextPixel(maxIteration-1, cc, cx, cy, dx, dy);
+        colorizeNextPixel(maxIteration, cc, cx, cy, dx, dy);
         continue;
       }
 
@@ -83,14 +83,15 @@ function draw(fractal) {
 function updateSettings() {
   switch (document.getElementById('fractal').selectedIndex) {
     case 0: fractal = mandelbrot; break;
-    case 1: fractal = mandelbrotApprox; break;
-    case 2: if (fractal != drop) { fractal = drop; target = { x: 0, y: 0, dx: 3, dy: 2 } }; break;
-    case 3: if (fractal != eye) { fractal = eye; target = { x: 0, y: 0, dx: 3, dy: 2 } }; break;
-    case 4: if (fractal != necklace) { fractal = necklace; target = { x: 0, y: 0, dx: 3, dy: 2 } }; break;
-    case 5: if (fractal != mandelpinski) { fractal = mandelpinski; target = { x: 0, y: 0, dx: 3, dy: 2 } }; break;
-    case 6: if (fractal != circle) { fractal = circle; target = { x: 0, y: 0, dx: 6, dy: 4 } }; break;
-    case 7: if (fractal != bug) { fractal = bug; target = { x: 0, y: 0, dx: 3, dy: 2 } }; break;
-    case 8: if (fractal != test) { fractal = test; target = { x: 0, y: 0, dx: 3, dy: 2 } }; break;
+    case 1: fractal = mandelbrotDouble; break;
+    case 2: fractal = mandelbrotPerturb; break;
+    case 3: if (fractal != drop) { fractal = drop; target = { x: 0, y: 0, dx: 3, dy: 2 } }; break;
+    case 4: if (fractal != eye) { fractal = eye; target = { x: 0, y: 0, dx: 3, dy: 2 } }; break;
+    case 5: if (fractal != necklace) { fractal = necklace; target = { x: 0, y: 0, dx: 3, dy: 2 } }; break;
+    case 6: if (fractal != mandelpinski) { fractal = mandelpinski; target = { x: 0, y: 0, dx: 3, dy: 2 } }; break;
+    case 7: if (fractal != circle) { fractal = circle; target = { x: 0, y: 0, dx: 6, dy: 4 } }; break;
+    case 8: if (fractal != bug) { fractal = bug; target = { x: 0, y: 0, dx: 3, dy: 2 } }; break;
+    case 9: if (fractal != test) { fractal = test; target = { x: 0, y: 0, dx: 3, dy: 2 } }; break;
     default: window.alert("error");
   }
   maxIteration = parseInt(document.getElementById('maxIteration').value);

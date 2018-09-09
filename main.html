@@ -11,14 +11,15 @@
     <span>Fractal</span>
     <select id="fractal" onchange="updateSettings(); draw(fractal)">
       <option value="0">mandelbrot</option>
-      <option value="1">mandelbrotApprox</option>
-      <option value="2">drop</option>
-      <option value="3">eye</option>
-      <option value="4">necklace</option>
-      <option value="5">mandelpinski</option>
-      <option value="6">circle</option>
-      <option value="7">bug</option>
-      <option value="8">test</option>
+      <option value="1">mandelbrotDouble</option>
+      <option value="2">mandelbrotPerturb</option>
+      <option value="3">drop</option>
+      <option value="4">eye</option>
+      <option value="5">necklace</option>
+      <option value="6">mandelpinski</option>
+      <option value="7">circle</option>
+      <option value="8">bug</option>
+      <option value="9">test</option>
     </select>
     <span>Max iteration:</span>
     <input id="maxIteration" type="number" onchange="updateSettings(); draw(fractal)" style="width: 70px" value="200" step="500">
@@ -60,7 +61,7 @@
   <script src="src/mandelbrot.js"></script>
   <script src="src/events.js"></script>
   <script src="lib/complex.js"></script>
-  <script src="lib/big.js"></script>
+  <script src="lib/double.js"></script>
   <script src="src/spaghettiMonster.js"></script>
 </body>
 </html>
