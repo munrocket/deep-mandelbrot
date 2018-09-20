@@ -37,8 +37,8 @@
     </select>
     <span> Color method</span>
     <select id="colorAlgo" onchange="updateSettings(); draw(fractal)">
-      <option value="0" selected="selected">iteration count</option>
-      <option value="1">smooth iteration count</option>
+      <option value="0">iteration count</option>
+      <option value="1" selected="selected">smooth iteration count</option>
       <option value="2">some distance estimator</option>
       <option value="3">escape angle</option>
       <option value="4">derivative angle</option>
@@ -61,6 +61,8 @@
   <script src="lib/double.js"></script>
   <script src="src/mandelbrot.js"></script>
   <script src="src/events.js"></script>
+  <script src="lib/numeric.min.js"></script>
+  <script src="lib/bfgs.js"></script>
   <script src="src/spaghettiMonster.js"></script>
 </body>
 </html>

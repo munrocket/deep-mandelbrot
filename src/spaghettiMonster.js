@@ -1,22 +1,50 @@
 'use strict';
 
+// with double.js
+function mandelbrotDouble(target, width, height) {
+  pixelColorId = 0;
+  for (let j = 0; j < height; j++) {
+    for (let i = 0; i < width; i++) {
+
+      let iteration = 0, X = D.Zero, Y = D.Zero, XX = D.Zero, XY = D.Zero, YY = D.Zero;
+      let CX = D.add22(D.sub22(D.clone(target.x), target.dx), D.div21(D.mul21(D.clone(target.dx), 2 * i), width));
+      let CY = D.sub22(D.add22(D.clone(target.y), target.dy), D.div21(D.mul21(D.clone(target.dy), 2 * j), height));
+
+      while (iteration++ < maxIteration && (!preventEscape || D.lt21(D.add22(D.clone(XX), YY), escapeSqr))) {
+        X = D.add22(D.sub22(XX, YY), CX);
+        Y = D.add22(D.add22(XY, XY), CY);
+        XX = D.sqr2(D.clone(X)); YY = D.sqr2(D.clone(Y)); XY = D.mul22(X, Y);
+      }
+
+      colorizeNextPixel(iteration - 1, D.add22(XX, YY).toNumber(), X.toNumber(), Y.toNumber());
+    }
+  }
+}
+
 //perturbation theory
 function mandelbrotPerturb(target, width, height) {
   
-  let ox = [target.x], oy = [target.y];
-  let oxox = [ox[0].sqr()], oyoy = [oy[0].sqr()], oxoy = ox[0].mul(oy[0]);
+  let OX = [target.x], OY = [target.y];
+  let OXOX = [OX[0].sqr()], OYOY = [OY[0].sqr()], OXOY = OX[0].mul(OY[0]);
   for (let i = 0; i < maxIteration - 1; i++) {
-    ox.push(oxox[i].sub(oyoy[i]).add(target.x));
-    oy.push(oxoy.add(oxoy).add(target.y));
-    oxox.push(ox[i+1].sqr());
-    oyoy.push(oy[i+1].sqr());
-    oxoy = ox[i+1].mul(oy[i+1]);
+    OX.push(OXOX[i].sub(OYOY[i]).add(target.x));
+    OY.push(OXOY.add(OXOY).add(target.y));
+    OXOX.push(OX[i+1].sqr());
+    OYOY.push(OY[i+1].sqr());
+    OXOY = OX[i+1].mul(OY[i+1]);
+  }
+  let ox = [], oy = [], oxox = [], oyoy = [];
+  for (let i = 0; i < OX.length; i++) {
+    ox[i] = OX[i].toNumber();
+    oy[i] = OY[i].toNumber();
+    oxox[i] = OXOX[i].toNumber();
+    oyoy[i] = OYOY[i].toNumber();
   }
   pixelColorId = 0;
   for (let j = 0; j < height; j++) {
     for (let i = 0; i < width; i++) {
-      let vx = -target.dx + 2 * target.dx * i / width;
-      let vy = target.dy - 2 * target.dy * j / height;
+      let vx = target.dx.neg().add(target.dx.mul(2 * i).div(width)).toNumber();
+      let vy = target.dy.sub(target.dy.mul(2 * j).div(height)).toNumber();
       
       let dx = vx, dy = vy, rr = 0, n = -1;
       let zx, zy, dxdx, dydy, oxdx, oydy, oxn, oyn;
@@ -28,26 +56,6 @@ function mandelbrotPerturb(target, width, height) {
         rr = oxox[n] + oxdx + oxdx + dxdx + oyoy[n] + oydy + oydy + dydy;
       }
       colorizeNextPixel(n - 1, rr, zx, zy, dx, dy);
-    }
-  }
-}
-
-// with double.js
-function mandelbrotDouble(target, width, height) {
-  pixelColorId = 0;
-  for (let j = 0; j < height; j++) {
-    for (let i = 0; i < width; i++) {
-
-      let iteration = 0, X = D.Zero, Y = D.Zero, XX = D.Zero, XY = D.Zero, YY = D.Zero;
-      let CX = D.add22(D.sub22(target.x, target.dx), D.div21(D.mul21(target.dx, 2 * i), width));
-      let CY = D.sub22(D.add22(target.y, target.dy), D.div21(D.mul21(target.dy, 2 * j), height));
-      while (iteration++ < maxIteration && (!preventEscape || D.lt21(D.add22(D.clone(XX), YY), escapeSqr))) {
-        X = D.add22(D.sub22(XX, YY), CX);
-        Y = D.add22(D.add22(XY, XY), CY);
-        XX = D.sqr2(D.clone(X)); YY = D.sqr2(D.clone(Y)); XY = D.mul22(X, Y);
-      }
-
-      colorizeNextPixel(iteration - 1, D.add22(XX, YY).toNumber(), X.toNumber(), Y.toNumber());
     }
   }
 }

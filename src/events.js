@@ -24,8 +24,8 @@ multiEventListener(window, 'mouseup touchend', function(e) {
   let pos = getMousePos(e);
   if (pos && savedMousePos) {
     if (e.button == 2) {
-      D.mul(target.dx, 20);
-      D.mul(target.dy, 20);
+      D.mul21(target.dx, 20);
+      D.mul21(target.dy, 20);
       draw(fractal);
     } else if (e.button == 0) {
       target.x = savedMousePos.x.add(pos.x).div(2);
