@@ -42,7 +42,19 @@ multiEventListener(window, 'mouseup touchend', function(e) {
       }
       draw(fractal);
     } else if (e.button == 1 && document.getElementById('fractal').selectedIndex < 1) {
-      
+      let cx = (savedMousePos.x + pos.x) / 2;
+      let cy = (savedMousePos.y + pos.y) / 2;
+      let ctx = canvas.getContext('2d');
+      ctx.beginPath();
+      ctx.moveTo(((cx - target.x) / target.dx + 1) * canvas.width / 2, ((target.y - cy) / target.dy + 1) * canvas.height / 2);
+      let x = cx, y = cy, xx = x * x, yy = y * y, xy = x * y;
+      for (let i = 0; i < 100 && xx + yy < 4; i++) {
+        x = xx - yy + cx; y = xy + xy + cy;
+        xx = x * x; yy = y * y; xy = x * y;
+        ctx.lineTo(((x - target.x) / target.dx + 1) * canvas.width / 2, ((target.y - y) / target.dy + 1) * canvas.height / 2);
+      }
+      ctx.strokeStyle = '#ff0000';
+      ctx.stroke();
     }
   }
 })

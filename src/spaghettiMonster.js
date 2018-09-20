@@ -38,19 +38,17 @@ function mandelbrotDouble(target, width, height) {
   for (let j = 0; j < height; j++) {
     for (let i = 0; i < width; i++) {
 
-      let iteration = 0, X = [0, 0], Y = [0, 0], XX = [0, 0], XY = [0, 0], YY = [0, 0];
-      let CX = sum22(sum11(target.x, -target.dx), div21(mul11(target.dx, 2 * i), width));
-      let CY = sub22(sum11(target.y, target.dy), div21(mul11(target.dy, 2 * j), height));
-
-      while (iteration++ < maxIteration && (!preventEscape || lt21(sum22(XX, YY), escapeSqr))) {
-        X = sum22(sub22(XX, YY), CX);
-        Y = sum22(mul21pow2(XY, 2), CY);
-        XX = sqr2(X);
-        YY = sqr2(Y);
-        XY = mul22(X, Y);
+      let iteration = 0, X = D.Zero, Y = D.Zero, XX = D.Zero, XY = D.Zero, YY = D.Zero;
+      let TX = new D(target.x), TY = new D(target.y), TDX = new D(target.dx), TDY = new D(target.dy);
+      let CX = D.add22(D.sub22(TX, TDX), D.div21(D.mul21(TDX, 2 * i), width));
+      let CY = D.sub22(D.add22(TY, TDY), D.div21(D.mul21(TDY, 2 * j), height));
+      while (iteration++ < maxIteration && (!preventEscape || D.lt21(D.add22(D.clone(XX), YY), escapeSqr))) {
+        X = D.add22(D.sub22(XX, YY), CX);
+        Y = D.add22(D.add22(XY, XY), CY);
+        XX = D.sqr2(D.clone(X)); YY = D.sqr2(D.clone(Y)); XY = D.mul22(X, Y);
       }
 
-      colorizeNextPixel(iteration - 1, toNumber(sum22(XX, YY)), toNumber(X), toNumber(Y));
+      colorizeNextPixel(iteration - 1, D.add22(XX, YY).toNumber(), X.toNumber(), Y.toNumber());
     }
   }
 }
