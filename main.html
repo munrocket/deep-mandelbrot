@@ -52,15 +52,15 @@
 
   <button type="button" onclick="draw(fractal)">goto</button>
   <span></span>
-  <input id="x" type="number" onchange="target.x = this.value" style="width: 40px" value="-0.5">
+  <input id="x" type="number" onchange="target.x = new D(this.value)" style="width: 40px" value="-0.5">
   <span></span>
-  <input id="y" type="number" onchange="target.y = this.value" style="width: 40px" value="0">
+  <input id="y" type="number" onchange="target.y = new D(this.value)" style="width: 40px" value="0">
   <span></span>
-  <input id="zoom" type="number" onchange="target.dy = 1/this.value; target.dx = 3/2*target.dy" style="width: 40px" value="1">
+  <input id="zoom" type="number" onchange="target.dy = new D(1/this.value); target.dx = new D(3/2*target.dy)" style="width: 40px" value="1">
 
+  <script src="lib/double.js"></script>
   <script src="src/mandelbrot.js"></script>
   <script src="src/events.js"></script>
-  <script src="lib/double.js"></script>
   <script src="src/spaghettiMonster.js"></script>
 </body>
 </html>

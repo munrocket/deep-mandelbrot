@@ -1,7 +1,7 @@
 'use strict';
 
 let fractal, maxIteration, preventEscape, escapeSqr, palette, colorAlgo, colorStep;
-let canvas, image, pixelColorId, savedMousePos, target = { x: -0.5, y: 0, dx: 3, dy: 2 };
+let canvas, image, pixelColorId, savedMousePos, target = { x: new D(-0.5), y: new D(0), dx: new D(3), dy: new D(2) };
 
 function mandelbrot(target, width, height) {
   pixelColorId = 0;
@@ -10,8 +10,8 @@ function mandelbrot(target, width, height) {
 
       let iteration = 0, x = 0, y = 0, xx = 0, xy = 0, yy = 0;
       let temp = 0, dx = 0, dy = 0;
-      let cx = target.x - target.dx + 2 * target.dx * i / width;
-      let cy = target.y + target.dy - 2 * target.dy * j / height;
+      let cx = target.x.sub(target.dx).add(target.dx.mul(2 * i).div(width)).toNumber();
+      let cy = target.y.add(target.dy).sub(target.dy.mul(2 * j).div(height)).toNumber();
 
       let cc = cx*cx + cy*cy;
       if (!preventEscape || 256 * cc * cc - 96 * cc + 32 * cx - 3 < 0) {
@@ -77,7 +77,7 @@ function draw(fractal) {
   context.putImageData(image, 0, 0);
   context.font='10px Verdana';
   context.fillStyle = (!palette) ? '#777' : '#FFF';
-  context.fillText(`(${target.x}, ${target.y}) with ${Math.floor(1.5 / target.dx)}x zoom`, 5, canvas.height - 5);
+  context.fillText(`(${target.x.toNumber()}, ${target.y.toNumber()}) with ${Math.floor(1.5 * target.dx.inv().toNumber())}x zoom`, 5, canvas.height - 5);
 }
 
 function updateSettings() {
@@ -85,13 +85,13 @@ function updateSettings() {
     case 0: fractal = mandelbrot; break;
     case 1: fractal = mandelbrotDouble; break;
     case 2: fractal = mandelbrotPerturb; break;
-    case 3: if (fractal != drop) { fractal = drop; target = { x: 0, y: 0, dx: 3, dy: 2 } }; break;
-    case 4: if (fractal != eye) { fractal = eye; target = { x: 0, y: 0, dx: 3, dy: 2 } }; break;
-    case 5: if (fractal != necklace) { fractal = necklace; target = { x: 0, y: 0, dx: 3, dy: 2 } }; break;
-    case 6: if (fractal != mandelpinski) { fractal = mandelpinski; target = { x: 0, y: 0, dx: 3, dy: 2 } }; break;
-    case 7: if (fractal != circle) { fractal = circle; target = { x: 0, y: 0, dx: 6, dy: 4 } }; break;
-    case 8: if (fractal != bug) { fractal = bug; target = { x: 0, y: 0, dx: 3, dy: 2 } }; break;
-    case 9: if (fractal != test) { fractal = test; target = { x: 0, y: 0, dx: 3, dy: 2 } }; break;
+    case 3: if (fractal != drop) { fractal = drop; target = { x: new D(0), y: new D(0), dx: new D(3), dy: new D(2) } }; break;
+    case 4: if (fractal != eye) { fractal = eye; target = { x: new D(0), y: new D(0), dx: new D(3), dy: new D(2) } }; break;
+    case 5: if (fractal != necklace) { fractal = necklace; target = { x: new D(0), y: new D(0), dx: new D(3), dy: new D(2) } }; break;
+    case 6: if (fractal != mandelpinski) { fractal = mandelpinski; target = { x: new D(0), y: new D(0), dx: new D(3), dy: new D(2) } }; break;
+    case 7: if (fractal != circle) { fractal = circle; target = { x: new D(0), y: new D(0), dx: new D(6), dy: new D(4) } }; break;
+    case 8: if (fractal != bug) { fractal = bug; target = { x: new D(0), y: new D(0), dx: new D(3), dy: new D(2) } }; break;
+    case 9: if (fractal != test) { fractal = test; target = { x: new D(0), y: new D(0), dx: new D(3), dy: new D(2) } }; break;
     default: window.alert("error");
   }
   maxIteration = parseInt(document.getElementById('maxIteration').value);

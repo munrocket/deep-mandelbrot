@@ -4,15 +4,15 @@
 function mandelbrotPerturb(target, width, height) {
   
   let ox = [target.x], oy = [target.y];
-  let oxox = [ox[0] * ox[0]], oyoy = [oy[0] * oy[0]], oxoy = ox[0] * oy[0];
+  let oxox = [ox[0].sqr()], oyoy = [oy[0].sqr()], oxoy = ox[0].mul(oy[0]);
   for (let i = 0; i < maxIteration - 1; i++) {
-    ox.push(oxox[i] - oyoy[i] + target.x);
-    oy.push(oxoy + oxoy + target.y);
-    oxox.push(ox[i+1] * ox[i+1]);
-    oyoy.push(oy[i+1] * oy[i+1]);
-    oxoy = ox[i+1] * oy[i+1];
+    ox.push(oxox[i].sub(oyoy[i]).add(target.x));
+    oy.push(oxoy.add(oxoy).add(target.y));
+    oxox.push(ox[i+1].sqr());
+    oyoy.push(oy[i+1].sqr());
+    oxoy = ox[i+1].mul(oy[i+1]);
   }
-   pixelColorId = 0;
+  pixelColorId = 0;
   for (let j = 0; j < height; j++) {
     for (let i = 0; i < width; i++) {
       let vx = -target.dx + 2 * target.dx * i / width;
@@ -39,9 +39,8 @@ function mandelbrotDouble(target, width, height) {
     for (let i = 0; i < width; i++) {
 
       let iteration = 0, X = D.Zero, Y = D.Zero, XX = D.Zero, XY = D.Zero, YY = D.Zero;
-      let TX = new D(target.x), TY = new D(target.y), TDX = new D(target.dx), TDY = new D(target.dy);
-      let CX = D.add22(D.sub22(TX, TDX), D.div21(D.mul21(TDX, 2 * i), width));
-      let CY = D.sub22(D.add22(TY, TDY), D.div21(D.mul21(TDY, 2 * j), height));
+      let CX = D.add22(D.sub22(target.x, target.dx), D.div21(D.mul21(target.dx, 2 * i), width));
+      let CY = D.sub22(D.add22(target.y, target.dy), D.div21(D.mul21(target.dy, 2 * j), height));
       while (iteration++ < maxIteration && (!preventEscape || D.lt21(D.add22(D.clone(XX), YY), escapeSqr))) {
         X = D.add22(D.sub22(XX, YY), CX);
         Y = D.add22(D.add22(XY, XY), CY);
@@ -61,8 +60,8 @@ function drop(target, width, height) {
 
       let iteration = 0, x = 0, y = 0, xx = 0, xy = 0, yy = 0;
       let temp = 0, dx = 0, dy = 0;
-      let cx = target.x - target.dx + 2 * target.dx * i / width + 1.25;
-      let cy = target.y + target.dy - 2 * target.dy * j / height;
+      let cx = target.x.sub(target.dx).add(target.dx.mul(2 * i).div(width)).toNumber() + 1.25;
+      let cy = target.y.add(target.dy).sub(target.dy.mul(2 * j).div(height)).toNumber();
       temp = cx * cx + cy * cy;
       cx = cx / temp;
       cy = -cy / temp;
@@ -94,8 +93,8 @@ function eye(target, width, height) {
 
       let iteration = 0, x = 0, y = 0, xx = 0, yy = 0;
       let temp = 0, dx = 0, dy = 0;
-      let cx = target.x - target.dx + 2 * target.dx * i / width;
-      let cy = target.y + target.dy - 2 * target.dy * j / height;
+      let cx = target.x.sub(target.dx).add(target.dx.mul(2 * i).div(width)).toNumber();
+      let cy = target.y.add(target.dy).sub(target.dy.mul(2 * j).div(height)).toNumber();
       temp = cx * cx + cy * cy;
       cx = cx / temp;
       cy = -cy / temp;
@@ -127,8 +126,8 @@ function necklace(target, width, height) {
 
       let iteration = 0, x = 0, y = 0, xx = 0, xy = 0, yy = 0;
       let temp = 0, dx = 0, dy = 0;
-      let cx = target.y + target.dy - 2 * target.dy * j / height;
-      let cy = target.x - target.dx + 2 * target.dx * i / width;
+      let cx = target.x.sub(target.dx).add(target.dx.mul(2 * i).div(width)).toNumber();
+      let cy = target.y.add(target.dy).sub(target.dy.mul(2 * j).div(height)).toNumber();
 
       if (true) {
         x = cx; y = cy;
@@ -169,8 +168,8 @@ function mandelpinski(target, width, height) {
 
       let iteration = 0, x = 0, y = 0, xx = 0, xy = 0, yy = 0;
       let temp = 0, dx = 0, dy = 0;
-      let cx = target.y + target.dy - 2 * target.dy * j / height;
-      let cy = target.x - target.dx + 2 * target.dx * i / width;
+      let cx = target.x.sub(target.dx).add(target.dx.mul(2 * i).div(width)).toNumber();
+      let cy = target.y.add(target.dy).sub(target.dy.mul(2 * j).div(height)).toNumber();
 
       if (true) {
         x = cx; y = cy;
@@ -211,8 +210,8 @@ function circle(target, width, height) {
 
       let iteration = 0, x = 0, y = 0, xx = 0, xy = 0, yy = 0;
       let temp = 0, dx = 0, dy = 0;
-      let cx = target.y + target.dy - 2 * target.dy * j / height;
-      let cy = target.x - target.dx + 2 * target.dx * i / width;
+      let cx = target.y.add(target.dy).sub(target.dy.mul(2 * j).div(height)).toNumber();
+      let cy = target.x.sub(target.dx).add(target.dx.mul(2 * i).div(width)).toNumber();
       temp = cx * cx + cy * cy;
       cx = cx / temp - 1;
       cy = -cy / temp;
@@ -244,8 +243,8 @@ function bug(target, width, height) {
 
       let iteration = 0, x = 0, y = 0, xx = 0, xy = 0, yy = 0;
       let temp = 0, dx = 0, dy = 0;
-      let cx = target.x - target.dx + 2 * target.dx * i / width;
-      let cy = target.y + target.dy - 2 * target.dy * j / height;
+      let cx = target.x.add(target.dx).sub(target.dx.mul(2 * i).div(width)).toNumber();
+      let cy = target.y.sub(target.dy).add(target.dy.mul(2 * j).div(height)).toNumber();
       temp = cx * cx + cy * cy;
       cx = cx + 0.03 * cx / temp - 0.9;
       cy = cy - 0.03 * cy / temp;
@@ -276,8 +275,8 @@ function test(target, width, height) {
 
       let iteration = 0, x = 0, y = 0, x1, y1, x2, y2, u, v, p, q;
       let temp = 0, dx = 0, dy = 0;
-      let cx = target.x - target.dx + 2 * target.dx * i / width;
-      let cy = target.y + target.dy - 2 * target.dy * j / height;
+      let cx = target.x.sub(target.dx).add(target.dx.mul(2 * i).div(width)).toNumber();
+      let cy = target.y.add(target.dy).sub(target.dy.mul(2 * j).div(height)).toNumber();
 
       while (iteration++ < maxIteration && (!preventEscape || x * x + y * y < escapeSqr)) {
         x1 = x * x - y * y + cx;
