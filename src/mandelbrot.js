@@ -3,35 +3,27 @@
 let fractal, maxIteration, preventEscape, escapeSqr, palette, colorAlgo, colorStep;
 let canvas, image, pixelColorId, savedMousePos, target = { x: new D(-0.5), y: new D(0), dx: new D(3), dy: new D(2) };
 
+function calc(obj) {
+  obj.x = obj.xx - obj.yy + obj.cx;
+  obj.y = obj.xy + obj.xy + obj.cy;
+  obj.xx = obj.x * obj.x;
+  obj.yy = obj.y * obj.y;
+  obj.xy = obj.x * obj.y;
+
+  let temp = 2 * (obj.x * obj.dx - obj.y * obj.dy) + 1;
+  obj.dy = 2 * (obj.x * obj.dy + obj.y * obj.dx);
+  obj.dx = temp;
+}
+
 function mandelbrot(target, width, height) {
   pixelColorId = 0;
   for (let j = 0; j < height; j++) {
     for (let i = 0; i < width; i++) {
-
-      let iteration = 0, x = 0, y = 0, xx = 0, xy = 0, yy = 0;
-      let temp = 0, dx = 0, dy = 0;
-      let cx = target.x.sub(target.dx).add(target.dx.mul(2 * i).div(width)).toNumber();
-      let cy = target.y.add(target.dy).sub(target.dy.mul(2 * j).div(height)).toNumber();
-
-      let cc = cx*cx + cy*cy;
-      if (!preventEscape || 256 * cc * cc - 96 * cc + 32 * cx - 3 < 0) {
-        colorizeNextPixel(maxIteration, cc, cx, cy, dx, dy);
-        continue;
-      }
-
-      while (iteration++ < maxIteration && (!preventEscape || xx + yy < escapeSqr)) {
-        x = xx - yy + cx;
-        y = xy + xy + cy;
-        xx = x * x;
-        yy = y * y;
-        xy = x * y;
-
-        temp = 2 * (x * dx - y * dy) + 1;
-        dy = 2 * (x * dy + y * dx);
-        dx = temp;
-      }
-
-      colorizeNextPixel(iteration - 1, xx + yy, x, y, dx, dy);
+      let iteration = 0, obj = { x: 0, y: 0, xx: 0, yy: 0, xy:0, dx:0, dy:0 };
+      obj.cx = target.x.sub(target.dx).add(target.dx.mul(2 * i).div(width)).toNumber();
+      obj.cy = target.y.add(target.dy).sub(target.dy.mul(2 * j).div(height)).toNumber();
+      while (iteration++ < maxIteration && (!preventEscape || obj.xx + obj.yy < escapeSqr)) calc(obj)
+      colorizeNextPixel(iteration - 1, obj.xx + obj.yy, obj.x, obj.y, obj.dx, obj.dy);
     }
   }
 }
@@ -85,13 +77,13 @@ function updateSettings() {
     case 0: fractal = mandelbrot; break;
     case 1: fractal = mandelbrotDouble; break;
     case 2: fractal = mandelbrotPerturb; break;
-    case 3: if (fractal != drop) { fractal = drop; target = { x: new D(0), y: new D(0), dx: new D(3), dy: new D(2) } }; break;
-    case 4: if (fractal != eye) { fractal = eye; target = { x: new D(0), y: new D(0), dx: new D(3), dy: new D(2) } }; break;
-    case 5: if (fractal != necklace) { fractal = necklace; target = { x: new D(0), y: new D(0), dx: new D(3), dy: new D(2) } }; break;
-    case 6: if (fractal != mandelpinski) { fractal = mandelpinski; target = { x: new D(0), y: new D(0), dx: new D(3), dy: new D(2) } }; break;
-    case 7: if (fractal != circle) { fractal = circle; target = { x: new D(0), y: new D(0), dx: new D(6), dy: new D(4) } }; break;
-    case 8: if (fractal != bug) { fractal = bug; target = { x: new D(0), y: new D(0), dx: new D(3), dy: new D(2) } }; break;
-    case 9: if (fractal != test) { fractal = test; target = { x: new D(0), y: new D(0), dx: new D(3), dy: new D(2) } }; break;
+    case 3: fractal = mandelbrotApprox; break;
+    case 4: if (fractal != drop) { fractal = drop; target = { x: new D(0), y: new D(0), dx: new D(3), dy: new D(2) } }; break;
+    case 5: if (fractal != eye) { fractal = eye; target = { x: new D(0), y: new D(0), dx: new D(3), dy: new D(2) } }; break;
+    case 6: if (fractal != necklace) { fractal = necklace; target = { x: new D(0), y: new D(0), dx: new D(3), dy: new D(2) } }; break;
+    case 7: if (fractal != mandelpinski) { fractal = mandelpinski; target = { x: new D(0), y: new D(0), dx: new D(3), dy: new D(2) } }; break;
+    case 8: if (fractal != circle) { fractal = circle; target = { x: new D(0), y: new D(0), dx: new D(6), dy: new D(4) } }; break;
+    case 9: if (fractal != bug) { fractal = bug; target = { x: new D(0), y: new D(0), dx: new D(3), dy: new D(2) } }; break;
     default: window.alert("error");
   }
   maxIteration = parseInt(document.getElementById('maxIteration').value);
