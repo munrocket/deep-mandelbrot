@@ -22,9 +22,9 @@
       <option value="9">bug</option>
     </select>
     <span>Max iteration:</span>
-    <input id="maxIteration" type="number" onchange="updateSettings(); draw(fractal)" style="width: 70px" value="200" step="500">
+    <input id="imax" type="number" onchange="updateSettings(); draw(fractal)" style="width: 70px" value="200" step="500">
     <span> Escape radius:</span>
-    <input id="escapeRadius" type="number" onchange="updateSettings(); draw(fractal)" style="width: 70px" value="4">
+    <input id="bailout" type="number" onchange="updateSettings(); draw(fractal)" style="width: 70px" value="4">
     <span> Prevent escape:</span>
     <input id="preventEscape" type="checkbox" onchange="updateSettings(); draw(fractal)" checked>
     <button type="button" onclick="savePng()">Save PNG</button>
@@ -48,7 +48,11 @@
     <input id="colorStep" type="number" onchange="updateSettings(); draw(fractal)" style="width: 70px" value="24">
   </div>
 
-  <canvas id="canvas" width="900" height="600"></canvas><br/>
+  <div class="container"></div>
+    <canvas id="canvas" width="900" height="600"></canvas><br/>
+    <div id="overlay">
+      <div>Time: <span id="time"></span></div>
+    </div>
 
   <button type="button" onclick="draw(fractal)">goto</button>
   <span></span>
@@ -58,11 +62,10 @@
   <span></span>
   <input id="zoom" type="number" onchange="target.dy = new D(1/this.value); target.dx = new D(3/2*target.dy)" style="width: 40px" value="1">
 
+  <script src="https://cdn.jsdelivr.net/npm/twgl.js@4.5.2/dist/4.x/twgl-full.min.js"></script>
   <script src="lib/double.js"></script>
-  <script src="src/mandelbrot.js"></script>
+  <script src="src/render.js"></script>
+  <script src="src/shaders.js"></script>
   <script src="src/events.js"></script>
-  <script src="lib/numeric.min.js"></script>
-  <script src="lib/bfgs.js"></script>
-  <script src="src/spaghettiMonster.js"></script>
 </body>
 </html>

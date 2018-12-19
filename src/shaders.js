@@ -1,5 +1,94 @@
 'use strict';
 
+const vsource = `
+attribute vec3 position;
+void main() {
+  gl_Position = vec4(position, 1.0);
+}`;
+
+const fsource =
+` 
+precision mediump float;
+
+uniform vec2 center;
+uniform vec2 delta;
+uniform vec2 resolution;
+uniform int imax;
+
+void main() {
+  float x, y, xx, yy, xy;
+  vec2 c = center + delta * (gl_FragCoord.xy - resolution / 2.0) / resolution;
+
+  for (int i = 0; i < 100000; i++) {
+    x = xx - yy + c.x;
+    y = xy + xy + c.y;
+
+    xx = x * x;
+    yy = y * y;
+    xy = x * y;
+
+    if (i > imax || xx + yy > 16.0) {
+      float t = min(1.0, (float(i) + 2.0 - log2(log2(xx + yy))) / float(imax + 1));
+      gl_FragColor = vec4(t, t, t, 1);
+      break;
+    }
+  }
+}
+`;
+
+function colorizeNextPixel() {
+  if (preventEscape && iteration == iterations) {
+    image.data[pixelColorId++] = 0; image.data[pixelColorId++] = 0; image.data[pixelColorId++] = 0;
+  } else {
+    switch (colorAlgo) {
+      case 0: color = iteration; break;
+      case 1: color = iteration + 1 + Math.log(logE / Math.log(rr)) / log2; break;
+      case 2: color = -Math.log(Math.sqrt(rr / (dx*dx + dy*dy)) * Math.log(rr)); break;
+      case 3: color = (Math.atan2(y, x) + Math.PI) * 32 / Math.PI; break;
+      case 4: color = (Math.atan2(dy, dx) + Math.PI) * 32 / Math.PI; break;
+      case 5: color = Math.log(dx*dx + dy*dy)/2; break;
+      default: alert("error");
+    }
+    switch (palette) {
+      case 0:
+        let t = (colorStep * color / 256) % 6;
+        image.data[pixelColorId++] = (2 - abs(t-5) + abs(t-4) + abs(t-2) - abs(t-1)) * 110 + 50;
+        image.data[pixelColorId++] = (abs(t-4) - abs(t-3) - abs(t-1) + abs(t)) * 110 + 50;
+        image.data[pixelColorId++] = (abs(t-6) - abs(t-5) - abs(t-3) + abs(t-2)) * 110 + 100;
+        break;
+      case 1:
+        color = 256 * (iterations - (color * colorStep) % iterations) / iterations;
+        image.data[pixelColorId++] = color;  image.data[pixelColorId++] = color;  image.data[pixelColorId++] = color;
+        break;
+      default: alert("error");
+    }
+  }
+  image.data[pixelColorId++] = 255;
+}
+
+function mandelbrot(target, width, height) {
+  pixelColorId = 0;
+  for (let j = 0; j < height; j++) {
+    for (let i = 0; i < width; i++) {
+      let iteration = 0, x = 0, y = 0, xx = 0, yy = 0, xy = 0, dx = 0, dy = 0;
+      cx = target.x.sub(target.dx).add(target.dx.mul(2 * i).div(width)).toNumber();
+      cy = target.y.add(target.dy).sub(target.dy.mul(2 * j).div(height)).toNumber();
+      while (iteration++ < iterations && (!preventEscape || xx + yy < escapeSqr)) {
+        x = xx - yy + cx;
+        y = xy + xy + cy;
+        xx = x * x;
+        yy = y * y;
+        xy = x * y;
+
+        let temp = 2 * (x * dx - y * dy) + 1;
+        dy = 2 * (x * dy + y * dx);
+        dx = temp;
+      }
+      colorizeNextPixel(iteration - 1, xx + yy, x, y, dx, dy);
+    }
+  }
+}
+
 // with double.js
 function mandelbrotDouble(target, width, height) {
   pixelColorId = 0;
@@ -10,7 +99,7 @@ function mandelbrotDouble(target, width, height) {
       let CX = D.add22(D.sub22(D.clone(target.x), target.dx), D.div21(D.mul21(D.clone(target.dx), 2 * j), width));
       let CY = D.sub22(D.add22(D.clone(target.y), target.dy), D.div21(D.mul21(D.clone(target.dy), 2 * i), height));
 
-      while (iteration++ < maxIteration && (!preventEscape || XX.toNumber() + YY.toNumber() < escapeSqr)) {
+      while (iteration++ < iterations && (!preventEscape || XX.toNumber() + YY.toNumber() < escapeSqr)) {
         X = D.add22(D.sub22(XX, YY), CX);
         Y = D.add22(D.add22(XY, XY), CY);
         XX = D.sqr2(D.clone(X)); YY = D.sqr2(D.clone(Y)); XY = D.mul22(X, Y);
@@ -25,7 +114,7 @@ function mandelbrotDouble(target, width, height) {
 function mandelbrotPerturb(target, width, height) {
   let ox = D.Zero, oy = D.Zero, oxox = D.Zero, oyoy = D.Zero, oxoy = D.Zero;
   let OX = [], OY = [], OXOX = [], OYOY = [];
-  for (let i = 0; i < maxIteration; i++) {
+  for (let i = 0; i < iterations; i++) {
     ox = oxox.sub(oyoy).add(target.x); oy = oxoy.add(oxoy).add(target.y);
     oxox = ox.sqr(); oyoy = oy.sqr(); oxoy = ox.mul(oy);
     OX.push(ox.toNumber()); OY.push(oy.toNumber()); OXOX.push(oxox.toNumber()); OYOY.push(oyoy.toNumber());
@@ -47,122 +136,6 @@ function mandelbrotPerturb(target, width, height) {
   }
 }
 
-//series approx
-function mandelbrotApprox(target, width, height) {
-  let approxOrder = 5;
-  let ox = D.Zero, oy = D.Zero, oxox = D.Zero, oyoy = D.Zero, oxoy = D.Zero;
-  let OX = [], OY = [], OXOX = [], OYOY = [];
-  for (let i = 0; i < maxIteration && ox.lt(1e50); i++) {
-    ox = oxox.sub(oyoy).add(target.x); oy = oxoy.add(oxoy).add(target.y);
-    oxox = ox.sqr(); oyoy = oy.sqr(); oxoy = ox.mul(oy);
-    OX.push(ox); OY.push(oy); OXOX.push(oxox); OYOY.push(oyoy);
-  }
-  console.log("1");
-  let CX = [], CY = [];
-  for (let m = 0; m < approxOrder; m++) {
-    CX[m] = (m == 0) ? [D.One] : [D.Zero]; CY[m] = [D.Zero];
-  }
-  for (let i = 0; i < OX.length; i++) {
-    let ox = OX[i], oy = OY[i];
-    for (let m = approxOrder - 1; m >= 0; m--) {
-      let cx = CX[m][i], cy = CX[m][i], temp;
-      temp = ox.mul(cx).sub(oy.mul(cy)).mul(2);
-      cy = ox.mul(cy).add(oy.mul(cx)).mul(2); cx = temp;
-      if (m == 1) cx = cx.add(1);
-      for (let k = 0; k < m - 1; k++) {
-        temp = cx.add(CX[k][i].mul(CX[approxOrder - k - 1][i]).sub(CY[k][i].mul(CY[approxOrder - k - 1][i])));
-        cy = cy.add(CX[k][i].mul(CY[approxOrder - k - 1][i]).add(CY[k][i].mul(CX[approxOrder - k - 1][i]))); cx = temp;
-      }
-      CX[m].push(cx); CY[m].push(cy);
-    }
-  }
-  console.log("2");
-  for (let i = 0; i < OX.length; i++) {
-    OX[i] = OX[i].toNumber(); OY[i] = OY[i].toNumber();
-    OXOX[i] = OXOX[i].toNumber(); OYOY[i] = OYOY[i].toNumber();
-    for (let m = 0; m < approxOrder; m++) {
-      CX[m][i] = CX[m][i].toNumber(); CY[m][i] = CY[m][i].toNumber();
-    }
-  }
-  console.log("ox, cx", OX, CX);
-  pixelColorId = 0;
-  for (let i = 0; i < height; i++) {
-    for (let j = 0; j < width; j++) {
-      let VX = [target.dx.neg().add(target.dx.mul(2 * j).div(width))];
-      let VY = [target.dy.sub(target.dy.mul(2 * i).div(height))];
-      for (let m = 0; m < approxOrder-1; m++) {
-        VX.push(VX[m].sqr().sub(VY[m].sqr()));
-        VY.push(VX[m].mul(VY[m]).mul(2));
-      }
-      for (let m = 0; m < approxOrder; m++) {
-        VX[m] = VX[m].toNumber(); VY[m] = VY[m].toNumber();
-      }
-      let n, rr = 0, dx = 0, dy = 0;
-      for (n = 0; n < OX.length && rr < escapeSqr; n++) {
-        for (let m = 0; m < approxOrder; m++) {
-          dx += CX[m][n] * VX[m] - CX[m][n] * VY[m];
-          dy += CX[m][n] * VY[m] + CX[m][n] * VX[m];
-        }
-        rr = OXOX[n] + OYOY[n] + 2 * (OX[n] * dx + OY[n] * dy) + dx * dx + dy * dy;
-      }
-      colorizeNextPixel(n, rr, OX[n] + dx, OY[n] + dy, dx, dy);
-    }
-  }
-  console.log("3")
-}
-
-// //series approx
-// function mandelbrotApprox(target, width, height) {
-//   let ox = D.Zero, oy = D.Zero, oxox = D.Zero, oyoy = D.Zero, oxoy = D.Zero;
-//   let OX = [], OY = [], OXOX = [], OYOY = [];
-//   for (let i = 0; i < maxIteration; i++) {
-//     ox = oxox.sub(oyoy).add(target.x); oy = oxoy.add(oxoy).add(target.y);
-//     oxox = ox.sqr(); oyoy = oy.sqr(); oxoy = ox.mul(oy);
-//     OX.push(ox); OY.push(oy); OXOX.push(oxox.toNumber()); OYOY.push(oyoy.toNumber());
-//   }
-//   let ax = D.Zero, ay = ax, bx = ax, by = ax, cx = ax, cy = ax, dx = ax, dy = ax, temp;
-//   let AX = [], AY = [], BX = [], BY = [], CX = [], CY = [], DX = [], DY = [];
-//   for (let i = 0; i < maxIteration-1; i++) {
-//     let ox = OX[i], oy = OY[i];
-//     temp = ox.mul(dx).sub(oy.mul(dy)).add(ax.mul(cx)).sub(ay.mul(cy)).mul(2).add(bx.sqr().sub(by.sqr()));
-//     dy = ox.mul(dy).add(oy.mul(dx)).add(ax.mul(cy)).add(ay.mul(cx)).add(bx.mul(by)).mul(2); dx = temp;
-//     temp = ox.mul(cx).sub(oy.mul(cy)).add(ax.mul(bx)).sub(ay.mul(by)).mul(2);
-//     cy = ox.mul(cy).add(oy.mul(cx)).add(ax.mul(by)).add(ay.mul(bx)).mul(2); cx = temp;
-//     temp = ox.mul(bx).sub(oy.mul(by)).mul(2).add(ax.sqr()).sub(ay.sqr());
-//     by = ox.mul(by).add(oy.mul(bx)).add(ax.mul(ay)).mul(2); bx = temp;
-//     temp = (ox.mul(ax).sub(oy.mul(ay))).mul(2).add(1);
-//     ay = ox.mul(ay).add((oy).mul(ax)).mul(2); ax = temp;
-//     AX.push(ax.toNumber()); AY.push (ay.toNumber());
-//     BX.push(bx.toNumber()); BY.push(by.toNumber());
-//     CX.push(cx.toNumber()); CY.push(cy.toNumber());
-//     DX.push(dx.toNumber()); DY.push(dy.toNumber());
-//     OX[i] = ox.toNumber(); OY[i] = oy.toNumber();
-//   }
-//   console.log("AX,BX,CX,DX",AX,BX,CX,DX);
-//   pixelColorId = 0;
-//   for (let i = 0; i < height; i++) {
-//     for (let j = 0; j < width; j++) {
-//       let vx = target.dx.neg().add(target.dx.mul(2 * j).div(width));
-//       let vy = target.dy.sub(target.dy.mul(2 * i).div(height));
-//       let vx2 = vx.sqr().sub(vy.sqr()), vy2 = vx.mul(vy).mul(2);
-//       let vx3 = vx.mul(vx2).sub(vy.mul(vy2)), vy3 = vx.mul(vy2).add(vy.mul(vx2));
-//       let vx4 = vx2.sqr().sub(vy2.sqr()), vy4 = vx2.mul(vy2).mul(2);
-//       vx = vx.toNumber(); vy = vy.toNumber(); vx2 = vx2.toNumber(); vy2 = vy2.toNumber();
-//       vx3 = vx3.toNumber(); vy3 = vy3.toNumber(); vx4 = vx4.toNumber(); vy4 = vy4.toNumber();
-//       let rr = 0, n, dx, dy, zx, zy;
-//       for(n = 0; n < maxIteration && rr < escapeSqr; n++) {
-//         dx = AX[n] * vx - AY[n] * vy + BX[n] * vx2 - BY[n] * vy2 + CX[n] * vx3 - CY[n] * vy3 + DX[n] * vx4 - DX[n] * vy4;
-//         dy = AX[n] * vy + AY[n] * vx + BX[n] * vy2 + BY[n] * vx2 + CX[n] * vy3 + CY[n] * vx3 + DX[n] * vy4 + DX[n] * vx4;
-//         zx = OX[n + 1] + 2 * (OX[n] * dx - OY[n] * dy) + dx * dx - dy * dy + vx;
-//         zy = OY[n + 1] + 2 * (OX[n] * dy + OY[n] * dx) + dx * dy + dy * dx + vy;
-//         rr = zx * zx + zy * zy;
-//       }
-//       colorizeNextPixel(n, rr, OX[n] + dx, OY[n] + dy, dx, dy);
-//     }
-//   }
-//   console.log("3")
-// }
-
 //z -> z^2 + 1/c
 function drop(target, width, height) {
   pixelColorId = 0;
@@ -177,7 +150,7 @@ function drop(target, width, height) {
       cx = cx / temp;
       cy = -cy / temp;
 
-      while (iteration++ < maxIteration && (!preventEscape || xx + yy < escapeSqr)) {
+      while (iteration++ < iterations && (!preventEscape || xx + yy < escapeSqr)) {
         x = xx - yy + cx;
         y = xy + xy + cy;
         xx = x * x;
@@ -210,7 +183,7 @@ function eye(target, width, height) {
       cx = cx / temp;
       cy = -cy / temp;
 
-      while (iteration++ < maxIteration && (!preventEscape || xx + yy < escapeSqr)) {
+      while (iteration++ < iterations && (!preventEscape || xx + yy < escapeSqr)) {
         temp = (xx - 3 * yy) * x + cx;
         y = 3 * xx * y - yy * y + cy;
         x = temp;
@@ -246,7 +219,7 @@ function necklace(target, width, height) {
         cx = -2; cy = 2;
       }
 
-      while (iteration++ < maxIteration && (!preventEscape || xx + yy < escapeSqr)) {
+      while (iteration++ < iterations && (!preventEscape || xx + yy < escapeSqr)) {
         temp = (xx - 3 * yy) * x;
         y = 3 * xx * y - yy * y;
         x = temp;
@@ -288,7 +261,7 @@ function mandelpinski(target, width, height) {
         cx = 100; cy = 0;
       }
 
-      while (iteration++ < maxIteration && (!preventEscape || xx + yy < escapeSqr)) {
+      while (iteration++ < iterations && (!preventEscape || xx + yy < escapeSqr)) {
         // temp = (xx - 3 * yy) * x;
         // y = 3 * xx * y - yy * y;
         // x = temp;
@@ -327,7 +300,7 @@ function circle(target, width, height) {
       cx = cx / temp - 1;
       cy = -cy / temp;
 
-      while (iteration++ < maxIteration && (!preventEscape || xx + yy < escapeSqr)) {
+      while (iteration++ < iterations && (!preventEscape || xx + yy < escapeSqr)) {
         x = (xx - yy) + cx;
         y = (xy + xy) + cy;
         xx = x * x;
@@ -360,7 +333,7 @@ function bug(target, width, height) {
       cx = cx + 0.03 * cx / temp - 0.9;
       cy = cy - 0.03 * cy / temp;
 
-      while (iteration++ < maxIteration && (!preventEscape || xx + yy < escapeSqr)) {
+      while (iteration++ < iterations && (!preventEscape || xx + yy < escapeSqr)) {
         x = xx - yy + cx;
         y = xy + xy + cy;
         xx = x * x;
@@ -389,7 +362,7 @@ function test(target, width, height) {
       let cx = target.x.sub(target.dx).add(target.dx.mul(2 * j).div(width)).toNumber();
       let cy = target.y.add(target.dy).sub(target.dy.mul(2 * i).div(height)).toNumber();
 
-      while (iteration++ < maxIteration && (!preventEscape || x * x + y * y < escapeSqr)) {
+      while (iteration++ < iterations && (!preventEscape || x * x + y * y < escapeSqr)) {
         x1 = x * x - y * y + cx;
         y1 = 2 * x * y + cy;
         x2 = x1 * x1 - y1 * y1 + cx;
@@ -409,3 +382,68 @@ function test(target, width, height) {
     }
   }
 }
+
+const trash =
+`
+precision mediump float;
+#define PI 3.141592653589793238;
+#define E 2.718281828459045235;
+
+uniform int iterations;
+uniform int palette;
+uniform int colorAlgo;
+uniform int colorStep;
+uniform int preventEscape;
+uniform float escapeSqr;
+
+uniform vec2 resolution;
+uniform vec2 center;
+uniform vec2 delta;
+
+void colorizePixel(int iter, vec2 z, vec2 dz) {
+  // vec3 rgb = vec3(0.0);
+  // float param;
+  // if (iter != iterations || preventEscape != 0) {
+  //   if (colorAlgo == 1) { param = iter + 1 + log(log(E) / log(dot(z, z))) / log(2); }
+  //   else if (colorAlgo == 2) { param = -log(sqrt(dot(z, z) / (dot(dz, dz)) * log(dot(z, z))); }
+  //   else if (colorAlgo == 3) { param = (atan(z) + PI) * 32 / PI; }
+  //   else if (colorAlgo == 4) { param = (atan(dz) + PI) * 32 / PI; }
+  //   else if (colorAlgo == 5) { param = log(dot(dz, dz)) / 2; };
+  //   else param = iter;
+
+  //   if (palette == 0) {
+  //     float t = (colorStep * param / 256) % 6;
+  //     rgb.x = (2 - abs(t-5) + abs(t-4) + abs(t-2) - abs(t-1)) * 110 + 50;
+  //     rgb.y = (abs(t-4) - abs(t-3) - abs(t-1) + abs(t)) * 110 + 50;
+  //     rgb.z = (abs(t-6) - abs(t-5) - abs(t-3) + abs(t-2)) * 110 + 100;
+  //   } else if {
+  //     rgb = vec3((iterations - floor(param * colorStep)) % iterations) / iterations);
+  //   };
+  // };
+  //gl_FragColor = vec4(rgb, 1);
+  gl_FragColor = vec4(vec3(float(iter) / float(iterations)), 1);
+}
+
+void main() {
+  float x = 0.0, y = 0.0, xx = 0.0, yy = 0.0, xy = 0.0, dx = 0.0, dy = 0.0, temp;
+  vec2 c = center + delta * (gl_FragCoord.xy - canvas / 2.0) / canvas;
+
+  for (int i = 0; i < 256; i++) {
+    x = xx - yy + c.x;
+    y = xy + xy + c.y;
+
+    temp = 2.0 * (x * dx - y * dy) + 1.0;
+    dy = 2.0 * (x * dy + y * dx);
+    dx = temp;
+
+    xx = x * x;
+    yy = y * y;
+    xy = x * y;
+
+    if (i > iterations || xx + yy > escapeSqr) {
+      colorizePixel(i, vec2(x, y), vec2(dx, dy));
+      break;
+    }
+  }
+}
+`;

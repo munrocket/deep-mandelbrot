@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Simple example</title>
+</head>
+<body>
+<canvas id="canvasgl"></canvas>
+<script src="https://cdn.jsdelivr.net/npm/twgl.js@4.5.2/dist/4.x/twgl-full.min.js"></script>
+<script>
+  'use strict';
+  const vsource = `
+    attribute vec3 position;
+    void main() {
+        gl_Position = vec4(position, 1);
+    }`;
+  const fsource = `
+    precision mediump float;
+
+    uniform vec2 center;
+    uniform vec2 delta;
+    uniform vec2 resolution;
+    const int imax = 32;
+    
+    void main() {
+      float x, y, xx = 0.0, yy = 0.0, xy = 0.0;
+      vec2 c = center + delta * (2.0 * gl_FragCoord.xy - resolution) / resolution;
+
+      for (int i = 0; i < imax; i++) {
+        x = xx - yy + c.x;
+        y = xy + xy + c.y;
+        xx = x * x;
+        yy = y * y;
+        xy = x * y;
+
+        if (xx + yy > 4.0) {
+          float t = float(i) / float(imax);
+          gl_FragColor = vec4(t, 0, t, 1);
+          break;
+        }
+      }
+    }`;
+  const gl = document.getElementById('canvasgl').getContext('webgl');
+  const programInfo = twgl.createProgramInfo(gl, [vsource, fsource]);
+
+  const arrays = { position: [-1, 1, 0, 1, 1, 0, 1, -1, 0, 1, -1, 0, -1, -1, 0, -1, 1, 0] };
+  const bufferInfo = twgl.createBufferInfoFromArrays(gl, arrays);
+
+  twgl.resizeCanvasToDisplaySize(gl.canvas);
+  gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+
+  const uniforms = {
+    center: [-0.5, 0],
+    delta: [1.75, 1],
+    resolution: [gl.canvas.width, gl.canvas.height],
+  };
+
+  gl.useProgram(programInfo.program);
+  twgl.setBuffersAndAttributes(gl, programInfo, bufferInfo);
+  twgl.setUniforms(programInfo, uniforms);
+  twgl.drawBufferInfo(gl, bufferInfo);
+</script>
+</body>
+</html>

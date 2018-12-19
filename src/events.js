@@ -1,5 +1,7 @@
 'use strict';
 
+let savedMousePos;
+
 function getMousePos(e) {
   let rect = canvas.getBoundingClientRect();
   let pos = { x: target.x.sub(target.dx).add(target.dx.mul(2 * (e.clientX - rect.left)).div(canvas.width)),
@@ -26,7 +28,7 @@ multiEventListener(window, 'mouseup touchend', function(e) {
     if (e.button == 2) {
       D.mul21(target.dx, 20);
       D.mul21(target.dy, 20);
-      draw(fractal);
+      draw();
     } else if (e.button == 0) {
       target.x = savedMousePos.x.add(pos.x).div(2);
       target.y = savedMousePos.y.add(pos.y).div(2);
@@ -40,7 +42,7 @@ multiEventListener(window, 'mouseup touchend', function(e) {
       } else {
         target.dy = target.dx.div(ratio);
       }
-      draw(fractal);
+      draw();
     } else if (e.button == 1 && document.getElementById('fractal').selectedIndex < 1) {
       let cx = savedMousePos.x.add(pos.x).div(2).toNumber();
       let cy = savedMousePos.y.add(pos.y).div(2).toNumber();
