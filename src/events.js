@@ -1,6 +1,7 @@
 'use strict';
 
 let savedMousePos;
+let ticking = false;
 
 function getMousePos(e) {
   let rect = canvas.getBoundingClientRect();
@@ -11,31 +12,35 @@ function getMousePos(e) {
   return pos;
 }
 
-function multiEventListener(element, eventNames, action) {
-  let events = eventNames.split(' ');
-  for (let i = 0; i < events.length; i++) {
-    element.addEventListener(events[i], action, false);
+window.addEventListener('scroll', function(e) {
+  if (!ticking) {
+    ticking = true;
+
+    ticking = false;
   }
-}
+}, false);
 
-multiEventListener(window, 'mousedown touchstart', function(e) {
+
+window.addEventListener('mousedown', function(e) {
   savedMousePos = getMousePos(e);
-})
+}, false);
 
-multiEventListener(window, 'mouseup touchend', function(e) {
+window.addEventListener('mouseup', function(e) {
   let pos = getMousePos(e);
   if (pos && savedMousePos) {
     if (e.button == 2) {
-      D.mul21(target.dx, 20);
-      D.mul21(target.dy, 20);
+      //right button
+      target.dx.mul(5);
+      target.dy.mul(5);
       draw();
     } else if (e.button == 0) {
+      //left button
       target.x = savedMousePos.x.add(pos.x).div(2);
       target.y = savedMousePos.y.add(pos.y).div(2);
       let dx = savedMousePos.x.sub(pos.x).abs().div(2);
       let dy = savedMousePos.y.sub(pos.y).abs().div(2);
-      target.dx = (dx.div(target.dx).gt(0.05)) ? dx : target.dx.div(20);
-      target.dy = (dy.div(target.dy).gt(0.05)) ? dy : target.dy.div(20);
+      target.dx = (dx.div(target.dx).gt(0.05)) ? dx : target.dx.div(5);
+      target.dy = (dy.div(target.dy).gt(0.05)) ? dy : target.dy.div(5);
       let ratio = canvas.width / canvas.height;
       if (ratio > target.dx / target.dy) {
         target.dx = target.dy.mul(ratio);
@@ -44,6 +49,7 @@ multiEventListener(window, 'mouseup touchend', function(e) {
       }
       draw();
     } else if (e.button == 1 && document.getElementById('fractal').selectedIndex < 1) {
+      //scroll button
       let cx = savedMousePos.x.add(pos.x).div(2).toNumber();
       let cy = savedMousePos.y.add(pos.y).div(2).toNumber();
       let ctx = canvas.getContext('2d');
@@ -61,7 +67,11 @@ multiEventListener(window, 'mouseup touchend', function(e) {
       ctx.stroke();
     }
   }
-})
+}, false);
+
+window.addEventListener('scroll', function(e) {
+  
+}, false);
 
 function savePng() {
   var a  = document.createElement('a');

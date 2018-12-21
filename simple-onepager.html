@@ -17,16 +17,17 @@
         gl_Position = vec4(position, 1);
     }`;
   const fsource = `
+    #define bailout 16.0
     precision mediump float;
 
     uniform vec2 center;
-    uniform vec2 delta;
+    uniform vec2 size;
     uniform vec2 resolution;
     const int imax = 32;
     
     void main() {
-      float x, y, xx = 0.0, yy = 0.0, xy = 0.0;
-      vec2 c = center + delta * (2.0 * gl_FragCoord.xy - resolution) / resolution;
+      float x, y, xx = 0.0, yy = 0.0, xy = 0.0, t = 0.0;
+      vec2 c = center + size * (gl_FragCoord.xy / resolution - 0.5);
 
       for (int i = 0; i < imax; i++) {
         x = xx - yy + c.x;
@@ -35,12 +36,11 @@
         yy = y * y;
         xy = x * y;
 
-        if (xx + yy > 4.0) {
-          float t = float(i) / float(imax);
-          gl_FragColor = vec4(t, 0, t, 1);
-          break;
-        }
+        if (xx + yy > bailout) break;
+        else { t += 1.0; }
       }
+      t = min(1.0, (t + 1.0 + log2(log2(bailout) / log2(xx + yy))) / float(imax));
+      gl_FragColor = vec4(t, t, t, 1.0);
     }`;
   const gl = document.getElementById('canvasgl').getContext('webgl');
   const programInfo = twgl.createProgramInfo(gl, [vsource, fsource]);
@@ -53,7 +53,7 @@
 
   const uniforms = {
     center: [-0.5, 0],
-    delta: [1.75, 1],
+    size: [4, 2],
     resolution: [gl.canvas.width, gl.canvas.height],
   };
 
