@@ -1,25 +1,14 @@
 'use strict';
 
 let savedMousePos;
-let ticking = false;
+let canvas = document.getElementById('canvasgl');
 
 function getMousePos(e) {
   let rect = canvas.getBoundingClientRect();
-  let pos = { x: target.x.sub(target.dx).add(target.dx.mul(2 * (e.clientX - rect.left)).div(canvas.width)),
-              y: target.y.add(target.dy).sub(target.dy.mul(2 * (e.clientY - rect.top)).div(canvas.height)) };
-  if (target.x.sub(target.dx).gt(pos.x) || target.x.add(target.dx).lt(pos.x)) return null;
-  if (target.y.sub(target.dy).gt(pos.y) || target.y.add(target.dy).lt(pos.y)) return null;
+  let pos = { x: target.x.add(target.hx.mul(2 * (e.clientX - rect.left) / canvas.width - 1)),
+              y: target.y.sub(target.hy.mul(2 * (e.clientY - rect.top) / canvas.height - 1)) };
   return pos;
 }
-
-window.addEventListener('scroll', function(e) {
-  if (!ticking) {
-    ticking = true;
-
-    ticking = false;
-  }
-}, false);
-
 
 window.addEventListener('mousedown', function(e) {
   savedMousePos = getMousePos(e);
@@ -28,58 +17,66 @@ window.addEventListener('mousedown', function(e) {
 window.addEventListener('mouseup', function(e) {
   let pos = getMousePos(e);
   if (pos && savedMousePos) {
-    if (e.button == 2) {
-      //right button
-      target.dx.mul(5);
-      target.dy.mul(5);
-      draw();
-    } else if (e.button == 0) {
-      //left button
+    if (e.button == 0) {
+      //left button (zoom in)
       target.x = savedMousePos.x.add(pos.x).div(2);
       target.y = savedMousePos.y.add(pos.y).div(2);
-      let dx = savedMousePos.x.sub(pos.x).abs().div(2);
-      let dy = savedMousePos.y.sub(pos.y).abs().div(2);
-      target.dx = (dx.div(target.dx).gt(0.05)) ? dx : target.dx.div(5);
-      target.dy = (dy.div(target.dy).gt(0.05)) ? dy : target.dy.div(5);
+      let hx = savedMousePos.x.sub(pos.x).abs().div(2);
+      let hy = savedMousePos.y.sub(pos.y).abs().div(2);
+      target.hx = (hx.div(target.hx).gt(0.05)) ? hx : target.hx.div(20);
+      target.hy = (hy.div(target.hy).gt(0.05)) ? hy : target.hy.div(20);
       let ratio = canvas.width / canvas.height;
-      if (ratio > target.dx / target.dy) {
-        target.dx = target.dy.mul(ratio);
+      if (ratio > target.hx / target.hy) {
+        target.hx = target.hy.mul(ratio);
       } else {
-        target.dy = target.dx.div(ratio);
+        target.hy = target.hx.div(ratio);
       }
       draw();
-    } else if (e.button == 1 && document.getElementById('fractal').selectedIndex < 1) {
-      //scroll button
-      let cx = savedMousePos.x.add(pos.x).div(2).toNumber();
-      let cy = savedMousePos.y.add(pos.y).div(2).toNumber();
-      let ctx = canvas.getContext('2d');
-      ctx.beginPath();
-      ctx.moveTo(((cx - target.x.toNumber()) / target.dx.toNumber() + 1) * canvas.width / 2,
-                ((target.y.toNumber() - cy) / target.dy.toNumber() + 1) * canvas.height / 2);
-      let x = cx, y = cy, xx = x * x, yy = y * y, xy = x * y;
-      for (let i = 0; i < 100 && xx + yy < 4; i++) {
-        x = xx - yy + cx; y = xy + xy + cy;
-        xx = x * x; yy = y * y; xy = x * y;
-        ctx.lineTo(((x - target.x.toNumber()) / target.dx.toNumber() + 1) * canvas.width / 2,
-                  ((target.y.toNumber() - y) / target.dy.toNumber() + 1) * canvas.height / 2);
-      }
-      ctx.strokeStyle = '#ff0000';
-      ctx.stroke();
+    } else if (e.button == 2) {
+      //right button (zoom out)
+      target.hx = target.hx.mul(20);
+      target.hy = target.hy.mul(20);
+      draw();
+    } else if (e.button == 1) {
+      //scroll button (draw orbit)
+      let zx = savedMousePos.x.add(pos.x).div(20).toNumber();
+      let zy = savedMousePos.y.add(pos.y).div(20).toNumber();
+      let orbit = calcOrbit([zx, zy]);
+      // let ctx = canvas.getContext('2d');
+      // ctx.beginPath();
+      // for (let i = 0; i < imax; i++) {
+      //   ctx.moveTo(((orbit.x[i] - target.x.toNumber()) / target.hx.toNumber() + 1) / 2 * canvas.width,
+      //             ((target.y.toNumber() - orbit.y[i]) / target.hy.toNumber() + 1) / 2 * canvas.height);
+      // }
+      // ctx.strokeStyle = '#ff0000';
+      // ctx.stroke();
     }
   }
 }, false);
 
-window.addEventListener('scroll', function(e) {
+document.addEventListener("wheel", function (e) {
+  var oldVal = parseInt(document.getElementById("body").style.transform.replace("translateY(","").replace("px)",""));
+  var variation = parseInt(e.deltaY);
   
-}, false);
+  // update the body translation to simulate a scroll
+  document.getElementById("body").style.transform = "translateY(" + (oldVal - variation) + "px)";
+
+  return false;
+  
+}, true);
 
 function savePng() {
   var a  = document.createElement('a');
   a.href = canvas.toDataURL('png');
-  a.download = `mandelbrot_${target.x.toNumber()}_${target.y.toNumber()})_${Math.floor(1.5 * target.dx.inv().toNumber())}x.png`;
+  a.download = `mandelbrot_${target.x.toNumber()}_${target.y.toNumber()})_${Math.floor(1.5 * target.hx.inv().toNumber())}x.png`;
   a.click();
 }
 
-document.getElementById('canvas').addEventListener('contextmenu', function(evt) { 
+canvas.addEventListener('contextmenu', function(evt) { 
   evt.preventDefault();
 }, false);
+
+window.onload = function() {
+  
+  draw(fractal);
+};

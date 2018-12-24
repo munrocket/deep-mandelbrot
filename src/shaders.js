@@ -1,9 +1,9 @@
 'use strict';
 
 const vsource = `
-attribute vec3 position;
+attribute vec2 position;
 void main() {
-  gl_Position = vec4(position, 1.0);
+  gl_Position = vec4(position, 0.0, 1.0);
 }`;
 
 const fsource =
@@ -11,19 +11,19 @@ const fsource =
 #define imax 200
 #define bailout 16.0
 #define logB log2(bailout)
-
-precision mediump float;
+precision highp float;
 
 uniform vec2 center;
 uniform vec2 size;
 uniform vec2 resolution;
+
 uniform float ox[imax];
 uniform float oy[imax];
 uniform float oxx[imax];
 uniform float oyy[imax];
 
 void main() {
-  vec2 d = size * (gl_FragCoord.xy / resolution - 0.5);//center - vec2(ox[0], ox[0]) + 
+  vec2 d = center - vec2(ox[0], oy[0]) + size * (gl_FragCoord.xy / resolution - 0.5);
   float u = d.x, v = d.y, uu, vv, xu, yv, xv, yu, zz, param;
 
   for (int i = 0; i < imax; i++) {
