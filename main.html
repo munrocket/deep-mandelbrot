@@ -19,53 +19,16 @@
 </head>
 <body>
   <div>
-    <span>Fractal</span>
-    <select id="fractal" onchange="updateSettings(); draw(fractal)">
-      <option value="0">mandelbrot</option>
-      <option value="1">mandelbrotDouble</option>
-      <option value="2">mandelbrotPerturb</option>
-      <option value="3">mandelbrotApprox</option>
-      <option value="4">drop</option>
-      <option value="5">eye</option>
-      <option value="6">necklace</option>
-      <option value="7">mandelpinski</option>
-      <option value="8">circle</option>
-      <option value="9">bug</option>
-    </select>
-    <span>Max iteration:</span>
-    <input id="imax" type="number" onchange="updateSettings(); draw()" style="width: 70px" value="200" step="500">
-    <span> Escape radius:</span>
-    <input id="bailout" type="number" onchange="updateSettings(); draw()" style="width: 70px" value="4">
-    <span> Prevent escape:</span>
-    <input id="preventEscape" type="checkbox" onchange="updateSettings(); draw()" checked>
+    <span>
+        <button type="button" onclick="draw()">goto:</button>
+        <span></span>
+        <input id="x" type="number" onchange="target.x = new D(this.value)" style="width: 40px" value="-0.5">
+        <span></span>
+        <input id="y" type="number" onchange="target.y = new D(this.value)" style="width: 40px" value="0">
+        <span></span>
+        <input id="zoom" type="number" onchange="target.dy = new D(1/this.value); target.dx = new D(3/2*target.dy)" style="width: 40px" value="1">
+      </span>
     <button type="button" style="float: right;" onclick="savePng()">Save PNG</button>
-  </div>
-  <div>
-    <span> Color palette:</span>
-    <select id="palette" onchange="updateSettings(); draw()">
-      <option value="0" selected="selected">hsv, cycle</option>
-      <option value="1">grey, repeat</option>
-    </select>
-    <span> Color method</span>
-    <select id="colorAlgo" onchange="updateSettings(); draw()">
-      <option value="0">iteration count</option>
-      <option value="1" selected="selected">smooth iteration count</option>
-      <option value="2">some distance estimator</option>
-      <option value="3">escape angle</option>
-      <option value="4">derivative angle</option>
-      <option value="5">derivative norm</option>
-    </select>
-    <span> Color step:</span>
-    <input id="colorStep" type="number" onchange="draw()" style="width: 70px" value="24">
-    <span style="float: right;">
-      <button type="button" onclick="draw()">goto:</button>
-      <span></span>
-      <input id="x" type="number" onchange="target.x = new D(this.value)" style="width: 40px" value="-0.5">
-      <span></span>
-      <input id="y" type="number" onchange="target.y = new D(this.value)" style="width: 40px" value="0">
-      <span></span>
-      <input id="zoom" type="number" onchange="target.dy = new D(1/this.value); target.dx = new D(3/2*target.dy)" style="width: 40px" value="1">
-    </span>
   </div>
 
   <canvas id="canvasgl"></canvas>

@@ -4,13 +4,17 @@ Simple version of famous fractal in [web page](http://htmlpreview.github.io/?htt
 
 ### Features
 
-- [X] Zoom in / zoom out
-- [X] 2 color pallete + 5 colorizing algorithm
-- [X] Optimization with algebra
+- [X] Deep zoom (beta version 10^-31)
+- [X] Webgl parallel processing
+- [X] Double.js float
 - [X] Perturbation theory
-- [X] Double float
+- [X] Brute force for reference orbit
 
-![](https://i.imgur.com/BQWzSYr.png)
+### 2do
+- [ ] Increase max iteration (pack orbit in texture)
+- [ ] Use another arbitrary float library for deeper zoom
+- [ ] Color palettes and schemes
+- [ ] Cute UI
 
 ### References
 

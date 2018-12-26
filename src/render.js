@@ -3,16 +3,16 @@ let fractal, target = { x: new D(-0.6), y: new D(0), hx: new D(1.5), hy: new D(1
 let imax = 200;
 
 function calcOrbit(z) {
-  let X, Y, XX = D.Zero, YY = D.Zero, XY = D.Zero;
-  let x = [], y = [], xx = [], yy = [];
+  let orbittex = [], X, Y, XX = D.Zero, YY = D.Zero, XY = D.Zero;
   for (let i = 0; i < imax && XX.add(YY).lt(16); i++) {
     X = XX.sub(YY).add(z.x);
     Y = XY.add(XY).add(z.y);
     XX = X.sqr(); YY = Y.sqr(); XY = X.mul(Y);
-    x.push(X.toNumber()); y.push(Y.toNumber());
-    xx.push(XX.toNumber()); yy.push(YY.toNumber());
+    orbittex.push(X.toNumber());
+    orbittex.push(Y.toNumber());
+    orbittex.push(XX.add(YY).toNumber());
   }
-  return { x: x, y: y, xx: xx, yy: yy };
+  return orbittex;
 }
 
 function imandel(z) {
@@ -53,32 +53,30 @@ function fractal_search(target) {
 
 function draw() {
   const gl = document.getElementById('canvasgl').getContext('webgl');
-  const programInfo = twgl.createProgramInfo(gl, [vsource, fsource]);
-  gl.useProgram(programInfo.program);
-  
   twgl.resizeCanvasToDisplaySize(gl.canvas);
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+  target.hx = target.hy.mul(gl.canvas.width).div(gl.canvas.height);
 
-  const arrays = { position: { data:[-1, 1, 1, 1, 1, -1, 1, -1, -1, -1, -1, 1], numComponents: 2 } };
+  const programInfo = twgl.createProgramInfo(gl, [vsource, fsource]);
+  gl.useProgram(programInfo.program);
+
+  const arrays = { position: { data: [-1, 1, 1, 1, 1, -1, 1, -1, -1, -1, -1, 1], numComponents: 2 } };
   const bufferInfo = twgl.createBufferInfoFromArrays(gl, arrays);
   twgl.setBuffersAndAttributes(gl, programInfo, bufferInfo);
 
-  let orbit = calcOrbit(fractal_search(target));
+  let neworigin = fractal_search(target);
   const uniforms = {
-    center: [target.x.toNumber(), target.y.toNumber()],
+    neworigin: [target.x.sub(neworigin.x).toNumber(), target.y.sub(neworigin.y).toNumber()],
     size: [target.hx.mul(2).toNumber(), target.hy.mul(2).toNumber()],
     resolution: [gl.canvas.width, gl.canvas.height],
-    ox: orbit.x,
-    oy: orbit.y,
-    oxx: orbit.xx,
-    oyy: orbit.yy
+    orbit: calcOrbit(neworigin)
   };
   twgl.setUniforms(programInfo, uniforms);
-
   twgl.drawBufferInfo(gl, bufferInfo);
   
   //let context = document.getElementById('canvas').getContext('2d');
   //context.font='10px Verdana';
   //context.fillStyle = (!uniforms.palette) ? '#777' : '#FFF';
   //context.fillText(`(${target.x.toNumber()}, ${target.y.toNumber()}) with ${Math.floor(target.hx.div(1.5).inv().toNumber())}x zoom`, 5, canvas.height - 5);
+  document.getElementById('zoom').value = Math.floor(Math.log10(target.hx.div(1.5).toNumber()));
 }
