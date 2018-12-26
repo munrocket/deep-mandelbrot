@@ -1,13 +1,13 @@
-# Mandelbrot Set
+# Deep Mandelbrot
 
-Simple version of famous fractal in [web page](http://htmlpreview.github.io/?https://github.com/munrocket/mandelbrot-set/blob/master/main.html)
+Famous fractal with deep zoom in [web page](https://munrocket.github.io/deep-mandelbrot/)
 
 ### Features
 
 - [X] Deep zoom (beta version 10^-31)
 - [X] Webgl parallel processing
-- [X] Double.js float
 - [X] Perturbation theory
+- [X] Double.js float
 - [X] Brute force for reference orbit
 
 ### 2do

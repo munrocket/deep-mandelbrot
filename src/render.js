@@ -1,9 +1,9 @@
 'use strict';
-let fractal, target = { x: new D(-0.6), y: new D(0), hx: new D(1.5), hy: new D(1.1) };
+let fractal, target = { x: new Double(-0.6), y: new Double(0), hx: new Double(1.5), hy: new Double(1.1) };
 let imax = 200;
 
 function calcOrbit(z) {
-  let orbittex = [], X, Y, XX = D.Zero, YY = D.Zero, XY = D.Zero;
+  let orbittex = [], X, Y, XX = Double.Zero, YY = Double.Zero, XY = Double.Zero;
   for (let i = 0; i < imax && XX.add(YY).lt(16); i++) {
     X = XX.sub(YY).add(z.x);
     Y = XY.add(XY).add(z.y);
@@ -16,7 +16,7 @@ function calcOrbit(z) {
 }
 
 function imandel(z) {
-  let i, X, Y, XX = D.Zero, YY = D.Zero, XY = D.Zero;;
+  let i, X, Y, XX = Double.Zero, YY = Double.Zero, XY = Double.Zero;;
   for (i = 0; i < imax && XX.add(YY).lt(16); i++) {
     X = XX.sub(YY).add(z.x);
     Y = XY.add(XY).add(z.y);
@@ -25,7 +25,7 @@ function imandel(z) {
   return (i != imax) ? i : Infinity;
 }
 
-function fractal_search(target) {
+function searchOrigin(target) {
   let repeat = 6, n = 10, m = 2;
   let z = {}, zbest = {}, ztarget = Object.assign({}, target), f, fbest = -Infinity;
   for (let k = 0; k < repeat; k++) {
@@ -64,7 +64,7 @@ function draw() {
   const bufferInfo = twgl.createBufferInfoFromArrays(gl, arrays);
   twgl.setBuffersAndAttributes(gl, programInfo, bufferInfo);
 
-  let neworigin = fractal_search(target);
+  let neworigin = searchOrigin(target);
   const uniforms = {
     neworigin: [target.x.sub(neworigin.x).toNumber(), target.y.sub(neworigin.y).toNumber()],
     size: [target.hx.mul(2).toNumber(), target.hy.mul(2).toNumber()],
