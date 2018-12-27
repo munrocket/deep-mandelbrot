@@ -14,7 +14,7 @@ const fsource =
 precision highp float;
 
 #define imax ${imax}
-#define bailout 5000.0
+#define bailout 5000.
 varying vec2 v_position;
 
 uniform vec2 center;
@@ -24,7 +24,8 @@ uniform vec3 orbit[imax];
 void main() {
   vec3 o, col;
   vec2 c = center + size * v_position;
-  float x = c.x, y = c.y, xx, yy, xy, xox, xoy, yox, yoy, ww, param;
+  const float logB = log2(bailout);
+  float x = c.x, y = c.y, xx, yy, xy, xox, xoy, yox, yoy, ozoz, param;
 
   for (int i = 0; i < imax; i++) {
     o = orbit[i];
@@ -38,19 +39,17 @@ void main() {
     yox = y * o.x;
     yoy = y * o.y;
 
-    // Z -> Z^2 + 2*O*Z + C
-    x = xx - yy + xox - yoy + c.x;
+    x = xx - yy + xox - yoy + c.x;    // Z -> Z^2 + 2*O*Z + C
     y = xy + xy + yox + xoy + c.y;
 
-    // |O + Z|^2 = |O|^2 + 2*(O, Z) + |Z|^2
-    ww = o.p + xox + yoy + xx + yy;
+    ozoz = o.z + xox + yoy + xx + yy;  // |O + Z|^2 = |O|^2 + 2*(O, Z) + |Z|^2
     
-    if (ww > bailout) { break; }
-    else { param += 1.0; }
+    if (ozoz > bailout) { break; }
+    else { param += 1.; }
   }
 
-  param += 1.0 + min(1.0, log2(log2(bailout) / log2(ww)));
-  col = 0.5 + 0.5 * cos(3. + 31. * param / float(imax) + vec3(-0.2,0.4,1.0));
+  param += 1.0 + min(1.0, log2(logB / log2(ozoz)));
+  col = 0.5 + 0.5 * cos(3. + 24.8 * param / float(imax) + vec3(-0.2,0.4,1.0));
   gl_FragColor = vec4(col, 1.0);
 }
 `;

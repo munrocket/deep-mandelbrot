@@ -8,7 +8,7 @@ Famous fractal with deep zoom in [web page](https://munrocket.github.io/deep-man
 - [X] Webgl parallel processing
 - [X] Perturbation theory
 - [X] Double.js float
-- [X] Brute force for reference orbit
+- [X] Logarithmic search for reference orbit
 
 ### 2do
 - [ ] Increase max iteration (pack orbit in texture)

@@ -6,27 +6,17 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Mandelbrot set</title>
   <style>
-    body, #contaiter {
-      border: 0;
-      margin: 0;
-    }
-    #canvasgl {
-      width: 100vw;
-      height: 92vh;
-      display: block;
-    }
+    body { border: 0; margin: 0; }
+    #canvasgl { width: 100vw; height: 92vh; display: block; }
   </style>
 </head>
 <body>
-  <div>
+  <div id="panel">
     <span>
-        <button type="button" onclick="draw()">goto:</button>
-        <span></span>
-        <input id="x" type="number" onchange="target.x = new D(this.value)" style="width: 40px" value="-0.5">
-        <span></span>
-        <input id="y" type="number" onchange="target.y = new D(this.value)" style="width: 40px" value="0">
-        <span></span>
-        <input id="zoom" type="number" onchange="target.dy = new D(1/this.value); target.dx = new D(3/2*target.dy)" style="width: 40px" value="1">
+        <button type="button" onclick="buttonGoto()">goto:</button> <span></span>
+        <input id="aim.x" type="number" style="width: 120px" value="-0.75"> <span></span>
+        <input id="aim.y" type="number" style="width: 120px" value="0"> <span></span>
+        <input id="zoom" type="number" style="width: 120px" value="1"> <span></span>
       </span>
     <button type="button" style="float: right;" onclick="savePng()">Save PNG</button>
   </div>
@@ -38,5 +28,6 @@
   <script src="src/render.js"></script>
   <script src="src/shaders.js"></script>
   <script src="src/events.js"></script>
+
 </body>
 </html>

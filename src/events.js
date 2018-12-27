@@ -5,78 +5,100 @@ let canvas = document.getElementById('canvasgl');
 
 function getMousePos(e) {
   let rect = canvas.getBoundingClientRect();
-  let pos = { x: target.x.add(target.hx.mul(2 * (e.clientX - rect.left) / canvas.width - 1)),
-              y: target.y.sub(target.hy.mul(2 * (e.clientY - rect.top) / canvas.height - 1)) };
+  let pos = {
+    x: aim.x.add(aim.hx.mul(2 * (e.clientX - rect.left) / canvas.width - 1)),
+    y: aim.y.sub(aim.hy.mul(2 * (e.clientY - rect.top) / canvas.height - 1))
+  };
   return pos;
+}
+
+function updateUI() {
+  document.getElementById('aim.x').value = aim.x.toNumber();
+  document.getElementById('aim.y').value = aim.y.toNumber();
+  document.getElementById('zoom').value = aim.hx.toNumber().toExponential(1);
+}
+
+function zoomClick(pos, val) {
+  let dx = savedMousePos.x.sub(pos.x).div(2);
+  let dy = savedMousePos.y.sub(pos.y).div(2);
+  if (dx.abs().gt(aim.hx.mul(0.005)) || dy.abs().gt(aim.hy.mul(0.005))) {
+    aim.x = savedMousePos.x.add(pos.x).div(2);
+    aim.y = savedMousePos.y.add(pos.y).div(2);
+    aim.hx = dx.abs();
+    aim.hy = dy.abs();
+  } else {
+    aim.x = pos.x;
+    aim.y = pos.y;
+    aim.hx = aim.hx.mul(val);
+    aim.hy = aim.hy.mul(val);
+  }
+  updateUI();
+  draw();
+}
+
+function zoomWheel(pos, val) {
+  aim.x = pos.x.add(aim.x.sub(pos.x).mul(val));
+  aim.y = pos.y.add(aim.y.sub(pos.y).mul(val));
+  aim.hx = aim.hx.mul(val);
+  aim.hy = aim.hy.mul(val);
+  updateUI();
+  draw();
+}
+
+function buttonGoto() {
+  aim.x = new Double(document.getElementById('aim.x').value);
+  aim.y = new Double(document.getElementById('aim.y').value);
+  aim.hx = new Double(document.getElementById('zoom').value);
+  aim.hy = new Double(document.getElementById('zoom').value);
+  updateUI();
+  draw();
+}
+
+function savePng() {
+  var a  = document.createElement('a');
+  a.href = canvas.toDataURL('png');
+  a.download = `mandelbrot_${aim.x.toString()}_${aim.y.toString()})_${Math.floor(1.5 * aim.hx.inv().toNumber())}x.png`;
+  a.click();
 }
 
 window.addEventListener('mousedown', function(e) {
   savedMousePos = getMousePos(e);
 }, false);
 
-window.addEventListener('mouseup', function(e) {
+canvas.addEventListener('mouseup', function(e) {
   let pos = getMousePos(e);
-  if (pos && savedMousePos) {
+  if (savedMousePos) {
     if (e.button == 0) {
-      //left button (zoom in)
-      target.x = savedMousePos.x.add(pos.x).div(2);
-      target.y = savedMousePos.y.add(pos.y).div(2);
-      let hx = savedMousePos.x.sub(pos.x).abs().div(2);
-      let hy = savedMousePos.y.sub(pos.y).abs().div(2);
-      target.hx = (hx.div(target.hx).gt(0.05)) ? hx : target.hx.div(20);
-      target.hy = (hy.div(target.hy).gt(0.05)) ? hy : target.hy.div(20);
-      let ratio = canvas.width / canvas.height;
-      if (ratio > target.hx / target.hy) {
-        target.hx = target.hy.mul(ratio);
-      } else {
-        target.hy = target.hx.div(ratio);
-      }
-      draw();
+      zoomClick(pos, 1/15);
     } else if (e.button == 2) {
-      //right button (zoom out)
-      target.hx = target.hx.mul(20);
-      target.hy = target.hy.mul(20);
-      draw();
-    } else if (e.button == 1) {
-      //scroll button (draw orbit)
-      let zx = savedMousePos.x.add(pos.x).div(20).toNumber();
-      let zy = savedMousePos.y.add(pos.y).div(20).toNumber();
-      let orbit = calcOrbit([zx, zy]);
-      // let ctx = canvas.getContext('2d');
-      // ctx.beginPath();
-      // for (let i = 0; i < imax; i++) {
-      //   ctx.moveTo(((orbit.x[i] - target.x.toNumber()) / target.hx.toNumber() + 1) / 2 * canvas.width,
-      //             ((target.y.toNumber() - orbit.y[i]) / target.hy.toNumber() + 1) / 2 * canvas.height);
-      // }
-      // ctx.strokeStyle = '#ff0000';
-      // ctx.stroke();
+      zoomClick(pos, 15);
+    } else {
+      drawOrbit(pos);
     }
   }
 }, false);
 
-document.addEventListener("wheel", function (e) {
-  var oldVal = parseInt(document.getElementById("body").style.transform.replace("translateY(","").replace("px)",""));
-  var variation = parseInt(e.deltaY);
-  
-  // update the body translation to simulate a scroll
-  document.getElementById("body").style.transform = "translateY(" + (oldVal - variation) + "px)";
-
-  return false;
-  
-}, true);
-
-function savePng() {
-  var a  = document.createElement('a');
-  a.href = canvas.toDataURL('png');
-  a.download = `mandelbrot_${target.x.toNumber()}_${target.y.toNumber()})_${Math.floor(1.5 * target.hx.inv().toNumber())}x.png`;
-  a.click();
-}
+canvas.addEventListener("wheel", function (e) {
+  zoomWheel(getMousePos(e), Math.pow(2, e.deltaY / 100));
+}, false);
 
 canvas.addEventListener('contextmenu', function(evt) { 
   evt.preventDefault();
 }, false);
 
+function drawOrbit(pos) {
+  console.log("orbit");
+  let orbit = calcOrbit(pos);
+  // let ctx = canvas.getContext('2d');
+  // ctx.beginPath();
+  // for (let i = 0; i < imax; i++) {
+  //   ctx.moveTo(((orbit.x[i] - aim.x.toNumber()) / aim.hx.toNumber() + 1) / 2 * canvas.width,
+  //             ((aim.y.toNumber() - orbit.y[i]) / aim.hy.toNumber() + 1) / 2 * canvas.height);
+  // }
+  // ctx.strokeStyle = '#ff0000';
+  // ctx.stroke();
+}
+
 window.onload = function() {
-  
-  draw(fractal);
+  draw();
 };

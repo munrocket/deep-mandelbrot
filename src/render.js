@@ -1,6 +1,7 @@
 'use strict';
-let fractal, target = { x: new Double(-0.6), y: new Double(0), hx: new Double(1.5), hy: new Double(1.1) };
+
 let imax = 200;
+let aim = { x: new Double(-0.75), y: new Double(0), hx: new Double(1.25), hy: new Double(1.15) };
 
 function calcOrbit(z) {
   let orbittex = [], X, Y, XX = Double.Zero, YY = Double.Zero, XY = Double.Zero;
@@ -15,25 +16,24 @@ function calcOrbit(z) {
   return orbittex;
 }
 
-function imandel(z) {
-  let i, X, Y, XX = Double.Zero, YY = Double.Zero, XY = Double.Zero;;
-  for (i = 0; i < imax && XX.add(YY).lt(16); i++) {
-    X = XX.sub(YY).add(z.x);
-    Y = XY.add(XY).add(z.y);
-    XX = X.sqr(); YY = Y.sqr(); XY = X.mul(Y);
+function searchOrigin(aim) {
+  let repeat = 6, n = 12, m = 3;
+  function pointDepth(z) {
+    let i, X, Y, XX = Double.Zero, YY = Double.Zero, XY = Double.Zero;;
+    for (i = 0; i < imax && XX.add(YY).lt(16); i++) {
+      X = XX.sub(YY).add(z.x);
+      Y = XY.add(XY).add(z.y);
+      XX = X.sqr(); YY = Y.sqr(); XY = X.mul(Y);
+    }
+    return (i != imax) ? i : Infinity;
   }
-  return (i != imax) ? i : Infinity;
-}
-
-function searchOrigin(target) {
-  let repeat = 6, n = 10, m = 2;
-  let z = {}, zbest = {}, ztarget = Object.assign({}, target), f, fbest = -Infinity;
+  let z = {}, zbest = {}, newAim = Object.assign({}, aim), f, fbest = -Infinity;
   for (let k = 0; k < repeat; k++) {
     for (let i = 0; i <= n; i++) {
       for (let j = 0; j <= n; j++) {
-        z.x = ztarget.x.add(ztarget.hx.mul(2 * i / n - 1));
-        z.y = ztarget.y.add(ztarget.hy.mul(2 * j / n - 1));
-        f = imandel(z);
+        z.x = newAim.x.add(newAim.hx.mul(2 * i / n - 1));
+        z.y = newAim.y.add(newAim.hy.mul(2 * j / n - 1));
+        f = pointDepth(z);
         if (f == Infinity) {
           return z;
         } else if (f > fbest) {
@@ -43,10 +43,9 @@ function searchOrigin(target) {
         }
       }
     }
-    ztarget.x = zbest.x;
-    ztarget.y = zbest.y;
-    ztarget.hx = ztarget.hx.div(m / n);
-    ztarget.hy = ztarget.hy.div(m / n);
+    Object.assign(newAim, zbest);
+    newAim.hx = newAim.hx.div(m / n);
+    newAim.hy = newAim.hy.div(m / n);
   }
   return zbest;
 }
@@ -55,7 +54,12 @@ function draw() {
   const gl = document.getElementById('canvasgl').getContext('webgl');
   twgl.resizeCanvasToDisplaySize(gl.canvas);
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-  target.hx = target.hy.mul(gl.canvas.width).div(gl.canvas.height);
+  let ratio = gl.canvas.width / gl.canvas.height;
+  if (aim.hx.div(aim.hy).lt(ratio)) {
+    aim.hx = aim.hy.mul(ratio);
+  } else {
+    aim.hy = aim.hx.div(ratio);
+  }
 
   const programInfo = twgl.createProgramInfo(gl, [vsource, fsource]);
   gl.useProgram(programInfo.program);
@@ -64,18 +68,12 @@ function draw() {
   const bufferInfo = twgl.createBufferInfoFromArrays(gl, arrays);
   twgl.setBuffersAndAttributes(gl, programInfo, bufferInfo);
 
-  let origin = searchOrigin(target);
+  let origin = searchOrigin(aim);
   const uniforms = {
-    center: [target.x.sub(origin.x).toNumber(), target.y.sub(origin.y).toNumber()],
-    size: [target.hx.toNumber(), target.hy.toNumber()],
+    center: [aim.x.sub(origin.x).toNumber(), aim.y.sub(origin.y).toNumber()],
+    size: [aim.hx.toNumber(), aim.hy.toNumber()],
     orbit: calcOrbit(origin)
   };
   twgl.setUniforms(programInfo, uniforms);
   twgl.drawBufferInfo(gl, bufferInfo, gl.TRIANGLE_FAN);
-  
-  //let context = document.getElementById('canvas').getContext('2d');
-  //context.font='10px Verdana';
-  //context.fillStyle = (!uniforms.palette) ? '#777' : '#FFF';
-  //context.fillText(`(${target.x.toNumber()}, ${target.y.toNumber()}) with ${Math.floor(target.hx.div(1.5).inv().toNumber())}x zoom`, 5, canvas.height - 5);
-  document.getElementById('zoom').value = Math.floor(Math.log10(target.hx.div(1.5).toNumber()));
 }
