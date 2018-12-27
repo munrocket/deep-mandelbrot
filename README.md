@@ -13,7 +13,6 @@ Famous fractal with deep zoom in [web page](https://munrocket.github.io/deep-man
 ### 2do
 - [ ] Increase max iteration (pack orbit in texture)
 - [ ] Use another arbitrary float library for deeper zoom
-- [ ] Color palettes and schemes
 - [ ] Cute UI
 
 ### References

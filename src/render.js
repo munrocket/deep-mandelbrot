@@ -10,7 +10,7 @@ function calcOrbit(z) {
     XX = X.sqr(); YY = Y.sqr(); XY = X.mul(Y);
     orbittex.push(X.toNumber());
     orbittex.push(Y.toNumber());
-    orbittex.push(XX.add(YY).toNumber());
+    orbittex.push(XX.add(YY).div(2).toNumber());
   }
   return orbittex;
 }
@@ -60,19 +60,18 @@ function draw() {
   const programInfo = twgl.createProgramInfo(gl, [vsource, fsource]);
   gl.useProgram(programInfo.program);
 
-  const arrays = { position: { data: [-1, 1, 1, 1, 1, -1, 1, -1, -1, -1, -1, 1], numComponents: 2 } };
+  const arrays = { position: { data: [1, 1, 1, -1, -1, -1, -1, 1], numComponents: 2 } };
   const bufferInfo = twgl.createBufferInfoFromArrays(gl, arrays);
   twgl.setBuffersAndAttributes(gl, programInfo, bufferInfo);
 
-  let neworigin = searchOrigin(target);
+  let origin = searchOrigin(target);
   const uniforms = {
-    neworigin: [target.x.sub(neworigin.x).toNumber(), target.y.sub(neworigin.y).toNumber()],
-    size: [target.hx.mul(2).toNumber(), target.hy.mul(2).toNumber()],
-    resolution: [gl.canvas.width, gl.canvas.height],
-    orbit: calcOrbit(neworigin)
+    center: [target.x.sub(origin.x).toNumber(), target.y.sub(origin.y).toNumber()],
+    size: [target.hx.toNumber(), target.hy.toNumber()],
+    orbit: calcOrbit(origin)
   };
   twgl.setUniforms(programInfo, uniforms);
-  twgl.drawBufferInfo(gl, bufferInfo);
+  twgl.drawBufferInfo(gl, bufferInfo, gl.TRIANGLE_FAN);
   
   //let context = document.getElementById('canvas').getContext('2d');
   //context.font='10px Verdana';
