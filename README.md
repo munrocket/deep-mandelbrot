@@ -23,5 +23,7 @@ Famous fractal with deep zoom in [web page](https://munrocket.github.io/deep-man
 4. K.I. Martin. *Superfractalthing math.* [[pdf](http://www.superfractalthing.co.nf/sft_maths.pdf)]
 5. Jonathan Shewchuk. *Adaptive Precision Floating-Point Arithmetic and Fast Robust Geometric Predicates.* 1997 [[pdf](https://people.eecs.berkeley.edu/~jrs/papers/robustr.pdf)]
 6. *Newton-Raphson zooming.* [[url](http://www.fractalforums.com/index.php?topic=25029.msg98438#msg98438), [url2](https://en.wikibooks.org/wiki/Fractals/Iterations_in_the_complex_plane/periodic_points#Newton_method)]
-7. *Numerical Methods for Finding Periodic Orbits* [[url](http://www.scholarpedia.org/article/Periodic_orbit#Numerical_Methods_for_Finding_Periodic_Orbits)]
-8. Claude Heiland-Allen. *Adaptive super-sampling using distance estimate.* [[url](http://mathr.co.uk/blog/2014-11-22_adaptive_supersampling_using_distance_estimate.html)]
+7. Claude Heiland-Allen. *Adaptive super-sampling using distance estimate.* [[url](http://mathr.co.uk/blog/2014-11-22_adaptive_supersampling_using_distance_estimate.html)]
+8. *Numerical Methods for Finding Periodic Orbits* [[url](http://www.scholarpedia.org/article/Periodic_orbit#Numerical_Methods_for_Finding_Periodic_Orbits)]
+[//]: # (*Pictures of Julia and Mandelbrot Sets* [[pdf](https://upload.wikimedia.org/wikipedia/commons/4/47/Pictures_of_Julia_and_Mandelbrot_Sets.pdf)])
+[//]: # (https://www.math.univ-toulouse.fr/~cheritat/wiki-draw/index.php/Mandelbrot_set#Deep_zooms_and_log-potential_scale)

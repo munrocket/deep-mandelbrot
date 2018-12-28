@@ -1,6 +1,6 @@
 'use strict';
 
-let imax = 200;
+let imax = 60;
 let aim = { x: new Double(-0.75), y: new Double(0), hx: new Double(1.25), hy: new Double(1.15) };
 
 function calcOrbit(z) {
@@ -11,7 +11,7 @@ function calcOrbit(z) {
     XX = X.sqr(); YY = Y.sqr(); XY = X.mul(Y);
     orbittex.push(X.toNumber());
     orbittex.push(Y.toNumber());
-    orbittex.push(XX.add(YY).div(2).toNumber());
+    orbittex.push(XX.add(YY).toNumber());
   }
   return orbittex;
 }
@@ -52,6 +52,8 @@ function searchOrigin(aim) {
 
 function draw() {
   const gl = document.getElementById('canvasgl').getContext('webgl');
+  //imax = gl.MAX_FRAGMENT_UNIFORM_VECTORS / 32 / 2;
+  //console.log(gl.MAX_FRAGMENT_UNIFORM_VECTORS / 32 / 2);
   twgl.resizeCanvasToDisplaySize(gl.canvas);
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
   let ratio = gl.canvas.width / gl.canvas.height;
