@@ -6,11 +6,12 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Mandelbrot set</title>
   <style>
-    body { border: 0; margin: 0; }
-    #canvasgl { width: 100vw; height: 92vh; display: block; }
+    body { border: 0; margin: 0; background-color: black; }
+    #canvasgl { width: 100vw; height: 80vh; margin-top: 10vh; }
   </style>
 </head>
 <body>
+  <canvas id="canvasgl"></canvas>
   <div id="panel">
     <span>
         <button type="button" onclick="buttonGoto()">goto:</button> <span></span>
@@ -20,8 +21,6 @@
       </span>
     <button type="button" style="float: right;" onclick="savePng()">Save PNG</button>
   </div>
-
-  <canvas id="canvasgl"></canvas>
 
   <script src="lib/twgl.js"></script>
   <script src="lib/double.js"></script>

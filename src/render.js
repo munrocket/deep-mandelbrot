@@ -1,6 +1,6 @@
 'use strict';
 
-let imax = 60;
+let imax = 1000;
 let aim = { x: new Double(-0.75), y: new Double(0), hx: new Double(1.25), hy: new Double(1.15) };
 
 function calcOrbit(z) {
