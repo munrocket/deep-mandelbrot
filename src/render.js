@@ -1,6 +1,6 @@
 'use strict';
 
-let imax = 1000;
+let imax = 500;
 let aim = { x: new Double(-0.75), y: new Double(0), hx: new Double(1.25), hy: new Double(1.15) };
 
 function calcOrbit(z) {
@@ -51,7 +51,7 @@ function searchOrigin(aim) {
 }
 
 function draw() {
-  const gl = document.getElementById('canvasgl').getContext('webgl');
+  const gl = document.getElementById('glcanvas').getContext('webgl');
   //imax = gl.MAX_FRAGMENT_UNIFORM_VECTORS / 32 / 2;
   //console.log(gl.MAX_FRAGMENT_UNIFORM_VECTORS / 32 / 2);
   twgl.resizeCanvasToDisplaySize(gl.canvas);
