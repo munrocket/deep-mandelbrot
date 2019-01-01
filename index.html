@@ -35,13 +35,13 @@
     <canvas id="glcontrol"></canvas>
   </div>
   <div id="panel">
-    <span>
-        <button type="button" onclick="buttonGoto()">goto:</button> <span></span>
-        <input id="aim.x" type="number" style="width: 120px" value="-0.75"> <span></span>
-        <input id="aim.y" type="number" style="width: 120px" value="0"> <span></span>
-        <input id="zoom" type="number" style="width: 120px" value="1"> <span></span>
-      </span>
-    <button type="button" style="float: right;" onclick="savePng()">Save PNG</button>
+    <span style="display:none">
+      <button type="button" onclick="Buttons.goTo()">goto:</button> <span></span>
+      <input id="aim.x" type="number" style="width: 120px" value="-0.75"> <span></span>
+      <input id="aim.y" type="number" style="width: 120px" value="0"> <span></span>
+      <input id="zoom" type="number" style="width: 120px" value="1"> <span></span>
+    </span>
+    <button style="display:none" type="button" style="float: right;" onclick="Buttons.savePng()">Save PNG</button>
   </div>
 
   <script src="lib/twgl.js"></script>

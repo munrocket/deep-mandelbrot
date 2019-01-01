@@ -16,8 +16,8 @@ function calcOrbit(z) {
   return orbittex;
 }
 
-function searchOrigin(aim) {
-  let repeat = 6, n = 12, m = 3;
+function draw() {
+
   function pointDepth(z) {
     let i, X, Y, XX = Double.Zero, YY = Double.Zero, XY = Double.Zero;;
     for (i = 0; i < imax && XX.add(YY).lt(16); i++) {
@@ -27,33 +27,33 @@ function searchOrigin(aim) {
     }
     return (i != imax) ? i : Infinity;
   }
-  let z = {}, zbest = {}, newAim = Object.assign({}, aim), f, fbest = -Infinity;
-  for (let k = 0; k < repeat; k++) {
-    for (let i = 0; i <= n; i++) {
-      for (let j = 0; j <= n; j++) {
-        z.x = newAim.x.add(newAim.hx.mul(2 * i / n - 1));
-        z.y = newAim.y.add(newAim.hy.mul(2 * j / n - 1));
-        f = pointDepth(z);
-        if (f == Infinity) {
-          return z;
-        } else if (f > fbest) {
-          zbest.x = z.x;
-          zbest.y = z.y;
-          fbest = f;
+
+  function searchOrigin(aim) {
+    let repeat = 6, n = 12, m = 3;
+    let z = {}, zbest = {}, newAim = Object.assign({}, aim), f, fbest = -Infinity;
+    for (let k = 0; k < repeat; k++) {
+      for (let i = 0; i <= n; i++) {
+        for (let j = 0; j <= n; j++) {
+          z.x = newAim.x.add(newAim.hx.mul(2 * i / n - 1));
+          z.y = newAim.y.add(newAim.hy.mul(2 * j / n - 1));
+          f = pointDepth(z);
+          if (f == Infinity) {
+            return z;
+          } else if (f > fbest) {
+            zbest.x = z.x;
+            zbest.y = z.y;
+            fbest = f;
+          }
         }
       }
+      Object.assign(newAim, zbest);
+      newAim.hx = newAim.hx.div(m / n);
+      newAim.hy = newAim.hy.div(m / n);
     }
-    Object.assign(newAim, zbest);
-    newAim.hx = newAim.hx.div(m / n);
-    newAim.hy = newAim.hy.div(m / n);
+    return zbest;
   }
-  return zbest;
-}
 
-function draw() {
   const gl = document.getElementById('glcanvas').getContext('webgl');
-  //imax = gl.MAX_FRAGMENT_UNIFORM_VECTORS / 32 / 2;
-  //console.log(gl.MAX_FRAGMENT_UNIFORM_VECTORS / 32 / 2);
   twgl.resizeCanvasToDisplaySize(gl.canvas);
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
   let ratio = gl.canvas.width / gl.canvas.height;

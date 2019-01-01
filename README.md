@@ -13,7 +13,7 @@ Famous fractal with deep zoom in [web page](https://munrocket.github.io/deep-man
 ### 2do
 - [ ] Pack orbit in texture / check max vertex uniform ([[1mp](https://m.habr.com/post/303142/)])
 - [ ] Gracefull degradation zoom
-- [ ] Fix context lost bug
+- [ ] Webgl profiler: EXT_disjoint_timer_query
 - [ ] Use another arbitrary float library for deeper zoom
 - [ ] Cute UI
 
