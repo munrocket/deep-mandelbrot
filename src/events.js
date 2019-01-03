@@ -3,6 +3,7 @@
 (function () {
 
   let savedMousePos;
+  let savedWheelPos = 0;
   let control = document.getElementById('glcontrol');
 
   function getMousePos(e) {
@@ -47,6 +48,12 @@
     updateUI();
   }
 
+  function zoomWheel(pos) {
+    let factor = Math.pow(2, -savedWheelPos / 100);
+    zoom(pos, factor);
+    savedWheelPos = 0;
+  }
+
   function drawOrbit(pos) {
     let orbittex = calcOrbit(pos);
     let ctx = control.getContext('2d');
@@ -78,8 +85,11 @@
   }, false);
 
   control.addEventListener("wheel", e => {
-    zoom(getMousePos(e), Math.pow(2, e.deltaY / 100));
-  }, false);
+    if (savedWheelPos == 0) {
+      setTimeout(() => zoomWheel(getMousePos(e)), 100);
+    }
+    savedWheelPos += e.deltaY;
+  });
 
   document.getElementById('glcanvas').addEventListener('webglcontextlost', e => {
     alert("context lost!");
