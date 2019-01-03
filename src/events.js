@@ -18,9 +18,9 @@
 
   function updateUI() {
     control.getContext('2d').clearRect(0, 0, control.width, control.height);
-    document.getElementById('aim.x').value = aim.x.toNumber();
-    document.getElementById('aim.y').value = aim.y.toNumber();
-    document.getElementById('zoom').value = aim.hx.toNumber().toExponential(1);
+    //document.getElementById('aim.x').value = aim.x.toNumber();
+    //document.getElementById('aim.y').value = aim.y.toNumber();
+    //document.getElementById('zoom').value = aim.hx.toNumber().toExponential(1);
   }
 
   function zoomRect(pos, factor) {
@@ -89,8 +89,9 @@
   control.addEventListener('contextmenu', e => e.preventDefault());
 
   window.onload = function() {
-    updateUI();
     draw();
+    updateUI();
+    document.getElementById('buttonSave').style.display = 'block';
   }
 
 })();
@@ -99,7 +100,7 @@ let Buttons = {
   savePng() {
     var a  = document.createElement('a');
     a.href = document.getElementById('glcanvas').toDataURL('png');
-    a.download = `mandelbrot_${aim.x.toString()}_${aim.y.toString()})_${Math.floor(1.5 * aim.hx.inv().toNumber())}x.png`;
+    a.download = `mandelbrot_x_${aim.x.toExponential()}__y_${aim.y.toExponential()})__zoom_${Math.floor(1.5 * aim.hx.inv().toNumber())}x.png`;
     a.click();
   }
 }

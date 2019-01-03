@@ -53,7 +53,8 @@ function draw() {
     return zbest;
   }
 
-  const gl = document.getElementById('glcanvas').getContext('webgl');
+  const canvas = document.getElementById('glcanvas');
+  const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl', attributes);
   twgl.resizeCanvasToDisplaySize(gl.canvas);
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
   let ratio = gl.canvas.width / gl.canvas.height;
@@ -62,6 +63,8 @@ function draw() {
   } else {
     aim.hy = aim.hx.div(ratio);
   }
+  gl.disable(gl.DEPTH_TEST);
+  gl.disable(gl.STENCIL_TEST);
 
   const programInfo = twgl.createProgramInfo(gl, [vsource, fsource]);
   gl.useProgram(programInfo.program);
