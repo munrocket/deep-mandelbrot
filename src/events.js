@@ -2,17 +2,19 @@
 
 (function () {
 
+  let control = document.getElementById('glcontrol');
+  let canvas = document.getElementById('glcanvas');
   let savedMousePos;
   let savedWheelPos = 0;
-  let control = document.getElementById('glcontrol');
+  let isDrawingRect = false;
 
   function getMousePos(e) {
     let rect = control.getBoundingClientRect();
     let pos = {
-      x: aim.x.add(aim.hx.mul(2 * (e.clientX - rect.left) / rect.width - 1)),
-      y: aim.y.sub(aim.hy.mul(2 * (e.clientY - rect.top) / rect.height - 1)),
-      px: e.clientX - rect.left,
-      py: e.clientY - rect.top
+      x: aim.x.add(aim.hx.mul(2 * e.offsetX / rect.width - 1)),
+      y: aim.y.sub(aim.hy.mul(2 * e.offsetY / rect.height - 1)),
+      px: e.offsetX,
+      py: e.offsetY
     };
     return pos;
   }
@@ -71,20 +73,34 @@
 
   control.addEventListener('mousedown', e => {
     savedMousePos = getMousePos(e);
-  }, false);
-
-  control.addEventListener('mouseup', e => {
-    let pos = getMousePos(e);
-    if (savedMousePos) {
-      if (e.button == 0) {
-        zoomRect(pos, 1/20);
-      } else if (e.button == 2) {
-        zoom(pos, 20);
-      } else {
-        drawOrbit(pos);
-      }
+    if (e.button == 0) {
+      isDrawingRect = true;
     }
-  }, false);
+  });
+
+  window.addEventListener('mouseup', e => {
+    let pos = getMousePos(e);
+    if (e.button == 0) {
+      isDrawingRect = false;
+      zoomRect(pos, 1/20);
+    } else if (e.button == 2) {
+      zoom(pos, 20);
+    } else {
+      drawOrbit(pos);
+    }
+  });
+
+  control.addEventListener('mousemove', e => {
+    if (isDrawingRect) {
+      let ctx = control.getContext('2d');
+      ctx.clearRect(0, 0, control.width, control.height);
+      ctx.beginPath();
+      let saved = savedMousePos;
+      ctx.rect(saved.px, saved.py, e.offsetX - saved.px, e.offsetY - saved.py);
+      ctx.strokeStyle = '#f9a4a4';
+      ctx.stroke();
+    }
+  });
 
   control.addEventListener('wheel', e => {
     if (savedWheelPos == 0) {
@@ -95,7 +111,7 @@
 
   control.addEventListener('contextmenu', e => e.preventDefault());
   
-  document.getElementById('glcanvas').addEventListener('webglcontextlost', e => {
+  canvas.addEventListener('webglcontextlost', e => {
     alert("context lost!");
     e.preventDefault();
   });
@@ -122,7 +138,7 @@
 let Buttons = {
   savePng() {
     var a  = document.createElement('a');
-    a.href = document.getElementById('glcanvas').toDataURL('png');
+    a.href = canvas.toDataURL('png');
     a.download = `mandelbrot_x_${aim.x.toExponential()}__y_${aim.y.toExponential()})__zoom_${Math.floor(1.5 * aim.hx.inv().toNumber())}x.png`;
     a.click();
   }
