@@ -18,10 +18,10 @@
   }
 
   function updateUI() {
-    control.getContext('2d').clearRect(0, 0, control.width, control.height);
-    //document.getElementById('aim.x').value = aim.x.toNumber();
-    //document.getElementById('aim.y').value = aim.y.toNumber();
-    //document.getElementById('zoom').value = aim.hx.toNumber().toExponential(1);
+    let ctx = control.getContext('2d');
+    control.width = ctx.canvas.clientWidth;
+    control.height = ctx.canvas.clientHeight;
+    ctx.clearRect(0, 0, control.width, control.height);
   }
 
   function zoomRect(pos, factor) {
@@ -40,8 +40,8 @@
   }
 
   function zoom(pos, factor) {
-    aim.x = pos.x.add(aim.x.sub(pos.x).mul(factor));
-    aim.y = pos.y.add(aim.y.sub(pos.y).mul(factor));
+    aim.x = pos.x;
+    aim.y = pos.y;
     aim.hx = aim.hx.mul(factor);
     aim.hy = aim.hy.mul(factor);
     draw();
@@ -49,7 +49,9 @@
   }
 
   function zoomWheel(pos) {
-    let factor = Math.pow(2, -savedWheelPos / 100);
+    let factor = Math.pow(2, -savedWheelPos / 200 );
+    pos.x = pos.x.add(aim.x.sub(pos.x).mul(factor));
+    pos.y = pos.y.add(aim.y.sub(pos.y).mul(factor));
     zoom(pos, factor);
     savedWheelPos = 0;
   }
@@ -63,7 +65,7 @@
       ctx.lineTo(((point.x - aim.x.toNumber()) / aim.hx.toNumber() + 1) / 2 * control.width,
                 ((aim.y.toNumber() - point.y) / aim.hy.toNumber()+ 1) / 2 * control.height);
     }
-    ctx.strokeStyle = '#ff0000';
+    ctx.strokeStyle = '#efe1f4';
     ctx.stroke();
   }
 
@@ -75,28 +77,39 @@
     let pos = getMousePos(e);
     if (savedMousePos) {
       if (e.button == 0) {
-        zoomRect(pos, 1/15);
+        zoomRect(pos, 1/20);
       } else if (e.button == 2) {
-        zoom(pos, 15);
+        zoom(pos, 20);
       } else {
         drawOrbit(pos);
       }
     }
   }, false);
 
-  control.addEventListener("wheel", e => {
+  control.addEventListener('wheel', e => {
     if (savedWheelPos == 0) {
       setTimeout(() => zoomWheel(getMousePos(e)), 100);
     }
     savedWheelPos += e.deltaY;
   });
 
+  control.addEventListener('contextmenu', e => e.preventDefault());
+  
   document.getElementById('glcanvas').addEventListener('webglcontextlost', e => {
     alert("context lost!");
     e.preventDefault();
   });
-
-  control.addEventListener('contextmenu', e => e.preventDefault());
+  
+  window.addEventListener('resize', e => {
+    function requestResize(requestWheelPos) {
+      if (requestWheelPos == savedWheelPos) {
+        zoom(aim, 1);
+      }
+      savedWheelPos = 0;
+    }
+    savedWheelPos += 1;
+    setTimeout(() => requestResize(savedWheelPos), 200);
+  });
 
   window.onload = function() {
     draw();

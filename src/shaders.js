@@ -117,7 +117,6 @@ void main() {
   de = sqrt((x * x + y * y) / (dx * dx + dy * dy)) * log(x * x + y * y);
   //float a = 0.5; float b = 0.5; float c0 = 0.5; float d = 0.5; float col = atan(a ∗ de / 5.) + c0 / (1 + d ∗ h)) / (3.1415926535 * 0.5);
   
-
   gl_FragColor = vec4(vec3(cos(-log(de))), 1.);
 }
 `;

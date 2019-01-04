@@ -58,7 +58,7 @@ function draw() {
   twgl.resizeCanvasToDisplaySize(gl.canvas);
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
   let ratio = gl.canvas.width / gl.canvas.height;
-  if (aim.hx.div(aim.hy).lt(ratio)) {
+  if (ratio > 1) {
     aim.hx = aim.hy.mul(ratio);
   } else {
     aim.hy = aim.hx.div(ratio);
