@@ -53,30 +53,37 @@ function draw() {
     return zbest;
   }
 
-  const canvas = document.getElementById('glcanvas');
-  const gl = twgl.getContext(canvas, { antialias: false, depth: false });
-  twgl.resizeCanvasToDisplaySize(gl.canvas);
-  gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-  let ratio = gl.canvas.width / gl.canvas.height;
-  if (ratio > 1) {
-    aim.hx = aim.hy.mul(ratio);
-  } else {
-    aim.hy = aim.hx.div(ratio);
+  try {
+    const canvas = document.getElementById('glcanvas');
+    const gl = twgl.getContext(canvas, { antialias: false, depth: false });
+    if (!gl) { Events.showError('WebGL not supported', "Sorry, unable to render. This viewer requires WebGL, which is not supported or turned off."); }
+    twgl.resizeCanvasToDisplaySize(gl.canvas);
+    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+    let ratio = gl.canvas.width / gl.canvas.height;
+    if (ratio > 1) {
+      aim.hx = aim.hy.mul(ratio);
+    } else {
+      aim.hy = aim.hx.div(ratio);
+    }
+
+    imax = gl.getParameter(gl.MAX_FRAGMENT_UNIFORM_VECTORS);
+    const programInfo = twgl.createProgramInfo(gl, [vsource, fsource]);
+    gl.useProgram(programInfo.program);
+
+    const attribs = { position: { data: [1, 1, 1, -1, -1, -1, -1, 1], numComponents: 2 } };
+    const bufferInfo = twgl.createBufferInfoFromArrays(gl, attribs);
+    twgl.setBuffersAndAttributes(gl, programInfo, bufferInfo);
+
+    let origin = searchOrigin(aim);
+    const uniforms = {
+      center: [aim.x.sub(origin.x).toNumber(), aim.y.sub(origin.y).toNumber()],
+      size: [aim.hx.toNumber(), aim.hy.toNumber()],
+      orbit: calcOrbit(origin)
+    };
+    twgl.setUniforms(programInfo, uniforms);
+    twgl.drawBufferInfo(gl, bufferInfo, gl.TRIANGLE_FAN);
+  } catch (error) {
+    console.log(error);
+    Events.showError();
   }
-
-  const programInfo = twgl.createProgramInfo(gl, [vsource, fsource]);
-  gl.useProgram(programInfo.program);
-
-  const attribs = { position: { data: [1, 1, 1, -1, -1, -1, -1, 1], numComponents: 2 } };
-  const bufferInfo = twgl.createBufferInfoFromArrays(gl, attribs);
-  twgl.setBuffersAndAttributes(gl, programInfo, bufferInfo);
-
-  let origin = searchOrigin(aim);
-  const uniforms = {
-    center: [aim.x.sub(origin.x).toNumber(), aim.y.sub(origin.y).toNumber()],
-    size: [aim.hx.toNumber(), aim.hy.toNumber()],
-    orbit: calcOrbit(origin)
-  };
-  twgl.setUniforms(programInfo, uniforms);
-  twgl.drawBufferInfo(gl, bufferInfo, gl.TRIANGLE_FAN);
 }

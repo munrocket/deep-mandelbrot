@@ -1,6 +1,6 @@
 'use strict';
 
-const vsource =
+let vsource =
 `precision mediump float;
 
 attribute vec2 position;
@@ -17,7 +17,7 @@ void main() {
   c = center + vec2(z.x * rot.y - z.y * rot.x, dot(z, rot));
 }`;
 
-const fsource =
+let fsource =
 `precision mediump float;
 
 #define imax ${imax}
@@ -66,7 +66,7 @@ void main() {
   gl_FragColor = vec4(col, 1.);
 }`;
 
-const fsource0 =
+let fsource0 =
 `#ifdef GL_FRAGMENT_PRECISION_HIGH
   precision highp float;
 #else

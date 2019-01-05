@@ -1,11 +1,16 @@
 'use strict';
 
-let Buttons = {
+let Events = {
   savePng() {
     var a  = document.createElement('a');
     a.href = document.getElementById('glcanvas').toDataURL('png');
     a.download = `mandelbrot_x_${aim.x.toExponential()}__y_${aim.y.toExponential()})__zoom_${Math.floor(1.5 * aim.hx.inv().toNumber())}x.png`;
     a.click();
+  },
+  showError(header, msg) {
+    if (header) document.getElementById('errorHdr').innerHTML = header;
+    if (msg) document.getElementById('errorMsg').innerHTML = msg;
+    document.getElementById('errorBox').classList.add('is-active');
   }
 };
 
@@ -127,7 +132,7 @@ let Buttons = {
   control.addEventListener('contextmenu', e => e.preventDefault());
   
   document.getElementById('glcanvas').addEventListener('webglcontextlost', e => {
-    alert("context lost!");
+    Events.showError("WebGL context lost!", "GPU calculation was too long and the browser or the OS decides to reset the GPU.")
     e.preventDefault();
   });
   
@@ -143,15 +148,14 @@ let Buttons = {
   });
 
   window.onload = function() {
-    draw();
-    updateUI();
-
     let burger = document.querySelector('.navbar-burger');
     burger.addEventListener('click', () => {
       const target = document.getElementById(burger.dataset.target);
       burger.classList.toggle('is-active');
       target.classList.toggle('is-active');
     });
+    updateUI();
+    draw();
   }
 
 })();

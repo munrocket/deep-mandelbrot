@@ -10,15 +10,14 @@
   <title>Deep Mandelbrot</title>
   <style>
     html, body { overflow: hidden; }
-    .fract-full-height { display: flex; flex-direction: column; height: 100vh; min-height: 100%; }
-    .fract-full-height > div { flex: 1; display: flex; flex-direction: column; }
-    .fract-many-layers { position: relative; background-color: #0a0a0a; }
-    .fract-many-layers > canvas { position: absolute; width: 100%; height: 100%; }
+    .with-full-height { display: flex; flex-direction: column; height: 100vh; min-height: 100%; }
+    .with-full-height > div { flex: 1; display: flex; flex-direction: column; }
+    .with-many-layers { position: relative; background-color: #0a0a0a; }
+    .with-many-layers > canvas { position: absolute; width: 100%; height: 100%; }
   </style>
 </head>
 <body>
-  <section class="fract-full-height">
-
+  <section class="with-full-height">
     <nav class="navbar is-black" role="navigation" aria-label="main navigation">
       <div class="navbar-brand">
         <h1 class="navbar-item has-text-weight-bold">Deep Mandelbrot</h1>
@@ -31,7 +30,7 @@
       </div>
       <div id="mainMenu" class="navbar-menu">
         <div class="navbar-start">
-          <a class="navbar-item" onclick="Buttons.savePng()">Save</a>
+          <a class="navbar-item" onclick="Events.savePng()">Save</a>
           <div class="navbar-item has-dropdown is-hoverable">
             <a class="navbar-link">Color</a>
             <div class="navbar-dropdown">
@@ -52,12 +51,26 @@
       </div>
     </nav>
 
-    <div class="fract-many-layers">
+    <div class="with-many-layers">
       <canvas id="glcanvas"></canvas>
       <canvas id="glcontrol"></canvas>
     </div>
-
   </section>
+  
+  <div id="errorBox" class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-content">
+      <article id="error-message" class="message is-primary">
+        <div class="message-header">
+          <p id="errorHdr">Something went wrong</p>
+          <button class="delete" aria-label="delete" onclick="document.getElementById('errorBox').classList.toggle('is-active');"></button>
+        </div>
+        <div id="errorMsg" class="message-body">
+          Please check console and consider submit a bug report on <a href="https://github.com/munrocket/deep-mandelbrot/issues">github</a>.
+        </div>
+      </article>
+    </div>
+  </div>
 
   <script src="lib/twgl.js"></script>
   <script src="lib/double.js"></script>
