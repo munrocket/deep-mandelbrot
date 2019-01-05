@@ -15,7 +15,8 @@ Famous fractal with deep zoom in [web page](https://munrocket.github.io/deep-man
 ### 2do
 - [ ] Ping pong render
 - [ ] Progressive zoom / mariani algorithm
-- [ ] Webgl profiler: EXT_disjoint_timer_query
+- [ ] Webgl: EXT_disjoint_timer_query
+- [ ] UI: min-width, touchstart
 
 ### References
 

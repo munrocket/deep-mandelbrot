@@ -67,8 +67,8 @@ function draw() {
   const programInfo = twgl.createProgramInfo(gl, [vsource, fsource]);
   gl.useProgram(programInfo.program);
 
-  const arrays = { position: { data: [1, 1, 1, -1, -1, -1, -1, 1], numComponents: 2 } };
-  const bufferInfo = twgl.createBufferInfoFromArrays(gl, arrays);
+  const attribs = { position: { data: [1, 1, 1, -1, -1, -1, -1, 1], numComponents: 2 } };
+  const bufferInfo = twgl.createBufferInfoFromArrays(gl, attribs);
   twgl.setBuffersAndAttributes(gl, programInfo, bufferInfo);
 
   let origin = searchOrigin(aim);

@@ -1,9 +1,17 @@
 'use strict';
 
+let Buttons = {
+  savePng() {
+    var a  = document.createElement('a');
+    a.href = document.getElementById('glcanvas').toDataURL('png');
+    a.download = `mandelbrot_x_${aim.x.toExponential()}__y_${aim.y.toExponential()})__zoom_${Math.floor(1.5 * aim.hx.inv().toNumber())}x.png`;
+    a.click();
+  }
+};
+
 (function () {
 
   let control = document.getElementById('glcontrol');
-  let canvas = document.getElementById('glcanvas');
   let savedMousePos;
   let savedWheelPos = 0;
   let isDrawingRect = false;
@@ -78,15 +86,22 @@
     }
   });
 
-  window.addEventListener('mouseup', e => {
+  control.addEventListener('mouseup', e => {
     let pos = getMousePos(e);
     if (e.button == 0) {
       isDrawingRect = false;
-      zoomRect(pos, 1/20);
+      zoomRect(pos, 1/15);
     } else if (e.button == 2) {
-      zoom(pos, 20);
+      zoom(pos, 15);
     } else {
       drawOrbit(pos);
+    }
+  });
+
+  window.addEventListener('mouseup', e => {
+    if (isDrawingRect && e.target.id != 'glcontrol') {
+      getMousePos(e);
+      control.dispatchEvent(new MouseEvent('mouseup', e));
     }
   });
 
@@ -111,7 +126,7 @@
 
   control.addEventListener('contextmenu', e => e.preventDefault());
   
-  canvas.addEventListener('webglcontextlost', e => {
+  document.getElementById('glcanvas').addEventListener('webglcontextlost', e => {
     alert("context lost!");
     e.preventDefault();
   });
@@ -124,22 +139,19 @@
       savedWheelPos = 0;
     }
     savedWheelPos += 1;
-    setTimeout(() => requestResize(savedWheelPos), 200);
+    setTimeout(() => requestResize(savedWheelPos), 500);
   });
 
   window.onload = function() {
     draw();
     updateUI();
-    document.getElementById('buttonSave').style.display = 'block';
+
+    let burger = document.querySelector('.navbar-burger');
+    burger.addEventListener('click', () => {
+      const target = document.getElementById(burger.dataset.target);
+      burger.classList.toggle('is-active');
+      target.classList.toggle('is-active');
+    });
   }
 
 })();
-
-let Buttons = {
-  savePng() {
-    var a  = document.createElement('a');
-    a.href = canvas.toDataURL('png');
-    a.download = `mandelbrot_x_${aim.x.toExponential()}__y_${aim.y.toExponential()})__zoom_${Math.floor(1.5 * aim.hx.inv().toNumber())}x.png`;
-    a.click();
-  }
-}

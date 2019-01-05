@@ -1,27 +1,31 @@
 'use strict';
 
-const vsource = `
-precision mediump float;
+const vsource =
+`precision mediump float;
+
 attribute vec2 position;
-varying vec2 v_position;
+uniform vec2 size;
+uniform vec2 center;
+const float phi = 0.0;
+
+varying vec2 c;
+const vec2 rot = vec2(sin(phi), cos(phi));
 
 void main() {
   gl_Position = vec4(position, 0.0, 1.0);
-  v_position = position;
+  vec2 z = size * position;
+  c = center + vec2(z.x * rot.y - z.y * rot.x, dot(z, rot));
 }`;
 
 const fsource =
-` 
-precision mediump float;
+`precision mediump float;
 
 #define imax ${imax}
 #define bailout 5000.
 const float loglogB = log2(log2(bailout));
-varying vec2 v_position;
 
-uniform vec2 center;
-uniform vec2 size;
 uniform vec3 orbit[imax];
+varying vec2 c;
 
 float interpolate(float s, float s1, float s2, float s3, float d) {
   float d2 = d * d, d3 = d * d2;
@@ -29,7 +33,6 @@ float interpolate(float s, float s1, float s2, float s3, float d) {
 }
 
 void main() {
-  vec2 c = center + size * v_position;
   vec3 o, col;
   float x = c.x, y = c.y, xx, yy, xy, ox, oy, xox, xoy, yox, yoy, ww, time;
   float stripe, s1, s2, s3; 
@@ -61,12 +64,10 @@ void main() {
   col = 0.5 + 0.5 * sin(col + vec3(4.0, 4.6, 5.2) + 50.0 * time / float(imax));
 
   gl_FragColor = vec4(col, 1.);
-}
-`;
+}`;
 
 const fsource0 =
-` 
-#ifdef GL_FRAGMENT_PRECISION_HIGH
+`#ifdef GL_FRAGMENT_PRECISION_HIGH
   precision highp float;
 #else
   precision mediump float;
@@ -118,5 +119,4 @@ void main() {
   //float a = 0.5; float b = 0.5; float c0 = 0.5; float d = 0.5; float col = atan(a ∗ de / 5.) + c0 / (1 + d ∗ h)) / (3.1415926535 * 0.5);
   
   gl_FragColor = vec4(vec3(cos(-log(de))), 1.);
-}
-`;
+}`;
