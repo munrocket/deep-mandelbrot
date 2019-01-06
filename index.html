@@ -30,13 +30,14 @@
       </div>
       <div id="mainMenu" class="navbar-menu">
         <div class="navbar-start">
-          <a class="navbar-item" onclick="Events.savePng()">Save</a>
           <div class="navbar-item has-dropdown is-hoverable">
             <a class="navbar-link">Color</a>
             <div class="navbar-dropdown">
-              <a class="navbar-item">Scientific</a>
+              <a class="navbar-item" onclick="scheme = 1; draw();">Default</a>
+              <a class="navbar-item" onclick="scheme = 0; draw();">Tattoo</a>
             </div>
           </div>
+          <a class="navbar-item" onclick="Events.savePng()">Save</a>
         </div>
         <div class="navbar-end">
           <div class="navbar-item">

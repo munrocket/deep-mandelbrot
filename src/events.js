@@ -76,9 +76,12 @@ let Events = {
     let ctx = control.getContext('2d');
     ctx.beginPath();
     for (let i = 0; i < imax; i++) {
-      let point = { x: orbittex[3 * i], y: orbittex[3 * i + 1] };
-      ctx.lineTo(((point.x - aim.x.toNumber()) / aim.hx.toNumber() + 1) / 2 * control.width,
-                ((aim.y.toNumber() - point.y) / aim.hy.toNumber()+ 1) / 2 * control.height);
+      let point = { x: orbittex[4 * i], y: orbittex[4 * i + 1] };
+      let x = ((point.x - aim.x.toNumber()) / aim.hx.toNumber() + 1) / 2 * control.width;
+      let y = ((aim.y.toNumber() - point.y) / aim.hy.toNumber()+ 1) / 2 * control.height;
+      ctx.arc(x, y, 1, 0, 2 * Math.PI, true);
+      ctx.lineTo(x, y);
+      ctx.moveTo(x, y);
     }
     ctx.strokeStyle = '#efe1f4';
     ctx.stroke();

@@ -3,29 +3,31 @@
 let vsource =
 `precision mediump float;
 
-attribute vec2 position;
 uniform vec2 size;
 uniform vec2 center;
-const float phi = 0.0;
+//const float phi = 0.0;
+const vec2 rot = vec2(0, 1.);//sin(phi), cos(phi));
 
-varying vec2 c;
-const vec2 rot = vec2(sin(phi), cos(phi));
+attribute vec2 position;
+varying vec2 p;
 
 void main() {
-  gl_Position = vec4(position, 0.0, 1.0);
   vec2 z = size * position;
-  c = center + vec2(z.x * rot.y - z.y * rot.x, dot(z, rot));
+  p = center + vec2(z.x * rot.y - z.y * rot.x, dot(z, rot));
+  gl_Position = vec4(position, 0.0, 1.0);
 }`;
 
-let fsource =
-`precision mediump float;
+let fsource = (scheme) => `
+precision mediump float;
 
 #define imax ${imax}
-#define bailout 5000.
+#define bailout ${bailout}.
+#define DEFAULT ${scheme}
 const float loglogB = log2(log2(bailout));
 
-uniform vec3 orbit[imax];
-varying vec2 c;
+uniform vec4 orbit[imax];
+uniform vec2 size;
+varying vec2 p;
 
 float interpolate(float s, float s1, float s2, float s3, float d) {
   float d2 = d * d, d3 = d * d2;
@@ -33,90 +35,48 @@ float interpolate(float s, float s1, float s2, float s3, float d) {
 }
 
 void main() {
-  vec3 o, col;
-  float x = c.x, y = c.y, xx, yy, xy, ox, oy, xox, xoy, yox, yoy, ww, time;
-  float stripe, s1, s2, s3; 
-  float u, v;
+  float u = p.x, v = p.y, zz, time, temp;
+  float s1, s2, s3, stripe;
+  vec2 o = vec2(orbit[0].x, orbit[0].y);
+  vec2 z = o + vec2(u,v), dz;
+  vec3 col;
 
-  for (int i = 0; i < imax; i++) {
+  for (int i = 1; i < imax; i++) {
+    // calc derivative Z' -> 2*Z*Z' + 1
+    temp = 2. * (z.x * dz.x - z.y * dz.y) + 1.;
+    dz.y = 2. * (z.x * dz.y + z.y * dz.x);
+    dz.x = temp;
+
+    // next step: W -> W^2 + 2 * O * W + P
+    temp = u * u - v * v + 2. * (u * o.x - v * o.y) + p.x;
+    v = u * v + u * v + 2. * (v * o.x + u * o.y) + p.y;
+    u = temp;
 
     // initilizing
-    o = orbit[i]; xx = x * x; yy = y * y; xy = x * y; u = o.x + x; v = o.y + y;
-    xox = x * (o.x + o.x); xoy = x * (o.y + o.y); yox = y * (o.x + o.x);  yoy = y * (o.y + o.y);
+    o = vec2(orbit[i].x, orbit[i].y);
+    z = o + vec2(u,v);
+    zz = dot(z,z);    
     
-    // stripe average color 
-    if (i < 200 && i > 1) stripe += u * v / (u * u + v * v); s3 = s2; s2 = s1; s1 = stripe;
-
-    // calc result |W|^2 = |O + Z|^2
-    ww = o.z + xox + yoy + xx + yy;
-
-    // next step Z -> Z^2 + 2*O*Z + C
-    x = xx - yy + xox - yoy + c.x;
-    y = xy + xy + yox + xoy + c.y;
+    #if DEFAULT
+      // stripe average color 
+      stripe += z.x * z.y / zz * step(1.0, time);
+      s3 = s2; s2 = s1; s1 = stripe;
+    #endif
 
     // loop in webgl1
-    if (ww > bailout) { break; }
-    else { time += 1.; }
+    time += 1.;
+    if (zz > bailout) { break; }
   }
 
-  time += 1.0 + min(1.0, loglogB - log2(log2(ww)));
-  col += 0.7 + 2.5 * (interpolate(stripe, s1, s2, s3, fract(time)) / min(time, 200.));
-  col = 0.5 + 0.5 * sin(col + vec3(4.0, 4.6, 5.2) + 50.0 * time / float(imax));
+  #if DEFAULT
+    time += 1.0 + min(1.0, loglogB - log2(log2(zz)));
+    col += 0.7 + 2.5 * (interpolate(stripe, s1, s2, s3, fract(time)) / min(200., time)) * (1.0 - 0.6 * step(float(imax), 1. + time));
+    col = 0.5 + 0.5 * sin(col + vec3(4.0, 4.6, 5.2) + 50.0 * time / float(imax));
+  #else
+    // DEM/M = 2.0 * |Z / Z'| * ln(|Z|)
+    float dem = sqrt(dot(z,z) / dot(dz,dz)) * log(dot(z,z));
+    col += (1. - clamp(0., -log(dem / size.x * 500.), 1.)) * vec3(233, 202, 180) / 256.;
+  #endif
 
   gl_FragColor = vec4(col, 1.);
-}`;
-
-let fsource0 =
-`#ifdef GL_FRAGMENT_PRECISION_HIGH
-  precision highp float;
-#else
-  precision mediump float;
-#endif
-
-#define imax ${imax}
-#define bailout 5000.
-const float loglogB = log2(log2(bailout));
-varying vec2 v_position;
-
-uniform vec2 center;
-uniform vec2 size;
-uniform vec3 orbit[imax];
-
-// vec2 unpack(vec4 color) { return vec2(color.r / 255.0 + color.b, color.g / 255.0 + color.a); }
-// vec4 pack(vec2 pos)     { return vec4(fract(pos * 255.0), floor(pos * 255.0) / 255.0); }
-
-float interpolate(float s, float s1, float s2, float s3, float d) {
-  float d2 = d * d, d3 = d * d2;
-  return 0.5 * (s * (d3 - d2) + s1 * (d + 4.*d2 - 3.*d3) + s2 * (2. - 5.*d2 + 3.*d3) + s3 * (-d + 2.*d2 - d3));
-}
-
-void main() {
-  vec2 c = center + size * v_position + vec2(orbit[0]);
-  vec3 o;
-  float x, y, t, time;
-  float dx, dy;
-  float z2, de;
-
-  for (int i = 0; i < 3000; i++) {
-    // Z' -> 2*Z*Z' + 1
-    t = 2. * (x * dx - y * dy);
-    dy = 2. * (x * dy + y * dx);
-    dx = t;
-
-    // Z -> Z^2 + C
-    t = x * x - y * y + c.x;
-    y = x * y + x * y + c.y;
-    x = t;
-
-    if (x * x + y * y > 2000.0) break;
-    else time += 1.0;
-  }
-  time += 1.0 + min(1.0, loglogB - log2(log2(x*x+y*y)));
-  float q = 1. - fract(time);
-
-  // DE(Z) = 2.0 * |Z / Z'| * ln(|Z|)
-  de = sqrt((x * x + y * y) / (dx * dx + dy * dy)) * log(x * x + y * y);
-  //float a = 0.5; float b = 0.5; float c0 = 0.5; float d = 0.5; float col = atan(a ∗ de / 5.) + c0 / (1 + d ∗ h)) / (3.1415926535 * 0.5);
-  
-  gl_FragColor = vec4(vec3(cos(-log(de))), 1.);
 }`;
