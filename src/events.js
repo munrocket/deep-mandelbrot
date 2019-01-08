@@ -150,15 +150,21 @@ let Events = {
     setTimeout(() => requestResize(savedWheelPos), 500);
   });
 
-  window.onload = function() {
-    let burger = document.querySelector('.navbar-burger');
-    burger.addEventListener('click', () => {
-      const target = document.getElementById(burger.dataset.target);
-      burger.classList.toggle('is-active');
-      target.classList.toggle('is-active');
-    });
+  const burger = document.querySelector('.navbar-burger');
+  const menu = document.getElementById(burger.dataset.target);
+  burger.addEventListener('click', () => {
+    burger.classList.toggle('is-active');
+    menu.classList.toggle('is-active');
+  });
+  menu.addEventListener('click', () => {
+    if (window.getComputedStyle(burger).display == 'block') {
+      burger.click();
+    }
+  }, true);
+
+  document.addEventListener('DOMContentLoaded', () => {
     updateUI();
     draw();
-  }
+  });
 
 })();

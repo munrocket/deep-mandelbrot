@@ -2,7 +2,7 @@
 
 let imax;
 let bailout = 5000;
-let scheme = 0;
+let scheme = 3;
 let aim = { x: new Double(-0.75), y: new Double(0), hx: new Double(1.25), hy: new Double(1.15) };
 
 function calcOrbit(z) {
@@ -63,6 +63,8 @@ function draw() {
     const canvas = document.getElementById('glcanvas');
     const gl = twgl.getContext(canvas, { antialias: false, depth: false });
     if (!gl) { Events.showError('WebGL not supported', "This viewer requires WebGL, which is not supported by this device or turned off."); }
+    //let ext = gl.getExtension('EXT_disjoint_timer_query');
+
     twgl.resizeCanvasToDisplaySize(gl.canvas);
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
     let ratio = gl.canvas.width / gl.canvas.height;
@@ -87,6 +89,7 @@ function draw() {
       orbit: calcOrbit(origin)
     };
     twgl.setUniforms(programInfo, uniforms);
+
     twgl.drawBufferInfo(gl, bufferInfo, gl.TRIANGLE_FAN);
   } catch (error) {
     console.log(error);
