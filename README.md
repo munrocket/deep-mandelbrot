@@ -1,6 +1,6 @@
 # Deep Mandelbrot
 
-Deep zoom fractal viewer with WebGL and perturbation theory acceleration → [Web page](https://munrocket.github.io/deep-mandelbrot/)
+Fractal viewer with WebGL and perturbation theory acceleration in [web page](https://munrocket.github.io/deep-mandelbrot/)
 
 ### Features
 

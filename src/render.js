@@ -2,19 +2,21 @@
 
 let imax;
 let bailout = 5000;
-let scheme = 0;
+let colorScheme = 0;
 let aim = { x: new Double(-0.75), y: new Double(0), hx: new Double(1.25), hy: new Double(1.15) };
+//let aim = { x: new Double(0), y: new Double(0), hy: new Double(1.25), hy: new Double(1.15) };
 
-function calcOrbit(z) {
-  let orbit = [], X = Double.Zero, Y = Double.Zero;
-  let XX = Double.Zero, YY = Double.Zero, XY = Double.Zero;
-  let DX = Double.Zero, DY = Double.Zero, temp;
-  for (let i = 0; i < imax && XX.add(YY).lt(bailout); i++) {
+function calcOrbit(c, c0) {
+  let X = c0 ? c0.x : c.x, Y = c0 ? c0.y : c.y;
+  let XX = X.sqr(), YY = Y.sqr(), XY = X.mul(Y);
+  let DX = Double.One, DY = Double.Zero, temp;
+  let orbit = [X.toNumber(), Y.toNumber(), DX.toNumber(), DY.toNumber()]
+  for (let i = 1; i < imax && XX.add(YY).lt(bailout); i++) {
     temp = X.mul(DX).sub(Y.mul(DY)).mul(2).add(1);
     DY = X.mul(DY).add(Y.mul(DX)).mul(2);
     DX = temp;
-    X = XX.sub(YY).add(z.x);
-    Y = XY.add(XY).add(z.y);
+    X = XX.sub(YY).add(c.x);
+    Y = XY.add(XY).add(c.y);
     XX = X.sqr(); YY = Y.sqr(); XY = X.mul(Y);
     orbit.push(X.toNumber());  orbit.push(Y.toNumber());
     orbit.push(DX.toNumber()); orbit.push(DY.toNumber());
@@ -22,19 +24,20 @@ function calcOrbit(z) {
   return orbit;
 }
 
-function draw() {
+function draw(aim, julia) {
 
-  function pointDepth(z) {
-    let i, X, Y, XX = Double.Zero, YY = Double.Zero, XY = Double.Zero;;
+  function pointDepth(c, c0) {
+    let i, X = c0 ? c0.x : c.x, Y = c0 ? c0.y : c.y;
+    let XX = X.sqr(), YY = Y.sqr(), XY = X.mul(Y);
     for (i = 0; i < imax && XX.add(YY).lt(bailout); i++) {
-      X = XX.sub(YY).add(z.x);
-      Y = XY.add(XY).add(z.y);
+      X = XX.sub(YY).add(c.x);
+      Y = XY.add(XY).add(c.y);
       XX = X.sqr(); YY = Y.sqr(); XY = X.mul(Y);
     }
     return (i != imax) ? i : Infinity;
   }
 
-  function searchOrigin(aim) {
+  function searchOrigin(aim, julia) {
     let repeat = 6, n = 12, m = 3;
     let z = {}, zbest = {}, newAim = Object.assign({}, aim), f, fbest = -Infinity;
     for (let k = 0; k < repeat; k++) {
@@ -42,7 +45,7 @@ function draw() {
         for (let j = 0; j <= n; j++) {
           z.x = newAim.x.add(newAim.hx.mul(2 * i / n - 1));
           z.y = newAim.y.add(newAim.hy.mul(2 * j / n - 1));
-          f = pointDepth(z);
+          f = (julia) ? pointDepth(julia, z) : pointDepth(z)
           if (f == Infinity) {
             return z;
           } else if (f > fbest) {
@@ -60,9 +63,9 @@ function draw() {
   }
 
   try {
-    const canvas = document.getElementById('glcanvas');
+    const canvas = document.getElementById(julia ? 'gljulia' : 'glmandel');
     const gl = twgl.getContext(canvas, { antialias: false, depth: false });
-    if (!gl) { Events.showError('WebGL not supported', "This viewer requires WebGL, which is not supported by this device or turned off."); }
+    if (!gl) { Events.showError('This viewer requires WebGL', 'WebGL is turned off or not supported by this device.'); }
 
     twgl.resizeCanvasToDisplaySize(gl.canvas);
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
@@ -74,45 +77,19 @@ function draw() {
     }
 
     imax = Math.floor(gl.getParameter(gl.MAX_FRAGMENT_UNIFORM_VECTORS) / 2);
-    const programInfo = twgl.createProgramInfo(gl, [vert, frag(scheme)]);
+    const programInfo = twgl.createProgramInfo(gl, [vert, frag(julia ? 1 : 0)]);
     gl.useProgram(programInfo.program);
 
     const attribs = { position: { data: [1, 1, 1, -1, -1, -1, -1, 1], numComponents: 2 } };
     const bufferInfo = twgl.createBufferInfoFromArrays(gl, attribs);
     twgl.setBuffersAndAttributes(gl, programInfo, bufferInfo);
 
-    let origin = searchOrigin(aim);
+    let origin = searchOrigin(aim, julia ? julia : 0);
     const uniforms = {
       center: [aim.x.sub(origin.x).toNumber(), aim.y.sub(origin.y).toNumber()],
       size: [aim.hx.toNumber(), aim.hy.toNumber()],
-      orbit: calcOrbit(origin),
-    };
-    twgl.setUniforms(programInfo, uniforms);
-
-    twgl.drawBufferInfo(gl, bufferInfo, gl.TRIANGLE_FAN);
-  } catch (error) {
-    console.log(error);
-    Events.showError();
-  }
-}
-
-function julia(c0) {
-  try {
-    const gl = twgl.getContext(document.getElementById('gljulia'), { depth: false });
-    twgl.resizeCanvasToDisplaySize(gl.canvas);
-    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-
-    const programInfo = twgl.createProgramInfo(gl, [vert, juliaFrag(scheme)]);
-    gl.useProgram(programInfo.program);
-
-    const attribs = { position: { data: [1, 1, 1, -1, -1, -1, -1, 1], numComponents: 2 } };
-    const bufferInfo = twgl.createBufferInfoFromArrays(gl, attribs);
-    twgl.setBuffersAndAttributes(gl, programInfo, bufferInfo);
-
-    const uniforms = {
-      center: [0, 0],
-      size: [2, 2],
-      c0: [c0.x.toNumber(), c0.y.toNumber()],
+      orbit: julia ? calcOrbit(julia, origin) : calcOrbit(origin),
+      phi: 0,
     };
     twgl.setUniforms(programInfo, uniforms);
 

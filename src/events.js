@@ -3,8 +3,9 @@
 let Events = {
   savePng() {
     var a  = document.createElement('a');
-    a.href = document.getElementById('glcanvas').toDataURL('png');
-    a.download = `mandelbrot_x_${aim.x.toExponential()}__y_${aim.y.toExponential()})__zoom_${Math.floor(1.5 * aim.hx.inv().toNumber())}x.png`;
+    a.href = document.getElementById('glmandel').toDataURL('png');
+    a.download = `mandelbrot_x_${aim.x.toExponential()}__y_${aim.y.toExponential()})`
+      + `__zoom_${Math.floor(1.5 * aim.hx.inv().toNumber())}x.png`;
     a.click();
   },
   showError(header, msg) {
@@ -20,6 +21,7 @@ let Events = {
   let savedMousePos;
   let savedWheelPos = 0;
   let isDrawingRect = false;
+  let isJulia = false;
 
   function getMousePos(e) {
     let rect = control.getBoundingClientRect();
@@ -34,9 +36,11 @@ let Events = {
 
   function updateUI() {
     let ctx = control.getContext('2d');
+    ctx.clearRect(0, 0, control.width, control.height);
     control.width = ctx.canvas.clientWidth;
     control.height = ctx.canvas.clientHeight;
-    ctx.clearRect(0, 0, control.width, control.height);
+    let gl = twgl.getContext(document.getElementById('gljulia'));
+    gl.clear(gl.COLOR_BUFFER_BIT);
   }
 
   function zoomRect(pos, factor) {
@@ -49,7 +53,7 @@ let Events = {
       aim.y = savedMousePos.y.add(pos.y).div(2);
       aim.hx = dx.abs();
       aim.hy = dy.abs();
-      draw();
+      draw(aim);
       updateUI();
     }
   }
@@ -59,7 +63,7 @@ let Events = {
     aim.y = pos.y;
     aim.hx = aim.hx.mul(factor);
     aim.hy = aim.hy.mul(factor);
-    draw();
+    draw(aim);
     updateUI();
   }
 
@@ -74,6 +78,7 @@ let Events = {
   function drawOrbit(pos) {
     let orbittex = calcOrbit(pos);
     let ctx = control.getContext('2d');
+    ctx.clearRect(0, 0, control.width, control.height);
     ctx.beginPath();
     for (let i = 0; i < imax; i++) {
       let point = { x: orbittex[4 * i], y: orbittex[4 * i + 1] };
@@ -89,20 +94,20 @@ let Events = {
 
   control.addEventListener('mousedown', e => {
     savedMousePos = getMousePos(e);
-    if (e.button == 0) {
+    if ((e.button == 0 && e.ctrlKey) || e.button == 1) {
+      isJulia = true;      
+    } else if (e.button == 0) {
       isDrawingRect = true;
     }
   });
 
   control.addEventListener('mouseup', e => {
     let pos = getMousePos(e);
-    if (e.button == 0) {
+    if (e.button == 0 && !isJulia) {
       isDrawingRect = false;
       zoomRect(pos, 1/15);
     } else if (e.button == 2) {
       zoom(pos, 15);
-    } else {
-      drawOrbit(pos);
     }
   });
 
@@ -110,6 +115,10 @@ let Events = {
     if (isDrawingRect && e.target.id != 'glcontrol') {
       getMousePos(e);
       control.dispatchEvent(new MouseEvent('mouseup', e));
+    }
+    if (isJulia) {
+      isJulia = false;
+      updateUI();
     }
   });
 
@@ -123,7 +132,11 @@ let Events = {
       ctx.strokeStyle = '#f9a4a4';
       ctx.stroke();
     }
-    julia(getMousePos(e));
+    if (isJulia) {
+      let pos = getMousePos(e);
+      draw({x:Double.Zero, y:Double.Zero, hx:new Double(2), hy:new Double(2)}, pos);
+      drawOrbit(pos);
+    }
   });
 
   control.addEventListener('wheel', e => {
@@ -135,8 +148,9 @@ let Events = {
 
   control.addEventListener('contextmenu', e => e.preventDefault());
   
-  document.getElementById('glcanvas').addEventListener('webglcontextlost', e => {
-    Events.showError("WebGL context lost!", "GPU calculation was too long and the browser or the OS decides to reset the GPU.")
+  document.getElementById('glmandel').addEventListener('webglcontextlost', e => {
+    Events.showError("WebGL context lost!",
+      "GPU calculation was too long and the browser or the OS decides to reset the GPU.")
     e.preventDefault();
   });
   
@@ -165,7 +179,7 @@ let Events = {
 
   document.addEventListener('DOMContentLoaded', () => {
     updateUI();
-    draw();
+    draw(aim);
   });
 
 })();

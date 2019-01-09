@@ -14,7 +14,7 @@
     .with-full-height > div { flex: 1; display: flex; flex-direction: column; }
     .with-many-layers { position: relative; background-color: #0a0a0a; }
     .with-many-layers > canvas { position: absolute; width: 100%; height: 100%; }
-    #gljulia { left: 0; bottom: 0; height: 250px; width: 250px;}
+    #gljulia { left: 0; bottom: 0; height: 400px; width: 400px;}
   </style>
 </head>
 <body>
@@ -34,9 +34,8 @@
           <div class="navbar-item has-dropdown is-hoverable">
             <a class="navbar-link">Color</a>
             <div class="navbar-dropdown">
-              <a class="navbar-item" onclick="scheme = 0; draw();">Winter</a>
-              <a class="navbar-item" onclick="scheme = 2; draw();">Potential</a>
-              <a class="navbar-item" onclick="scheme = 1; draw();">Some DEM</a>
+              <a class="navbar-item" onclick="colorScheme = 0; draw(aim);">Winter</a>
+              <a class="navbar-item" onclick="colorScheme = 1; draw(aim);">Tatoo</a>
             </div>
           </div>
           <a class="navbar-item" onclick="Events.savePng()">Save</a>
@@ -55,7 +54,7 @@
     </nav>
 
     <div class="with-many-layers">
-      <canvas id="glcanvas"></canvas>
+      <canvas id="glmandel"></canvas>
       <canvas id="gljulia"></canvas>
       <canvas id="glcontrol"></canvas>
     </div>
