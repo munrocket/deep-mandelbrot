@@ -2,7 +2,7 @@
 
 let imax;
 let bailout = 5000;
-let scheme = 3;
+let scheme = 0;
 let aim = { x: new Double(-0.75), y: new Double(0), hx: new Double(1.25), hy: new Double(1.15) };
 
 function calcOrbit(z) {
@@ -63,7 +63,6 @@ function draw() {
     const canvas = document.getElementById('glcanvas');
     const gl = twgl.getContext(canvas, { antialias: false, depth: false });
     if (!gl) { Events.showError('WebGL not supported', "This viewer requires WebGL, which is not supported by this device or turned off."); }
-    //let ext = gl.getExtension('EXT_disjoint_timer_query');
 
     twgl.resizeCanvasToDisplaySize(gl.canvas);
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
@@ -75,7 +74,7 @@ function draw() {
     }
 
     imax = Math.floor(gl.getParameter(gl.MAX_FRAGMENT_UNIFORM_VECTORS) / 2);
-    const programInfo = twgl.createProgramInfo(gl, [vsource, fsource(scheme)]);
+    const programInfo = twgl.createProgramInfo(gl, [vert, frag(scheme)]);
     gl.useProgram(programInfo.program);
 
     const attribs = { position: { data: [1, 1, 1, -1, -1, -1, -1, 1], numComponents: 2 } };
@@ -86,7 +85,34 @@ function draw() {
     const uniforms = {
       center: [aim.x.sub(origin.x).toNumber(), aim.y.sub(origin.y).toNumber()],
       size: [aim.hx.toNumber(), aim.hy.toNumber()],
-      orbit: calcOrbit(origin)
+      orbit: calcOrbit(origin),
+    };
+    twgl.setUniforms(programInfo, uniforms);
+
+    twgl.drawBufferInfo(gl, bufferInfo, gl.TRIANGLE_FAN);
+  } catch (error) {
+    console.log(error);
+    Events.showError();
+  }
+}
+
+function julia(c0) {
+  try {
+    const gl = twgl.getContext(document.getElementById('gljulia'), { depth: false });
+    twgl.resizeCanvasToDisplaySize(gl.canvas);
+    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+
+    const programInfo = twgl.createProgramInfo(gl, [vert, juliaFrag(scheme)]);
+    gl.useProgram(programInfo.program);
+
+    const attribs = { position: { data: [1, 1, 1, -1, -1, -1, -1, 1], numComponents: 2 } };
+    const bufferInfo = twgl.createBufferInfoFromArrays(gl, attribs);
+    twgl.setBuffersAndAttributes(gl, programInfo, bufferInfo);
+
+    const uniforms = {
+      center: [0, 0],
+      size: [2, 2],
+      c0: [c0.x.toNumber(), c0.y.toNumber()],
     };
     twgl.setUniforms(programInfo, uniforms);
 

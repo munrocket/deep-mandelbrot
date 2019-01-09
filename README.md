@@ -1,6 +1,6 @@
 # Deep Mandelbrot
 
-Famous fractal with deep zoom in [web page](https://munrocket.github.io/deep-mandelbrot/)
+Deep zoom fractal viewer with WebGL and perturbation theory acceleration → [Web page](https://munrocket.github.io/deep-mandelbrot/)
 
 ### Features
 
@@ -9,14 +9,15 @@ Famous fractal with deep zoom in [web page](https://munrocket.github.io/deep-man
 - [X] Perturbation theory
 - [X] Double.js float
 - [X] Logarithmic search for reference orbit
+- [X] Julia set minimap
 
 ![Deep-Mandelbrot](https://munrocket.github.io/deep-mandelbrot/img/example.png)
 
 ### 2do
+- [ ] Rotation
 - [ ] Ping pong render
-- [ ] Optimization (Mariani algorithm, progressive, dem)
-- [ ] UI: phone zoom
-- [ ] Rotation, Julia set
+- [ ] Better mobile support
+- [ ] Additional optimization (Mariani algorithm / progressive render / dem)
 
 ### References
 

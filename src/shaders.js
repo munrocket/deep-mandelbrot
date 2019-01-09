@@ -1,23 +1,22 @@
 'use strict';
 
-let vsource =
+let vert =
   `precision highp float;
 
   uniform vec2 size;
   uniform vec2 center;
-  const float phi = 0.0;
-  const vec2 rot = vec2(sin(phi), cos(phi));
-
+  uniform float phi;
   attribute vec2 position;
-  varying vec2 p;
+  varying vec2 point;
 
   void main() {
     vec2 z = size * position;
-    p = center + vec2(z.x * rot.y - z.y * rot.x, dot(z, rot));
+    vec2 rot = vec2(sin(phi), cos(phi));
+    point = center + vec2(z.x * rot.y - z.y * rot.x, dot(z, rot));
     gl_Position = vec4(position, 0.0, 1.0);
   }`;
 
-let fsource = (scheme) => {
+let frag = (scheme) => {
   if (scheme < 2) {
     return `
       precision highp float;
@@ -29,7 +28,8 @@ let fsource = (scheme) => {
 
       uniform vec4 orbit[imax];
       uniform vec2 size;
-      varying vec2 p;
+      uniform vec2 julia;
+      varying vec2 point;
 
       float interpolate(float s, float s1, float s2, float s3, float d) {
         float d2 = d * d, d3 = d * d2;
@@ -37,7 +37,7 @@ let fsource = (scheme) => {
       }
 
       void main() {
-        float u = p.x, v = p.y, zz, time, temp;
+        float u = point.x, v = point.y, zz, time, temp;
         float s1, s2, s3, stripe;
         vec2 o = vec2(orbit[0].x, orbit[0].y);
         vec2 z = o + vec2(u,v), dz = vec2(1, 0);
@@ -50,8 +50,8 @@ let fsource = (scheme) => {
           dz.x = temp;
 
           // next step: W -> W^2 + 2 * O * W + P
-          temp = u * u - v * v + 2. * (u * o.x - v * o.y) + p.x;
-          v = u * v + u * v + 2. * (v * o.x + u * o.y) + p.y;
+          temp = u * u - v * v + 2. * (u * o.x - v * o.y) + point.x;
+          v = u * v + u * v + 2. * (v * o.x + u * o.y) + point.y;
           u = temp;
 
           // initilizing
@@ -88,10 +88,10 @@ let fsource = (scheme) => {
         const int imax = ${imax};
         uniform vec4 orbit[imax];
         uniform vec2 center;
-        varying vec2 p;
+        varying vec2 point;
 
         void main() {
-          vec2 c = p + vec2(orbit[0].x, orbit[0].y);
+          vec2 c = point + vec2(orbit[0].x, orbit[0].y);
           float x, y, t, col;
           
           for (int i = 0; i < imax; i++) {
@@ -107,3 +107,50 @@ let fsource = (scheme) => {
         }`
     }
 };
+
+let juliaFrag = (scheme) => {
+  return `
+    precision mediump float;
+
+    #define imax ${imax}
+    #define bailout ${bailout}.
+    #define DEM ${scheme}
+    const float loglogB = log2(log2(bailout));
+    uniform vec2 c0;
+    varying vec2 point;
+
+    float interpolate(float s, float s1, float s2, float s3, float d) {
+      float d2 = d * d, d3 = d * d2;
+      return 0.5 * (s * (d3 - d2) + s1 * (d + 4.*d2 - 3.*d3) + s2 * (2. - 5.*d2 + 3.*d3) + s3 * (-d + 2.*d2 - d3));
+    }
+
+    void main() {
+      if (length(point) > 2.0) {
+        gl_FragColor = vec4(0.0);
+      } else {
+        float x = point.x, y = point.y, xx = x * x, yy = y * y, xy = x * y;
+        float time, stripe, s1, s2, s3;
+        vec3 col;
+
+        for (int i = 0; i < imax; i++) {
+          time += 1.0;
+          x = xx - yy + c0.x;
+          y = xy + xy + c0.y;
+          xx = x * x;
+          yy = y * y;
+          xy = x * y;
+
+          #if !DEM
+            stripe += x * y / (xx + yy) * step(1.0, time);
+            s3 = s2; s2 = s1; s1 = stripe;
+          #endif
+
+          if (xx + yy > bailout) { break; }
+        }
+        time += 1.0 + min(1.0, loglogB - log2(log2(xx+yy)));
+        col += 0.7 + 2.5 * (interpolate(stripe, s1, s2, s3, fract(time)) / min(200., time)) * (1.0 - 0.6 * step(float(imax), 1. + time));
+        col = 0.5 + 0.5 * sin(col + vec3(4.0, 4.6, 5.2) + 50.0 * time / float(imax));
+        gl_FragColor = vec4(vec3(0.5 + 0.5 * sin(3.141595653589*col + vec3(4.0, 4.6, 5.2))), sqrt(2.0 - length(point)));
+      }
+    }`
+  };

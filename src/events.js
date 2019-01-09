@@ -123,6 +123,7 @@ let Events = {
       ctx.strokeStyle = '#f9a4a4';
       ctx.stroke();
     }
+    julia(getMousePos(e));
   });
 
   control.addEventListener('wheel', e => {
@@ -152,14 +153,14 @@ let Events = {
 
   const burger = document.querySelector('.navbar-burger');
   const menu = document.getElementById(burger.dataset.target);
-  burger.addEventListener('click', () => {
-    burger.classList.toggle('is-active');
-    menu.classList.toggle('is-active');
-  });
   menu.addEventListener('click', () => {
     if (window.getComputedStyle(burger).display == 'block') {
       burger.click();
     }
+  }, true);
+  burger.addEventListener('click', () => {
+    burger.classList.toggle('is-active');
+    menu.classList.toggle('is-active');
   }, true);
 
   document.addEventListener('DOMContentLoaded', () => {
