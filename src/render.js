@@ -4,7 +4,6 @@ let imax;
 let bailout = 5000;
 let colorScheme = 0;
 let aim = { x: new Double(-0.75), y: new Double(0), hx: new Double(1.25), hy: new Double(1.15) };
-//let aim = { x: new Double(0), y: new Double(0), hy: new Double(1.25), hy: new Double(1.15) };
 
 function calcOrbit(c, c0) {
   let X = c0 ? c0.x : c.x, Y = c0 ? c0.y : c.y;
@@ -67,7 +66,7 @@ function draw(aim, julia) {
     const gl = twgl.getContext(canvas, { antialias: false, depth: false });
     if (!gl) { Events.showError('This viewer requires WebGL', 'WebGL is turned off or not supported by this device.'); }
 
-    twgl.resizeCanvasToDisplaySize(gl.canvas);
+    twgl.resizeCanvasToDisplaySize(gl.canvas, window.devicePixelRatio || 1);
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
     let ratio = gl.canvas.width / gl.canvas.height;
     if (ratio > 1) {

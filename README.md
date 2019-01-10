@@ -11,9 +11,10 @@ Fractal viewer with WebGL and perturbation theory acceleration in [web page](htt
 - [X] Logarithmic search for reference orbit
 - [X] Julia set minimap
 
-![Deep-Mandelbrot](https://munrocket.github.io/deep-mandelbrot/img/example.png)
+![Deep-Mandelbrot](https://i.imgur.com/EfIDzxt.png)
 
 ### 2do
+- [ ] PWA, Google stats
 - [ ] Rotation
 - [ ] Ping pong render
 - [ ] Better mobile support

@@ -4,61 +4,87 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="img/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="img/favicon-16x16.png">
+  <link rel="manifest" href="img/site.webmanifest">
+  <link rel="mask-icon" href="img/safari-pinned-tab.svg" color="#5bbad5">
+  <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico">
+  <meta name="apple-mobile-web-app-title" content="Deep Mandelbrot">
+  <meta name="application-name" content="Deep Mandelbrot">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="msapplication-config" content="img/browserconfig.xml">
+  <meta name="theme-color" content="#ffffff">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Deep Mandelbrot">
+  <meta property="og:description" content="Deep zoom fractal viewer with WebGL and perturbation theory acceleration.">
+  <meta property="og:url" content="https://munrocket.github.io/deep-mandelbrot/">
+  <meta property="og:image" content="https://munrocket.github.io/deep-mandelbrot/img/og-image.jpg">
+  <meta property="og:image:height" content="420">
+  <meta property="og:image:width" content="803">
+
+  <title>Deep Mandelbrot</title>
   <link rel="stylesheet" href="lib/bulma.css">
   <script defer src="lib/fontawesome.js"></script>
-  <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon">
-  <title>Deep Mandelbrot</title>
   <style>
     html, body { overflow: hidden; }
-    .with-full-height { display: flex; flex-direction: column; height: 100vh; min-height: 100%; }
-    .with-full-height > div { flex: 1; display: flex; flex-direction: column; }
-    .with-many-layers { position: relative; background-color: #0a0a0a; }
-    .with-many-layers > canvas { position: absolute; width: 100%; height: 100%; }
+    main { display: flex; flex-direction: column; height: 100vh; min-height: 100%; }
+    main > section { flex: 1; display: flex; flex-direction: column; }
+    .viewer { position: relative; background-color: #0a0a0a; }
+    .viewer > canvas { position: absolute; width: 100%; height: 100%; }
     #gljulia { left: 0; bottom: 0; height: 400px; width: 400px;}
   </style>
+
 </head>
 <body>
-  <section class="with-full-height">
-    <nav class="navbar is-black" role="navigation" aria-label="main navigation">
-      <div class="navbar-brand">
-        <h1 class="navbar-item has-text-weight-bold">Deep Mandelbrot</h1>
 
-        <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="mainMenu">
-          <span aria-hidden="true"></span>
-          <span aria-hidden="true"></span>
-          <span aria-hidden="true"></span>
-        </a>
-      </div>
-      <div id="mainMenu" class="navbar-menu">
-        <div class="navbar-start">
-          <div class="navbar-item has-dropdown is-hoverable">
-            <a class="navbar-link">Color</a>
-            <div class="navbar-dropdown">
-              <a class="navbar-item" onclick="colorScheme = 0; draw(aim);">Winter</a>
-              <a class="navbar-item" onclick="colorScheme = 1; draw(aim);">Tatoo</a>
+  <main>
+
+    <header>
+      <nav class="navbar is-black" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+          <h1 class="navbar-item has-text-weight-bold">Deep Mandelbrot</h1>
+
+          <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="mainMenu">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+          </a>
+        </div>
+        <div id="mainMenu" class="navbar-menu">
+          <div class="navbar-start">
+            <div class="navbar-item has-dropdown is-hoverable">
+              <a class="navbar-link">Color</a>
+              <div class="navbar-dropdown">
+                <a class="navbar-item" onclick="colorScheme = 0; draw(aim);">Winter</a>
+                <a class="navbar-item" onclick="colorScheme = 1; draw(aim);">Tatoo</a>
+              </div>
+            </div>
+            <a class="navbar-item" onclick="Events.savePng()">Save</a>
+          </div>
+          <div class="navbar-end">
+            <div class="navbar-item">
+              <div class="buttons">
+                <a class="button is-light" target="_blank" href="https://github.com/munrocket/deep-mandelbrot">
+                  <span class="icon"><i class="fab fa-github-alt"></i></span>
+                  <span>GitHub</span>
+                </a>
+              </div>
             </div>
           </div>
-          <a class="navbar-item" onclick="Events.savePng()">Save</a>
         </div>
-        <div class="navbar-end">
-          <div class="navbar-item">
-            <div class="buttons">
-              <a class="button is-light" href="https://github.com/munrocket/deep-mandelbrot" >
-                <span class="icon"><i class="fab fa-github-alt"></i></span>
-                <span>GitHub</span>
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </nav>
+      </nav>
+    </header>
 
-    <div class="with-many-layers">
+    <section class="viewer">
       <canvas id="glmandel"></canvas>
       <canvas id="gljulia"></canvas>
       <canvas id="glcontrol"></canvas>
-    </div>
-  </section>
+    </section>
+
+  </main>
   
   <div id="errorBox" class="modal">
     <div class="modal-background"></div>
