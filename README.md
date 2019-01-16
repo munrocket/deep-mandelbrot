@@ -14,7 +14,7 @@
 ![Deep Mandelbrot](https://i.imgur.com/EfIDzxt.png)
 
 ### 2do
-- [ ] New feature (Rotation, Google stats, new name, new formulas, router, log color time, gaussian integer distance color)
+- [ ] New feature (Rotation, new formulas, router, log color time, gaussian integer distance color)
 - [ ] Better mobile support (minus button, white blink on iOS, fix glsl render inside set, pwa state)
 - [ ] Better optimization (julia render, ping pong render, Mariani algorithm / progressive render / dem)
 
