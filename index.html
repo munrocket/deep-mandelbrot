@@ -11,41 +11,40 @@
   <link rel="manifest" href="img/site.webmanifest">
   <link rel="mask-icon" href="img/safari-pinned-tab.svg" color="#5bbad5">
   <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico">
-  <meta name="apple-mobile-web-app-title" content="Deep Mandelbrot">
-  <meta name="application-name" content="Deep Mandelbrot">
+  <meta name="apple-mobile-web-app-title" content="Deep Fractal">
+  <meta name="application-name" content="Deep Fractal">
   <meta name="msapplication-TileColor" content="#da532c">
   <meta name="msapplication-config" content="img/browserconfig.xml">
-  <meta name="theme-color" content="#ffffff">
+  <meta name="theme-color" content="#0a0a0a">
 
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Deep Mandelbrot">
+  <meta property="og:title" content="Deep Fractal">
   <meta property="og:description" content="Deep zoom fractal viewer with WebGL and perturbation theory acceleration.">
-  <meta property="og:url" content="https://munrocket.github.io/deep-mandelbrot/">
-  <meta property="og:image" content="https://munrocket.github.io/deep-mandelbrot/img/og-image.jpg">
+  <meta property="og:url" content="https://munrocket.github.io/deep-fractal/">
+  <meta property="og:image" content="https://munrocket.github.io/deep-fractal/img/og-image.jpg">
   <meta property="og:image:height" content="420">
   <meta property="og:image:width" content="803">
 
-  <title>Deep Mandelbrot</title>
+  <title>Deep Fractal</title>
   <link rel="stylesheet" href="lib/bulma.css">
   <script defer src="lib/fontawesome.js"></script>
   <style>
-    html, body { overflow: hidden; }
-    main { display: flex; flex-direction: column; height: 100vh; min-height: 100%; }
-    main > section { flex: 1; display: flex; flex-direction: column; }
-    .viewer { position: relative; background-color: #0a0a0a; }
-    .viewer > canvas { position: absolute; width: 100%; height: 100%; }
+    html, body { overflow: hidden; background-color: #0a0a0a; }
+    .wrapper { display: flex; flex-direction: column; height: 100vh; min-height: 100%; }
+    main { flex: 1; position: relative; display: flex; flex-direction: column; background-color: #0a0a0a; }
+    canvas { position: absolute; width: 100%; height: 100%; }
     #gljulia { left: 0; bottom: 0; height: 400px; width: 400px;}
   </style>
 
 </head>
 <body>
 
-  <main>
+  <div class="wrapper">
 
     <header>
       <nav class="navbar is-black" role="navigation" aria-label="main navigation">
         <div class="navbar-brand">
-          <h1 class="navbar-item has-text-weight-bold">Deep Mandelbrot</h1>
+          <h1 class="navbar-item has-text-weight-bold">Deep Fractal</h1>
 
           <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="mainMenu">
             <span aria-hidden="true"></span>
@@ -67,7 +66,7 @@
           <div class="navbar-end">
             <div class="navbar-item">
               <div class="buttons">
-                <a class="button is-light" target="_blank" href="https://github.com/munrocket/deep-mandelbrot">
+                <a class="button is-light" target="_blank" href="https://github.com/munrocket/deep-fractal">
                   <span class="icon"><i class="fab fa-github-alt"></i></span>
                   <span>GitHub</span>
                 </a>
@@ -78,13 +77,13 @@
       </nav>
     </header>
 
-    <section class="viewer">
+    <main class="viewer">
       <canvas id="glmandel"></canvas>
       <canvas id="gljulia"></canvas>
       <canvas id="glcontrol"></canvas>
-    </section>
+    </main>
 
-  </main>
+  </div>
   
   <div id="errorBox" class="modal">
     <div class="modal-background"></div>

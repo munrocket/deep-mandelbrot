@@ -1,24 +1,22 @@
-# Deep Mandelbrot
+# Deep Fractal
 
-Fractal viewer with WebGL and perturbation theory acceleration in [web page](https://munrocket.github.io/deep-mandelbrot/)
+[Web](https://munrocket.github.io/deep-fractal/) viewer with WebGL and perturbation theory acceleration.
 
 ### Features
 
 - [X] Deep zoom (beta version 10^-31)
+- [X] Julia set minimap
 - [X] Webgl parallel processing
 - [X] Perturbation theory
 - [X] Double.js float
 - [X] Logarithmic search for reference orbit
-- [X] Julia set minimap
 
-![Deep-Mandelbrot](https://i.imgur.com/EfIDzxt.png)
+![Deep Mandelbrot](https://i.imgur.com/EfIDzxt.png)
 
 ### 2do
-- [ ] PWA, Google stats
-- [ ] Rotation
-- [ ] Ping pong render
-- [ ] Better mobile support
-- [ ] Additional optimization (Mariani algorithm / progressive render / dem)
+- [ ] New feature (Rotation, Google stats, new name, new formulas, router, log color time, gaussian integer distance color)
+- [ ] Better mobile support (minus button, white blink on iOS, fix glsl render inside set, pwa state)
+- [ ] Better optimization (julia render, ping pong render, Mariani algorithm / progressive render / dem)
 
 ### References
 
@@ -36,3 +34,9 @@ Fractal viewer with WebGL and perturbation theory acceleration in [web page](htt
 [//]: # "*Numerical Methods for Finding Periodic Orbits* [[url](http://www.scholarpedia.org/article/Periodic_orbit#Numerical_Methods_for_Finding_Periodic_Orbits)]"
 [//]: # "*Mandelbrot exterior coloring* https://en.wikibooks.org/wiki/Fractals/Iterations_in_the_complex_plane/demm"
 [//]: # "Claude Heiland-Allen. *Perturbation techniques applied to the Mandelbrot set* [[url](https://mathr.co.uk/mandelbrot/perturbation.pdf)]"
+[//]: # "Intresting modifications:
+          drop: z -> z^2 + 1/c
+          eye: z -> z^3 + 1/c
+          circle: z -> z^2 + 1/c - 1
+          stripe: z -> z^2 + 1/(conj(c) - 0.5) - 3/4
+          mandelpinski: julia z -> z^4 - 0.1/z^4"

@@ -1,18 +1,18 @@
 'use strict';
 
-let vert =
-  `precision highp float;
+let vert = () => `
+  precision highp float;
 
   attribute vec2 position;
   uniform vec2 center;
   uniform vec2 size;
   uniform float phi;
-  varying vec2 variation;
+  varying vec2 var;
 
   void main() {
     vec2 rot = vec2(sin(phi), cos(phi));
     vec2 z = size * position;
-    variation = center + vec2(z.x * rot.y - z.y * rot.x, dot(z, rot));
+    var = center + vec2(z.x * rot.y - z.y * rot.x, dot(z, rot));
     gl_Position = vec4(position, 0.0, 1.0);
   }`;
 
@@ -28,7 +28,8 @@ let frag = (isJulia) => {
 
     uniform vec4 orbit[imax];
     uniform vec2 size;
-    varying vec2 variation;
+    uniform vec2 origin;
+    varying vec2 var;
 
     float interpolate(float s, float s1, float s2, float s3, float d) {
       float d2 = d * d, d3 = d * d2;
@@ -36,11 +37,10 @@ let frag = (isJulia) => {
     }
 
     void main() {
-      float u = variation.x, v = variation.y, zz, time, temp;
+      float u = var.x, v = var.y, zz, time, temp;
       float s1, s2, s3, stripe;
       vec2 o = vec2(orbit[0].x, orbit[0].y);
-      vec2 z = o + vec2(u,v), dz = vec2(1, 0);
-      vec3 col;
+      vec2 z = o + var, dz = vec2(1, 0);
 
       #if is_julia
         if (length(z) > 2.) { gl_FragColor = vec4(0.); return; }
@@ -57,7 +57,8 @@ let frag = (isJulia) => {
         v = u * v + u * v + 2. * (v * o.x + u * o.y);
         u = temp;
         #if !is_julia
-          u += variation.x;  v += variation.y;
+          u += var.x;
+          v += var.y;
         #endif
 
         // initilizing:  Z = O + W
@@ -75,14 +76,16 @@ let frag = (isJulia) => {
         time += 1.;
         if (zz > bailout) { break; }
       }
+      
+      // DEM/M = 2.0 * |Z / Z'| * ln(|Z|)
+      float dem = sqrt(zz / dot(dz,dz)) * log(zz);
+      vec3 col;
 
       #if color_scheme == 0
         time += 1.0 + min(1.0, loglogB - log2(log2(zz)));
         col += 0.7 + 2.5 * (interpolate(stripe, s1, s2, s3, fract(time)) / min(200., time)) * (1.0 - 0.6 * step(float(imax), 1. + time));
         col = 0.5 + 0.5 * sin(col + vec3(4.0, 4.6, 5.2) + 50.0 * time / float(imax));
       #else
-        // DEM/M = 2.0 * |Z / Z'| * ln(|Z|)
-        float dem = sqrt(zz / dot(dz,dz)) * log(zz);
         col += (1. - clamp(0., -log(dem / size.x * 500.), 1.)) * vec3(233, 202, 180) / 256.;
       #endif
 

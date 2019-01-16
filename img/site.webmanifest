@@ -1,6 +1,6 @@
 {
-    "name": "Deep Mandelbrot",
-    "short_name": "Deep Mandelbrot",
+    "name": "Deep Fractal",
+    "short_name": "DeepFractal",
     "icons": [
         {
             "src": "/img/android-chrome-192x192.png",
@@ -13,7 +13,7 @@
             "type": "image/png"
         }
     ],
-    "theme_color": "#ffffff",
-    "background_color": "#ffffff",
+    "theme_color": "#111111",
+    "background_color": "#111111",
     "display": "standalone"
 }
