@@ -82,15 +82,14 @@ let frag = (isJulia) => {
       vec3 col;
 
       #if color_scheme == 0
-        time += 1.0 + min(1.0, loglogB - log2(log2(zz)));
-        col += 0.7 + 2.5 * (interpolate(stripe, s1, s2, s3, fract(time)) / min(200., time)); //(1.0 - 0.6 * step(float(imax), 1. + time))
+        time += 1.0 + clamp(loglogB - log2(log2(zz)), -1., 0.);
+        col += 0.7 + 2.5 * (interpolate(stripe, s1, s2, s3, fract(time)) / clamp(time, 0., 200.)) * (1.0 - 0.6 * step(float(imax), 1. + time));
         col = 0.5 + 0.5 * sin(col + vec3(4.0, 4.6, 5.2) + 50.0 * time / float(imax));
       #else
-        time += 1.0 + min(1.0, loglogB - log2(log2(zz)));
+        time += 1.0 + clamp(loglogB - log2(log2(zz)), -1., 0.);
         col += (1. - clamp(0., -log(dem / size.x * 500.), 1.));
         // col += 0.5 + 0.5 * sin(atan(z.y, z.x) + vec3(4.0, 4.6, 5.2));
         // col *= 0.5 + 0.5 * sin(col + vec3(4.0, 4.6, 5.2) + 50.0 * time / float(imax));
-        // min(1.0, loglogB - log2(log2(zz)))
       #endif
 
       gl_FragColor = vec4(col, 1.);

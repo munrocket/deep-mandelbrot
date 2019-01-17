@@ -68,9 +68,12 @@ const Events = {
   }
 
   function aimZoom(pos, newAim) {
-    if (!(newAim.hx) || (newAim.hx.div(aim.hx).toNumber() < 1/100)) {
-      if (newAim.phi) aim.phi = newAim.phi;
-      simpleZoom(pos, 1/100);
+    const ratio = newAim.hx.div(aim.hx).toNumber();
+    if (!(newAim.hx) || ratio < 1/15) {
+      if (Math.abs(mouseDownPos.px - pos.px) + Math.abs(mouseDownPos.py - pos.py) > 10) {
+        aim.phi = newAim.phi;
+      }
+      simpleZoom(pos, 1/15);
     } else {
       aim = newAim;
       draw(aim);

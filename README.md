@@ -15,7 +15,7 @@
 
 ### 2do
 - [ ] New feature (deeper zoom, log color time, router, super-sampling, new formulas)
-- [ ] Better platform support (minus button, white blink on iOS, fix glsl render inside set, pc)
+- [ ] Better platform support (minus button, white blink on iOS, pc)
 - [ ] Better optimization (julia render, Mariani algorithm / progressive render / dem)
 
 ### References
