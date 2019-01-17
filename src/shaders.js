@@ -47,12 +47,12 @@ let frag = (isJulia) => {
       #endif
 
       for (int i = 1; i < imax; i++) {
-        // calc derivative:  Z' -> 2*Z*Z' + 1
+        /*  calc derivative: Z' -> 2*Z*Z' + 1  */
         temp = 2. * (z.x * dz.x - z.y * dz.y) + 1.;
         dz.y = 2. * (z.x * dz.y + z.y * dz.x);
         dz.x = temp;
 
-        // next step: W -> W^2 + 2 * O * W + V
+        /*  next step: W -> W^2 + 2 * O * W + V  */
         temp = u * u - v * v + 2. * (u * o.x - v * o.y); 
         v = u * v + u * v + 2. * (v * o.x + u * o.y);
         u = temp;
@@ -61,32 +61,36 @@ let frag = (isJulia) => {
           v += var.y;
         #endif
 
-        // initilizing:  Z = O + W
+        /*  initilizing: Z = O + W  */
         o = vec2(orbit[i].x, orbit[i].y);
         z = o + vec2(u,v);
         zz = dot(z,z);    
         
-        // stripe average color
+        /*  stripe average color  */
         #if color_scheme == 0 
           stripe += z.x * z.y / zz * step(1.0, time);
           s3 = s2; s2 = s1; s1 = stripe;
         #endif
 
-        // loop in webgl1
+        /*  loop in webgl1  */
         time += 1.;
         if (zz > bailout) { break; }
       }
       
-      // DEM/M = 2.0 * |Z / Z'| * ln(|Z|)
+      /* DEM/M = 2.0 * |Z / Z'| * ln(|Z|) */
       float dem = sqrt(zz / dot(dz,dz)) * log(zz);
       vec3 col;
 
       #if color_scheme == 0
         time += 1.0 + min(1.0, loglogB - log2(log2(zz)));
-        col += 0.7 + 2.5 * (interpolate(stripe, s1, s2, s3, fract(time)) / min(200., time)) * (1.0 - 0.6 * step(float(imax), 1. + time));
+        col += 0.7 + 2.5 * (interpolate(stripe, s1, s2, s3, fract(time)) / min(200., time)); //(1.0 - 0.6 * step(float(imax), 1. + time))
         col = 0.5 + 0.5 * sin(col + vec3(4.0, 4.6, 5.2) + 50.0 * time / float(imax));
       #else
-        col += (1. - clamp(0., -log(dem / size.x * 500.), 1.)) * vec3(233, 202, 180) / 256.;
+        time += 1.0 + min(1.0, loglogB - log2(log2(zz)));
+        col += (1. - clamp(0., -log(dem / size.x * 500.), 1.));
+        // col += 0.5 + 0.5 * sin(atan(z.y, z.x) + vec3(4.0, 4.6, 5.2));
+        // col *= 0.5 + 0.5 * sin(col + vec3(4.0, 4.6, 5.2) + 50.0 * time / float(imax));
+        // min(1.0, loglogB - log2(log2(zz)))
       #endif
 
       gl_FragColor = vec4(col, 1.);
