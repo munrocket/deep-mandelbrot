@@ -40,8 +40,8 @@ const Events = {
       prevCos = Math.cos(aim.phi);
       prevSin = Math.sin(aim.phi);
     }
-    const dx = aim.hx.mul(2 * e.offsetX / glcontrol.width - 1);
-    const dy = aim.hy.mul(2 * e.offsetY / glcontrol.height - 1);
+    const dx = aim.hx.mul((2 * e.offsetX + 1) / glcontrol.width - 1);
+    const dy = aim.hy.mul((2 * e.offsetY + 1) / glcontrol.height - 1);
     return {
       x: aim.x.add(dx.mul(prevCos).add(dy.mul(prevSin))),
       y: aim.y.add(dx.mul(prevSin).sub(dy.mul(prevCos))),
@@ -68,8 +68,9 @@ const Events = {
   }
 
   function aimZoom(pos, newAim) {
-    const ratio = newAim.hx.div(aim.hx).toNumber();
-    if (!(newAim.hx) || ratio < 1/15) {
+    if (!newAim.hx) {
+      simpleZoom(pos, 1/15);
+    } else if (newAim == aim || newAim.hx.div(aim.hx).toNumber() < 1/15) {
       if (Math.abs(mouseDownPos.px - pos.px) + Math.abs(mouseDownPos.py - pos.py) > 10) {
         aim.phi = newAim.phi;
       }
