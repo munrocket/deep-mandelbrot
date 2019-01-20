@@ -12,20 +12,17 @@ const Events = {
     if (header) document.getElementById('errorHdr').innerHTML = header;
     if (msg) document.getElementById('errorMsg').innerHTML = msg;
     document.getElementById('errorBox').classList.add('is-active');
-  }
-};
-
-(function () {
-
-  let glcontrol = document.getElementById('glcontrol');
-  let mouseDownPos, prevPhi, prevSin, prevCos;
-  let newAim = {};
-  let isDrawingAim = false;
-  let isJulia = false;
-  let isOrbit = false;
-  let wheelAccum = 0;
-
-  function updateUI() {
+  },
+  simpleZoom(pos, factor) {
+    aim.x = pos.x;
+    aim.y = pos.y;
+    aim.hx = aim.hx.mul(factor);
+    aim.hy = aim.hy.mul(factor);
+    draw(aim);
+    Events.updateUI();
+  },
+  updateUI() {
+    const glcontrol = document.getElementById('glcontrol');
     const ctx = glcontrol.getContext('2d');
     ctx.clearRect(0, 0, glcontrol.width, glcontrol.height);
     glcontrol.width = ctx.canvas.clientWidth;
@@ -33,6 +30,17 @@ const Events = {
     const gl = twgl.getContext(document.getElementById('gljulia'));
     gl.clear(gl.COLOR_BUFFER_BIT);
   }
+};
+
+(function () {
+
+  const glcontrol = document.getElementById('glcontrol');
+  let mouseDownPos, prevPhi, prevSin, prevCos;
+  let newAim = {};
+  let isDrawingAim = false;
+  let isJulia = false;
+  let isOrbit = false;
+  let wheelAccum = 0;
 
   function getPos(e) {
     if (prevPhi != aim.phi) {
@@ -50,35 +58,26 @@ const Events = {
     };
   }
 
-  function simpleZoom(pos, factor) {
-    aim.x = pos.x;
-    aim.y = pos.y;
-    aim.hx = aim.hx.mul(factor);
-    aim.hy = aim.hy.mul(factor);
-    draw(aim);
-    updateUI();
-  }
-
   function wheelZoom(pos) {
     const factor = Math.pow(2, -wheelAccum / 200 );
     pos.x = pos.x.add(aim.x.sub(pos.x).mul(factor));
     pos.y = pos.y.add(aim.y.sub(pos.y).mul(factor));
-    simpleZoom(pos, factor);
+    Events.simpleZoom(pos, factor);
     wheelAccum = 0;
   }
 
   function aimZoom(pos, newAim) {
     if (!newAim.hx) {
-      simpleZoom(pos, 1/15);
+      Events.simpleZoom(pos, 1/15);
     } else if (newAim == aim || newAim.hx.div(aim.hx).toNumber() < 1/15) {
       if (Math.abs(mouseDownPos.px - pos.px) + Math.abs(mouseDownPos.py - pos.py) > 10) {
         aim.phi = newAim.phi;
       }
-      simpleZoom(pos, 1/15);
+      Events.simpleZoom(pos, 1/15);
     } else {
       aim = newAim;
       draw(aim);
-      updateUI();
+      Events.updateUI();
     }
   }
 
@@ -114,7 +113,7 @@ const Events = {
       isDrawingAim = false;
       aimZoom(pos, newAim);
     } else if (e.button == 2) {
-      simpleZoom(pos, 15);
+      Events.simpleZoom(pos, 15);
     }
   });
 
@@ -125,11 +124,11 @@ const Events = {
     }
     if (isJulia) {
       isJulia = false;
-      updateUI();
+      Events.updateUI();
     }
     if (isOrbit) {
       isOrbit = false;
-      updateUI();
+      Events.updateUI();
     }
   });
 
@@ -191,7 +190,7 @@ const Events = {
   window.addEventListener('resize', e => {
     function requestResize(crid) {
       if (crid == currentRequestId) {
-        simpleZoom(aim, 1);
+        Events.simpleZoom(aim, 1);
       }
       currentRequestId = 0;
     }
@@ -212,7 +211,7 @@ const Events = {
   }, true);
 
   document.addEventListener('DOMContentLoaded', () => {
-    updateUI();
+    Events.updateUI();
     draw(aim);
   });
 

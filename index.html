@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta rel="apple-touch-startup-image" name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
   <link rel="apple-touch-icon" sizes="180x180" href="img/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="img/favicon-16x16.png">
@@ -16,6 +19,17 @@
   <meta name="msapplication-TileColor" content="#da532c">
   <meta name="msapplication-config" content="img/browserconfig.xml">
   <meta name="theme-color" content="#0a0a0a">
+
+  <link rel="apple-touch-startup-image" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)" href="img/iphone5_splash.png"/>
+  <link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)" href="img/iphone6_splash.png"/>
+  <link rel="apple-touch-startup-image" media="(device-width: 621px) and (device-height: 1104px) and (-webkit-device-pixel-ratio: 3)" href="img/iphoneplus_splash.png" />
+  <link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)" href="img/iphonex_splash.png" />
+  <link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)" href="img/iphonexr_splash.png" />
+  <link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)" href="img/iphonexsmax_splash.png" />
+  <link rel="apple-touch-startup-image" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2)" href="img/ipad_splash.png" />
+  <link rel="apple-touch-startup-image" media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2)" href="img/ipadpro1_splash.png" />
+  <link rel="apple-touch-startup-image" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2)" href="img/ipadpro3_splash.png" />
+  <link rel="apple-touch-startup-image" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)" href="img/ipadpro2_splash.png" />
 
   <meta property="og:type" content="website">
   <meta property="og:title" content="Deep Fractal">
@@ -32,9 +46,12 @@
     html, body { overflow: hidden; background-color: #0a0a0a; }
     .wrapper { display: flex; flex-direction: column; height: 100vh; min-height: 100%; }
     main { flex: 1; position: relative; display: flex; flex-direction: column; background-color: #0a0a0a; }
+    /* #mainMenu { position: relative; width: 100%; top: 3.25em; background-color: #0a0a0a; } */
     canvas { position: absolute; width: 100%; height: 100%; }
     #gljulia { left: 0; bottom: 0; height: 400px; width: 400px;}
     #glcontrol { cursor: crosshair; }
+    #zoomOut { position: absolute; bottom: .4em; left: .4em; width: 2.3em; font-size: 1.3em;}
+    @media screen and (min-width: 1088px) { #zoomOut { display: none; } }
   </style>
 
 </head>
@@ -82,6 +99,7 @@
       <canvas id="glmandel"></canvas>
       <canvas id="gljulia"></canvas>
       <canvas id="glcontrol"></canvas>
+      <a id="zoomOut" class="button is-black is-rounded" onclick="Events.simpleZoom(aim,15);"><i class="fas fa-minus"></i></a>
     </main>
 
   </div>
