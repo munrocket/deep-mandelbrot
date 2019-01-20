@@ -15,7 +15,7 @@
 
 ### 2do
 - [ ] New feature (deeper zoom, log color time, router, super-sampling, new formulas)
-- [ ] Better platform support (mobile menu, pc)
+- [ ] Better platform support (pc)
 - [ ] Better optimization (julia render, Mariani algorithm / progressive render / dem)
 
 ### References

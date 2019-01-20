@@ -204,11 +204,11 @@ const Events = {
     if (window.getComputedStyle(burger).display == 'block') {
       burger.click();
     }
-  }, true);
+  });
   burger.addEventListener('click', () => {
-    burger.classList.toggle('is-active');
     menu.classList.toggle('is-active');
-  }, true);
+    burger.classList.toggle('is-active');
+  });
 
   document.addEventListener('DOMContentLoaded', () => {
     Events.updateUI();

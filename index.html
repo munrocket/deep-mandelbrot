@@ -46,12 +46,15 @@
     html, body { overflow: hidden; background-color: #0a0a0a; }
     .wrapper { display: flex; flex-direction: column; height: 100vh; min-height: 100%; }
     main { flex: 1; position: relative; display: flex; flex-direction: column; background-color: #0a0a0a; }
-    /* #mainMenu { position: relative; width: 100%; top: 3.25em; background-color: #0a0a0a; } */
+    #mainMenu.is-active { position: fixed; width: 100%; top: 3.25em; }
     canvas { position: absolute; width: 100%; height: 100%; }
     #gljulia { left: 0; bottom: 0; height: 400px; width: 400px;}
     #glcontrol { cursor: crosshair; }
     #zoomOut { position: absolute; bottom: .4em; left: .4em; width: 2.3em; font-size: 1.3em;}
-    @media screen and (min-width: 1088px) { #zoomOut { display: none; } }
+    @media screen and (min-width: 1088px) {
+      #mainMenu.is-active { position: static; width: auto; }
+      #zoomOut { display: none; }
+    }
   </style>
 
 </head>
