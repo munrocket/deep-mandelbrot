@@ -73,7 +73,7 @@ const Events = {
       if (Math.abs(mouseDownPos.px - pos.px) + Math.abs(mouseDownPos.py - pos.py) > 10) {
         aim.phi = newAim.phi;
       }
-      Events.simpleZoom(pos, 1/15);
+      Events.simpleZoom(mouseDownPos, 1/15);
     } else {
       aim = newAim;
       draw(aim);
