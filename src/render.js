@@ -3,7 +3,6 @@
 let imax;
 let bailout = 5000;
 let colorScheme = 0;
-let DROP = 1;
 let aim = { x: new Double(-0.75), y: new Double(0), hx: new Double(1.25), hy: new Double(1.15), phi: 0 };
 
 function calcOrbit(c, c0, returnIteration) {

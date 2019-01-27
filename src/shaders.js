@@ -8,7 +8,7 @@ let vert = () => `
   uniform vec2 size;
   uniform float phi;
 
-  varying vec2 window;
+  varying vec2 delta;
 
   void main() {
     vec2 rot = vec2(sin(phi), cos(phi));
@@ -17,7 +17,7 @@ let vert = () => `
     vec2 z = size * position;
 
     /*  translating and rotating window */
-    window = center + vec2(z.x * rot.y - z.y * rot.x, dot(z, rot));
+    delta = center + vec2(z.x * rot.y - z.y * rot.x, dot(z, rot));
 
     /*  webgl viewport position  */
     gl_Position = vec4(position, 0.0, 1.0);
@@ -33,7 +33,7 @@ let frag = (isJulia) => {
     #define is_julia ${isJulia}
     const float loglogB = log2(log2(bailout));
 
-    varying vec2 window;
+    varying vec2 delta;
     uniform vec4 orbit[imax];
     uniform vec2 size;
 
@@ -44,12 +44,15 @@ let frag = (isJulia) => {
     }
 
     void main() {
-      float u = window.x, v = window.y, zz, time, temp;
+      float u = delta.x, v = delta.y, du = 0., dv = 0.;
+      float zz, time, temp;
       float s1, s2, s3, stripe;
 
-      /*  taking new origin in a window, it is equal to the first point in main orbit  */
-      vec2 o = vec2(orbit[0].x, orbit[0].y);
-      vec2 z = o + window, dz = vec2(1, 0);
+      /*  taking new origin in a delta: Z = O + W, Z' = O' + W'  */
+      vec2 O = vec2(orbit[0].x, orbit[0].y);
+      vec2 dO = vec2(orbit[0].z, orbit[0].w);
+      vec2 z = O + delta;
+      vec2 dz = dO + vec2(du, dv);
 
       /*  making julia minimap transporent  */
       #if is_julia
@@ -59,24 +62,26 @@ let frag = (isJulia) => {
       /*  calculating perturbation regarding main orbit for mandelbrot or julia set */
       for (int i = 1; i < imax; i++) {
 
-        /*  calc derivative: Z' -> 2*Z*Z' + 1  */
-        temp = 2. * (z.x * dz.x - z.y * dz.y) + 1.;
-        dz.y = 2. * (z.x * dz.y + z.y * dz.x);
-        dz.x = temp;
+        /*  calc derivative:  dW'(u,v) -> 2 * (O' * W + Z * W')  */
+        temp = 2. * (dO.x * u - dO.y * v + z.x * du - z.y * dv);
+        dv =   2. * (dO.x * v + dO.y * u + z.x * dv + z.y * du);
+        du = temp;
 
-        /*  next step in the iterative process: W(u,v) -> W^2 + 2 * O * W + window  */
-        temp = u * u - v * v + 2. * (u * o.x - v * o.y); 
-        v = u * v + u * v + 2. * (v * o.x + u * o.y);
+        /*  next step in the iterative process:  W(u,v) -> W^2 + 2 * O * W + delta  */
+        temp = u * u - v * v + 2. * (u * O.x - v * O.y); 
+        v =    u * v + u * v + 2. * (v * O.x + u * O.y);
         u = temp;
         #if !is_julia
-          u += window.x;
-          v += window.y;
+          u += delta.x;
+          v += delta.y;
         #endif
 
-        /*  recall global coordinates: Z = O + W  */
-        o = vec2(orbit[i].x, orbit[i].y);
-        z = o + vec2(u,v);
-        zz = dot(z,z);    
+        /*  recall global coordinates  */
+        O = vec2(orbit[i].x, orbit[i].y);
+        dO = vec2(orbit[i].z, orbit[i].w);
+        z = O + vec2(u, v);
+        dz = dO + vec2(du, dv);
+        zz = dot(z, z);
         
         /*  stripe average, a color algo based on statistcs  */
         #if color_scheme == 0 
@@ -88,7 +93,7 @@ let frag = (isJulia) => {
         time += 1.;
         if (zz > bailout) { break; }
       }
-      
+           
       /*  exterior distance estimation = 2.0 * |Z / Z'| * ln(|Z|)  */
       float dem = sqrt(zz / dot(dz,dz)) * log(zz);
       vec3 col;

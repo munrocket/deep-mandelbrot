@@ -34,14 +34,6 @@ const Events = {
 
 (function () {
 
-  const glcontrol = document.getElementById('glcontrol');
-  let mouseDownPos, prevPhi, prevSin, prevCos;
-  let newAim = {};
-  let isDrawingAim = false;
-  let isJulia = false;
-  let isOrbit = false;
-  let wheelAccum = 0;
-
   function getPos(e) {
     if (prevPhi != aim.phi) {
       prevPhi = aim.phi;
@@ -69,10 +61,7 @@ const Events = {
   function aimZoom(pos, newAim) {
     if (!newAim.hx) {
       Events.simpleZoom(pos, 1/15);
-    } else if (newAim == aim || newAim.hx.div(aim.hx).toNumber() < 1/15) {
-      if (Math.abs(mouseDownPos.px - pos.px) + Math.abs(mouseDownPos.py - pos.py) > 10) {
-        aim.phi = newAim.phi;
-      }
+    } else if (Math.abs(mouseDownPos.px - pos.px) + Math.abs(mouseDownPos.py - pos.py) < 15) {
       Events.simpleZoom(mouseDownPos, 1/15);
     } else {
       aim = newAim;
@@ -97,6 +86,25 @@ const Events = {
     ctx.strokeStyle = '#efe1f4';
     ctx.stroke();
   }
+
+  const glcontrol = document.getElementById('glcontrol');
+  let mouseDownPos, prevPhi, prevSin, prevCos;
+  let newAim = {};
+  let isDrawingAim = false;
+  let isJulia = false;
+  let isOrbit = false;
+  let wheelAccum = 0;
+
+  // let hammer = new Hammer.Manager(glcontrol);
+  // let pinch = new Hammer.Pinch();
+  // let rotate = new Hammer.Rotate();
+  // pinch.recognizeWith(rotate);
+  // hammer.add([pinch, rotate]);
+
+  document.addEventListener('DOMContentLoaded', () => {
+    Events.updateUI();
+    draw(aim);
+  });
 
   glcontrol.addEventListener('mousedown', e => {
     mouseDownPos = getPos(e);
@@ -208,11 +216,6 @@ const Events = {
   burger.addEventListener('click', () => {
     menu.classList.toggle('is-active');
     burger.classList.toggle('is-active');
-  });
-
-  document.addEventListener('DOMContentLoaded', () => {
-    Events.updateUI();
-    draw(aim);
   });
 
 })();
