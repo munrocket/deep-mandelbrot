@@ -180,6 +180,7 @@ const Events = {
   });
 
   glcontrol.addEventListener('wheel', e => {
+    e.preventDefault();
     if (wheelAccum == 0) {
       setTimeout(() => wheelZoom(getPos(e)), 100);
     }

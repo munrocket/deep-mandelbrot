@@ -5,6 +5,11 @@
   <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
+  <title>Deep Fractal</title>
+  <meta name="description" content="Mandelbrot deep viewer in webapp. It uses WebGL and perturbation theory acceleration.">
+  <meta name="keywords" content="mandelbrot,julia,fractal,deep,webgl,perturbation">
+  <meta name="author" content="Munrocket">
+
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta rel="apple-touch-startup-image" name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
@@ -39,9 +44,8 @@
   <meta property="og:image:height" content="420">
   <meta property="og:image:width" content="803">
 
-  <title>Deep Fractal</title>
-  <link rel="stylesheet" href="lib/bulma.css">
-  <script defer src="lib/fontawesome.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
   <style>
     html, body { overflow: hidden; background-color: #0a0a0a; }
     .wrapper { display: flex; flex-direction: column; height: 100vh; min-height: 100%; }
@@ -87,7 +91,7 @@
           <div class="navbar-end">
             <div class="navbar-item">
               <div class="buttons">
-                <a class="button is-light" target="_blank" href="https://github.com/munrocket/deep-fractal">
+                <a class="button is-light" target="_blank" rel="noopener" href="https://github.com/munrocket/deep-fractal">
                   <span class="icon"><i class="fab fa-github-alt"></i></span>
                   <span>GitHub</span>
                 </a>
@@ -122,9 +126,8 @@
     </div>
   </div>
 
-  <script src="lib/twgl.js"></script>
-  <script src="lib/double.js"></script>
-  <!-- <script src="lib/hammer.js"></script> -->
+  <script src="https://cdn.jsdelivr.net/npm/twgl-base.js@4.8.2/dist/4.x/twgl.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/double.js@0.0.6/dist/double.iife.min.js"></script>
   <script src="src/render.js"></script>
   <script src="src/shaders.js"></script>
   <script src="src/events.js"></script>
@@ -134,7 +137,7 @@
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
+    gtag('js', new Date()); 
     gtag('config', 'UA-132550679-1');
   </script>
 
