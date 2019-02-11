@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
   <title>Deep Fractal</title>
@@ -10,13 +10,13 @@
   <meta name="keywords" content="mandelbrot,julia,fractal,deep,webgl,perturbation">
   <meta name="author" content="Munrocket">
 
+  <!-- PWA -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta rel="apple-touch-startup-image" name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
   <link rel="apple-touch-icon" sizes="180x180" href="img/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="img/favicon-16x16.png">
-  <link rel="manifest" href="img/site.webmanifest">
+  <link rel="manifest" href="manifest.json">
   <link rel="mask-icon" href="img/safari-pinned-tab.svg" color="#5bbad5">
   <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico">
   <meta name="apple-mobile-web-app-title" content="Deep Fractal">
@@ -24,7 +24,6 @@
   <meta name="msapplication-TileColor" content="#da532c">
   <meta name="msapplication-config" content="img/browserconfig.xml">
   <meta name="theme-color" content="#0a0a0a">
-
   <link rel="apple-touch-startup-image" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)" href="img/iphone5_splash.png"/>
   <link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)" href="img/iphone6_splash.png"/>
   <link rel="apple-touch-startup-image" media="(device-width: 621px) and (device-height: 1104px) and (-webkit-device-pixel-ratio: 3)" href="img/iphoneplus_splash.png" />
@@ -36,6 +35,7 @@
   <link rel="apple-touch-startup-image" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2)" href="img/ipadpro3_splash.png" />
   <link rel="apple-touch-startup-image" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)" href="img/ipadpro2_splash.png" />
 
+  <!-- Open Graph protocol -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="Deep Fractal">
   <meta property="og:description" content="Deep zoom fractal viewer with WebGL and perturbation theory acceleration.">
@@ -44,8 +44,9 @@
   <meta property="og:image:height" content="420">
   <meta property="og:image:width" content="803">
 
+  <!-- Stylesheets -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css">
-  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <style>
     html, body { overflow: hidden; background-color: #0a0a0a; }
     .wrapper { display: flex; flex-direction: column; height: 100vh; min-height: 100%; }
@@ -54,7 +55,7 @@
     canvas { position: absolute; width: 100%; height: 100%; }
     #gljulia { left: 0; bottom: 0; height: 400px; width: 400px;}
     #glcontrol { cursor: crosshair; }
-    #zoomOut { position: absolute; bottom: .4em; left: .4em; width: 2.3em; font-size: 1.3em;}
+    #zoomOut { position: absolute; bottom: .4em; left: .4em; width: 2.3em; font-size: 1em;}
     @media screen and (min-width: 1088px) {
       #mainMenu.is-active { position: static; width: auto; }
       #zoomOut { display: none; }
@@ -92,7 +93,7 @@
             <div class="navbar-item">
               <div class="buttons">
                 <a class="button is-light" target="_blank" rel="noopener" href="https://github.com/munrocket/deep-fractal">
-                  <span class="icon"><i class="fab fa-github-alt"></i></span>
+                  <span class="icon"><i class="fa fa-github-alt"></i></span>
                   <span>GitHub</span>
                 </a>
               </div>
@@ -106,11 +107,12 @@
       <canvas id="glmandel"></canvas>
       <canvas id="gljulia"></canvas>
       <canvas id="glcontrol"></canvas>
-      <a id="zoomOut" class="button is-black is-rounded" onclick="Events.simpleZoom(aim,15);"><i class="fas fa-minus"></i></a>
+      <a id="zoomOut" class="button is-black is-rounded" onclick="Events.simpleZoom(aim,15);"><span class="icon"><i class="fa fa-minus"></i></span></a>
     </main>
 
   </div>
   
+  <!-- Modal form -->
   <div id="errorBox" class="modal">
     <div class="modal-background"></div>
     <div class="modal-content">
@@ -126,6 +128,7 @@
     </div>
   </div>
 
+  <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/twgl-base.js@4.8.2/dist/4.x/twgl.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/double.js@0.0.6/dist/double.iife.min.js"></script>
   <script src="src/render.js"></script>

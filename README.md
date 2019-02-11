@@ -21,12 +21,11 @@ and restore the rest of the picture with float precision in GPU.
    - Finding a new reference point *O* (origin) where orbit sequence *O(n) < B* and calculate it with arbitrary precision.
    - Pass truncated to float precision orbit sequence to GPU and restore rest of points *Z(n) = O(n) + W(n)* with equation
      *W(n+1) -> W(n)^2 + 2 * O(n) * W(n) + delta*, where *delta* is coordinates relative to the new coordinate system and *Z(0) = O(0) + delta*.
-3. Since this orbit sequence too big for GPU uniforms we need to use ping-pong rendering or pack it in texture with dependent reads.
-4. Using arbitrary precision library based on *floating point expation* which is heavily optimized for geometric calculation in CPU.
+3. Since this orbit sequence too big for GPU uniforms we need to use ping-pong rendering.
+4. Using arbitrary precision library based on *floating point expation* which is heavily optimized for geometric calculation.
 
 ### 2do
 
-- [ ] Porting it to vue.js
 - [ ] New feature (ping-pong rendering for deeper zoom, log color time, router, super-sampling, new formulas)
 - [ ] Better platform support (add pinch on mobile devices)
 - [ ] Better optimization (julia render, Mariani algorithm / progressive render / dem)

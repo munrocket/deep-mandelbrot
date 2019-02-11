@@ -5,6 +5,11 @@ let bailout = 5000;
 let colorScheme = 0;
 let aim = { x: new Double(-0.75), y: new Double(0), hx: new Double(1.25), hy: new Double(1.15), phi: 0 };
 
+/**
+ * Calculating orbit for one point in Mandelbrot/Julia fractal
+ * for Mandelbrot c0=undefined, for julia set c0 it is initial c.
+ * if you want only iteration count, you need to pass returnIteration = true
+*/
 function calcOrbit(c, c0, returnIteration) {
   let x = c0 ? c0.x : c.x, y = c0 ? c0.y : c.y;
   let xx = x.sqr(), yy = y.sqr(), xy = x.mul(y);
@@ -27,6 +32,11 @@ function calcOrbit(c, c0, returnIteration) {
   return returnIteration ? i : orbit;
 }
 
+/**
+ * Main function for drawing fractal.
+ * At first it finding a new reference point with searchOrigin() function
+ * And then trying to draw fractal with WebGL
+ */
 function draw(aim, julia) {
   function searchOrigin(aim, julia) {
     let repeat = 6, n = 12, m = 3;

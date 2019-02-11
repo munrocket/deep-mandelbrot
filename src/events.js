@@ -34,6 +34,8 @@ const Events = {
 
 (function () {
 
+  /* ============== Functions ============== */
+
   function getPos(e) {
     if (prevPhi != aim.phi) {
       prevPhi = aim.phi;
@@ -87,6 +89,8 @@ const Events = {
     ctx.stroke();
   }
 
+  /* ============== Listeners ============== */
+
   const glcontrol = document.getElementById('glcontrol');
   let mouseDownPos, prevPhi, prevSin, prevCos;
   let newAim = {};
@@ -94,12 +98,6 @@ const Events = {
   let isJulia = false;
   let isOrbit = false;
   let wheelAccum = 0;
-
-  // let hammer = new Hammer.Manager(glcontrol);
-  // let pinch = new Hammer.Pinch();
-  // let rotate = new Hammer.Rotate();
-  // pinch.recognizeWith(rotate);
-  // hammer.add([pinch, rotate]);
 
   document.addEventListener('DOMContentLoaded', () => {
     Events.updateUI();
@@ -139,7 +137,6 @@ const Events = {
       Events.updateUI();
     }
   });
-
   glcontrol.addEventListener('mousemove', e => {
     if (isDrawingAim) {
       const ctx = glcontrol.getContext('2d');
@@ -188,7 +185,6 @@ const Events = {
   });
 
   glcontrol.addEventListener('contextmenu', e => e.preventDefault());
-  
   document.getElementById('glmandel').addEventListener('webglcontextlost', e => {
     Events.showError("WebGL context lost!",
       "GPU calculation was too long and the browser or the OS decides to reset the GPU.")
@@ -218,5 +214,13 @@ const Events = {
     menu.classList.toggle('is-active');
     burger.classList.toggle('is-active');
   });
+
+  /* ============== Service worker ============== */
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js');
+    });
+  }
 
 })();
