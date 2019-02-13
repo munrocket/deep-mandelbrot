@@ -1,9 +1,28 @@
 'use strict';
 
+/**
+ * State managment
+ */
 let imax;
 let bailout = 5000;
 let colorScheme = 0;
 let aim = { x: new Double(-0.75), y: new Double(0), hx: new Double(1.25), hy: new Double(1.15), phi: 0 };
+let programGetter = (() => {
+  let savedGl = null, savedVert = null, savedFrag = null, savedProgramInfo = null;
+  return (gl, vert, frag, julia) => {
+    julia = julia ? 1 : 0;
+    if (gl != savedGl || vert != savedVert || savedFrag != frag(julia)) {
+      savedGl = gl; savedVert = vert; savedFrag = frag(julia);
+      savedProgramInfo = twgl.createProgramInfo(savedGl, [vert, savedFrag]);
+    }
+    return savedProgramInfo;
+  }
+})();
+const glMandel = twgl.getContext(document.getElementById('glmandel'), { antialias: false, depth: false });
+const glJulia = twgl.getContext(document.getElementById('gljulia'), { antialias: false, depth: false });
+if (!glMandel || !glJulia ) {
+  Events.showError('This viewer requires WebGL', 'WebGL is turned off or not supported by this device.');
+};
 
 /**
  * Calculating orbit for one point in Mandelbrot/Julia fractal
@@ -33,40 +52,38 @@ function calcOrbit(c, c0, returnIteration) {
 }
 
 /**
- * Main function for drawing fractal.
- * At first it finding a new reference point with searchOrigin() function
- * And then trying to draw fractal with WebGL
+ * Logarithmic search of new reference point.
  */
-function draw(aim, julia) {
-  function searchOrigin(aim, julia) {
-    let repeat = 6, n = 12, m = 3;
-    let z = {}, zbest = {}, newAim = Object.assign({}, aim), f, fbest = -Infinity;
-    for (let k = 0; k < repeat; k++) {
-      for (let i = 0; i <= n; i++) {
-        for (let j = 0; j <= n; j++) {
-          z.x = newAim.x.add(newAim.hx.mul(2 * i / n - 1));
-          z.y = newAim.y.add(newAim.hy.mul(2 * j / n - 1));
-          f = (julia) ? calcOrbit(julia, z, true) : calcOrbit(z, null, true)
-          if (f == imax) {
-            return z;
-          } else if (f > fbest) {
-            Object.assign(zbest, z);
-            fbest = f;
-          }
+function searchOrigin(aim, julia) {
+  let repeat = 6, n = 12, m = 3;
+  let z = {}, zbest = {}, newAim = Object.assign({}, aim), f, fbest = -Infinity;
+  for (let k = 0; k < repeat; k++) {
+    for (let i = 0; i <= n; i++) {
+      for (let j = 0; j <= n; j++) {
+        z.x = newAim.x.add(newAim.hx.mul(2 * i / n - 1));
+        z.y = newAim.y.add(newAim.hy.mul(2 * j / n - 1));
+        f = (julia) ? calcOrbit(julia, z, true) : calcOrbit(z, null, true)
+        if (f == imax) {
+          return z;
+        } else if (f > fbest) {
+          Object.assign(zbest, z);
+          fbest = f;
         }
       }
-      Object.assign(newAim, zbest);
-      newAim.hx = newAim.hx.div(m / n);
-      newAim.hy = newAim.hy.div(m / n);
     }
-    return zbest;
+    Object.assign(newAim, zbest);
+    newAim.hx = newAim.hx.div(m / n);
+    newAim.hy = newAim.hy.div(m / n);
   }
+  return zbest;
+}
 
+/**
+ * Main function for drawing fractal. It uses searchOrigin() and then drawing fractal with WebGL
+ */
+function draw(aim, julia) {
   try {
-    const canvas = document.getElementById(julia ? 'gljulia' : 'glmandel');
-    const gl = twgl.getContext(canvas, { antialias: false, depth: false });
-    if (!gl) { Events.showError('This viewer requires WebGL', 'WebGL is turned off or not supported by this device.'); }
-
+    const gl = (julia) ? glJulia : glMandel;
     twgl.resizeCanvasToDisplaySize(gl.canvas, window.devicePixelRatio || 1);
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
     let ratio = gl.canvas.width / gl.canvas.height;
@@ -77,7 +94,7 @@ function draw(aim, julia) {
     }
 
     imax = Math.floor(gl.getParameter(gl.MAX_FRAGMENT_UNIFORM_VECTORS) / 2);
-    const programInfo = twgl.createProgramInfo(gl, [vert(), frag(julia ? 1 : 0)]);
+    const programInfo = programGetter(gl, vert, frag, julia);
     gl.useProgram(programInfo.program);
 
     const attribs = { position: { data: [1, 1, 1, -1, -1, -1, -1, 1], numComponents: 2 } };
@@ -95,7 +112,7 @@ function draw(aim, julia) {
 
     twgl.drawBufferInfo(gl, bufferInfo, gl.TRIANGLE_FAN);
   } catch (error) {
-    console.log(error);
+    document.getElementById('errorMsg').innerHTML += ' <br> ' + error;
     Events.showError();
   }
 }

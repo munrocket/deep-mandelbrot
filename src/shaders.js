@@ -1,6 +1,6 @@
 'use strict';
 
-let vert = () => `
+let vert = `
   precision highp float;
 
   attribute vec2 position;
