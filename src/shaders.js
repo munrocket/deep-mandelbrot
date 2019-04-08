@@ -23,16 +23,16 @@ let frag = (isJulia) => `
     precision highp float;
 
     #define imax ${imax}
-    #define exitSquare ${exitSquare}.
+    #define square_radius ${squareRadius}.
     #define super_sampling ${superSampling}
     #define color_scheme ${colorScheme}
     #define is_julia ${isJulia}
-    const float logLogE = log2(log2(exitSquare));
+    const float logLogE = log2(log2(square_radius));
 
     varying vec2 delta;
     uniform vec2 rotator;
     uniform vec2 size;
-    uniform vec2 resolution;
+    uniform vec2 pixelsize;
     uniform float zoom;
     uniform float texsize;
     uniform sampler2D orbittex;
@@ -93,7 +93,7 @@ let frag = (isJulia) => `
 
         /*  Loop in webgl1  */
         time += 1.;
-        if (zz > exitSquare) { break; }
+        if (zz > square_radius) { break; }
       }
 
       time += clamp(1.0 + logLogE - log2(log2(zz)), 0., 1.);
@@ -111,22 +111,18 @@ let frag = (isJulia) => `
       /*  Adaptive supersampling with additional 4 points  */
       #if (super_sampling == 1 && color_scheme != 1)
         if (-log(dem * zoom * 800.) > 0.5) {
-          const float AA = 4.0;
-          const float weight = 1. / (2.*AA + 1.);
-          R.time *= weight;
-          R.zz *= weight;
-          R.dzdz *= weight;
-          R.stripe *= weight;
-          vec2 pixelsize = size / resolution * 2.0 / 3.0 * sqrt(2.0);
-          for (int i = 0; i < int(AA); i++) {
-            vec2 offset = vec2( pixelsize.x * cos(2. * 3.14159265 * (float(i) + 0.5) / 4.),
-                                pixelsize.y * sin(2. * 3.14159265 * (float(i) + 0.5) / 4.));
+          R.time /= 5.;
+          R.zz /= 5.;
+          R.dzdz /= 5.;
+          R.stripe /= 5.;
+          for (int i = 0; i < 4; i++) {
+            vec2 offset = pixelsize * vec2(vec4(-1., 3., 3., 1.)[i], vec4(-3., -1., 1., 3.)[i]) / 4.;
             offset = vec2(offset.x * rotator.y - offset.y * rotator.x, dot(offset, rotator));
             result RI = calculator(offset);
-            R.time += RI.time * weight * 2.;
-            R.zz += RI.zz * weight * 2.;
-            R.dzdz += RI.dzdz * weight * 2.;
-            R.stripe += RI.stripe * weight * 2.;
+            R.time += RI.time / 5.;
+            R.zz += RI.zz / 5.;
+            R.dzdz += RI.dzdz / 5.;
+            R.stripe += RI.stripe / 5.;
           }
         }
       #endif

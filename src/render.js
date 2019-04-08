@@ -4,9 +4,9 @@
  * State managment
  */
 let imax = 1024;
-let exitSquare = 5000;
+let squareRadius = 5000;
 let colorScheme = 0;
-let superSampling = 0;
+let superSampling = 1;
 let aim = { x: new Double(-0.75), y: new Double(0), hx: new Double(1.25), hy: new Double(1.15), phi: 0 };
 let programGetter = (() => {
   let savedGl = null, savedVert = null, savedFrag = null, savedProgramInfo = null;
@@ -28,16 +28,16 @@ if (!glMandel || !glJulia ) {
 };
 
 /**
- * Calculating orbit for one point in Mandelbrot/Julia fractal
- * for Mandelbrot c0=undefined, for julia set c0 it is initial c.
- * if you want only iteration count, you need to pass returnIteration = true
+ * Calculating orbit for one point in Mandelbrot/Julia fractal.
+ * For Mandelbrot c0=undefined, for julia set c0 it is initial c.
+ * If you want only iteration count, you need to pass returnIteration = true
 */
 function calcOrbit(c, c0, returnIteration) {
   let x = c0 ? c0.x : c.x, y = c0 ? c0.y : c.y;
   let xx = x.sqr(), yy = y.sqr(), xy = x.mul(y);
   let dx = Double.One, dy = Double.Zero, temp;
   let i, orbit = [x.toNumber(), y.toNumber(), dx.toNumber(), dy.toNumber()]
-  for (i = 1; i < imax && xx.add(yy).lt(exitSquare); i++) {
+  for (i = 1; i < imax && xx.add(yy).lt(squareRadius); i++) {
     temp = x.mul(dx).sub(y.mul(dy)).mul(2).add(1);
     dy = x.mul(dy).add(y.mul(dx)).mul(2);
     dx = temp;
@@ -88,7 +88,7 @@ function draw(aim, julia) {
   try {
     const gl = (julia) ? glJulia : glMandel;
     twgl.resizeCanvasToDisplaySize(gl.canvas, window.devicePixelRatio || 1);
-    gl.viewport(0, 0, gl.canvas.clientWidth, gl.canvas.clientHeight);
+    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
     const ratio = gl.canvas.width / gl.canvas.height;
     if (ratio > 1) {
       aim.hx = aim.hy.mul(ratio);
@@ -117,7 +117,7 @@ function draw(aim, julia) {
       rotator: [Math.sin(aim.phi), Math.cos(aim.phi)],
       center: [aim.x.sub(origin.x).toNumber(), aim.y.sub(origin.y).toNumber()],
       size: [aim.hx.toNumber(), aim.hy.toNumber()],
-      resolution: [gl.canvas.clientWidth, gl.canvas.clientHeight],
+      pixelsize: [aim.hx.toNumber() / gl.canvas.width, aim.hy.toNumber() / gl.canvas.height],
       texsize: texsize,
       orbittex: orbittex,
     };
