@@ -3,7 +3,7 @@
 /**
  * State managment
  */
-let imax;
+let imax = 1024;
 let bailout = 5000;
 let colorScheme = 0;
 let aim = { x: new Double(-0.75), y: new Double(0), hx: new Double(1.25), hy: new Double(1.15), phi: 0 };
@@ -18,8 +18,10 @@ let programGetter = (() => {
     return savedProgramInfo;
   }
 })();
-const glMandel = twgl.getContext(document.getElementById('glmandel'), { antialias: false, depth: false });
-const glJulia = twgl.getContext(document.getElementById('gljulia'), { antialias: false, depth: false });
+const glMandel = twgl.getWebGLContext(document.getElementById('glmandel'), { antialias: false, depth: false });
+twgl.addExtensionsToContext(glMandel);
+const glJulia = twgl.getWebGLContext(document.getElementById('gljulia'), { antialias: false, depth: false });
+twgl.addExtensionsToContext(glJulia);
 if (!glMandel || !glJulia ) {
   Events.showError('This viewer requires WebGL', 'WebGL is turned off or not supported by this device.');
 };
@@ -86,27 +88,37 @@ function draw(aim, julia) {
     const gl = (julia) ? glJulia : glMandel;
     twgl.resizeCanvasToDisplaySize(gl.canvas, window.devicePixelRatio || 1);
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-    let ratio = gl.canvas.width / gl.canvas.height;
+    const ratio = gl.canvas.width / gl.canvas.height;
     if (ratio > 1) {
       aim.hx = aim.hy.mul(ratio);
     } else {
       aim.hy = aim.hx.div(ratio);
     }
-
-    imax = Math.floor(gl.getParameter(gl.MAX_FRAGMENT_UNIFORM_VECTORS) / 2);
     const programInfo = programGetter(gl, vert, frag, julia);
     gl.useProgram(programInfo.program);
 
-    const attribs = { position: { data: [1, 1, 1, -1, -1, -1, -1, 1], numComponents: 2 } };
+    const origin = searchOrigin(aim, julia ? julia : 0);
+    const orbit = julia ? calcOrbit(julia, origin) : calcOrbit(origin);
+    const texsize = Math.ceil(Math.sqrt(orbit.length / 4));
+    const orbittex = twgl.createTexture(gl, {
+      format: gl.RGBA,
+      type: gl.FLOAT,
+      minMag: gl.NEAREST,
+      wrap: gl.CLAMP_TO_EDGE,
+      src: orbit,
+    });
+
+    const attribs = { a_position: { data: [1, 1, 1, -1, -1, -1, -1, 1], numComponents: 2 } };
     const bufferInfo = twgl.createBufferInfoFromArrays(gl, attribs);
     twgl.setBuffersAndAttributes(gl, programInfo, bufferInfo);
 
-    let origin = searchOrigin(aim, julia ? julia : 0);
     const uniforms = {
       center: [aim.x.sub(origin.x).toNumber(), aim.y.sub(origin.y).toNumber()],
       size: [aim.hx.toNumber(), aim.hy.toNumber()],
       phi: aim.phi,
-      orbit: julia ? calcOrbit(julia, origin) : calcOrbit(origin),
+      texsize: texsize,
+      orbittex: orbittex,
+      zoom: 1.5 * aim.hx.inv().toNumber(),
     };
     twgl.setUniforms(programInfo, uniforms);
 

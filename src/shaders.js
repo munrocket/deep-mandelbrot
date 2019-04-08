@@ -3,7 +3,7 @@
 let vert = `
   precision highp float;
 
-  attribute vec2 position;
+  attribute vec2 a_position;
   uniform vec2 center;
   uniform vec2 size;
   uniform float phi;
@@ -11,16 +11,13 @@ let vert = `
   varying vec2 delta;
 
   void main() {
-    vec2 rot = vec2(sin(phi), cos(phi));
 
-    /*  size of window in complex coord  */
-    vec2 z = size * position;
-
-    /*  translating and rotating window */
-    delta = center + vec2(z.x * rot.y - z.y * rot.x, dot(z, rot));
-
-    /*  webgl viewport position  */
-    gl_Position = vec4(position, 0.0, 1.0);
+    /*  window coordinates in complex space with new origin  */
+    vec2 rotating = vec2(sin(phi), cos(phi));
+    vec2 z = size * a_position;
+    delta = center + vec2(z.x * rotating.y - z.y * rotating.x, dot(z, rotating));
+    
+    gl_Position = vec4(a_position, 0.0, 1.0);
   }`;
 
 let frag = (isJulia) => {
@@ -34,8 +31,9 @@ let frag = (isJulia) => {
     const float loglogB = log2(log2(bailout));
 
     varying vec2 delta;
-    uniform vec4 orbit[imax];
-    uniform vec2 size;
+    uniform float texsize;
+    uniform sampler2D orbittex;
+    uniform float zoom;
 
     /*  Catmull–Rom interpolation  */
     float interpolate(float s, float s1, float s2, float s3, float d) {
@@ -43,24 +41,28 @@ let frag = (isJulia) => {
       return 0.5 * (s * (d3 - d2) + s1 * (d + 4.*d2 - 3.*d3) + s2 * (2. - 5.*d2 + 3.*d3) + s3 * (-d + 2.*d2 - d3));
     }
 
+    vec4 unpackOrbit(int i) {
+      float fi = float(i);
+      vec2 texcoord = vec2(mod(fi, texsize), floor(fi / texsize)) / texsize;
+      return texture2D(orbittex, texcoord);
+    }
+
     void main() {
       float u = delta.x, v = delta.y, du = 0., dv = 0.;
       float zz, time, temp;
       float s1, s2, s3, stripe;
-
-      /*  taking new origin in a delta: Z = O + W, Z' = O' + W'  */
-      vec2 O = vec2(orbit[0].x, orbit[0].y);
-      vec2 dO = vec2(orbit[0].z, orbit[0].w);
-      vec2 z = O + delta;
-      vec2 dz = dO + vec2(du, dv);
-
-      /*  making julia minimap transporent  */
-      #if is_julia
-        if (length(z) > 2.) { gl_FragColor = vec4(0.); return; }
-      #endif
+      vec2 z, dz, O, dO;
 
       /*  calculating perturbation regarding main orbit for mandelbrot or julia set */
-      for (int i = 1; i < imax; i++) {
+      for (int i = 0; i < imax; i++) {
+
+        /*  recall global coordinates: Z = O + W, Z' = O' + W'  */
+        vec4 iorbit = unpackOrbit(i);
+        O = iorbit.xy;
+        dO = iorbit.zw;
+        z = O + vec2(u, v);
+        dz = dO + vec2(du, dv);
+        zz = dot(z, z);
 
         /*  calc derivative:  dW'(u,v) -> 2 * (O' * W + Z * W')  */
         temp = 2. * (dO.x * u - dO.y * v + z.x * du - z.y * dv);
@@ -75,13 +77,6 @@ let frag = (isJulia) => {
           u += delta.x;
           v += delta.y;
         #endif
-
-        /*  recall global coordinates  */
-        O = vec2(orbit[i].x, orbit[i].y);
-        dO = vec2(orbit[i].z, orbit[i].w);
-        z = O + vec2(u, v);
-        dz = dO + vec2(du, dv);
-        zz = dot(z, z);
         
         /*  stripe average, a color algo based on statistcs  */
         #if color_scheme == 0 
@@ -100,14 +95,12 @@ let frag = (isJulia) => {
 
       /*  final coloring  */
       #if color_scheme == 0
-        time += clamp(1.0 + loglogB - log2(log2(zz)), 0.0, 4.0);
+        time += clamp(1.0 + loglogB - log2(log2(zz)), 0., 4.);
         col += 0.7 + 2.5 * (interpolate(stripe, s1, s2, s3, fract(time)) / clamp(time, 0., 200.)) * (1.0 - 0.6 * step(float(imax), 1. + time));
         col = 0.5 + 0.5 * sin(col + vec3(4.0, 4.6, 5.2) + 50.0 * time / float(imax));
       #else
-        time += 1.0 + clamp(loglogB - log2(log2(zz)), -1., 0.);
-        col += 1.0 - clamp(0., -log(dem / size.x * 500.), 1.);
-        // col += 0.5 + 0.5 * sin(atan(z.y, z.x) + vec3(4.0, 4.6, 5.2));
-        // col *= 0.5 + 0.5 * sin(col + vec3(4.0, 4.6, 5.2) + 50.0 * time / float(imax));
+        time += 1.0 + clamp(loglogB - log2(log2(zz)), 0., 4.);
+        col += 1.0 - clamp(-log(dem / zoom * 500.), 0., 1.);
       #endif
 
       gl_FragColor = vec4(col, 1.);
