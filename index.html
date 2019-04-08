@@ -59,18 +59,8 @@
     @media screen and (min-width: 1088px) {
       #mainMenu.is-active { position: static; width: auto; }
       #zoomOut { display: none; }
-      /* .navbar-menu { box-shadow: 0 8px 16px rgba(10, 10, 10, 0.1); padding: 0.5rem 0; }
-      .navbar .navbar-menu { background-color: inherit; }
-      .navbar.is-black .navbar-item, .navbar.is-black .navbar-link {color: rgba(255, 255, 255, 0.7); } */
     }
-    /* html { font-size: 14px; text-size-adjust: 100%; }
-    body { color: #444; }
-    body, button, input, select, textarea { font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif; }
-    .navbar { background-color: #d9230f; min-height: 3.25rem; position: relative; z-index: 30; }
-    .navbar .is-black { background-image: linear-gradient(180deg, #121212 0%, #0a0a0a 60%, #030303 100%); filter: none;}
-    .navbar .navbar-menu { background-color: inherit; } */
   </style>
-  <!-- <link rel="stylesheet" href="/experiments/bulma.css"> -->
 
 </head>
 <body>
@@ -97,7 +87,13 @@
                 <a class="navbar-item" onclick="colorScheme = 1; draw(aim);">Scientific</a>
               </div>
             </div>
-            <a class="navbar-item" onclick="Events.savePng()">Save</a>
+            <a class="navbar-item" onclick="Events.savePng();">Save</a>
+            <div class="navbar-item is-hoverable">
+              <label class="checkbox">
+                <input type="checkbox" onclick="superSampling = superSampling == 0 ? 1 : 0; draw(aim);">
+                Supersamling
+              </label>
+            </div>
           </div>
           <div class="navbar-end">
             <div class="navbar-item">

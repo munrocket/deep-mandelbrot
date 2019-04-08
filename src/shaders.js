@@ -4,42 +4,38 @@ let vert = `
   precision highp float;
 
   attribute vec2 a_position;
+  uniform vec2 rotator;
   uniform vec2 center;
   uniform vec2 size;
-  uniform float phi;
 
   varying vec2 delta;
 
   void main() {
 
     /*  window coordinates in complex space with new origin  */
-    vec2 rotating = vec2(sin(phi), cos(phi));
     vec2 z = size * a_position;
-    delta = center + vec2(z.x * rotating.y - z.y * rotating.x, dot(z, rotating));
+    delta = center + vec2(z.x * rotator.y - z.y * rotator.x, dot(z, rotator));
     
     gl_Position = vec4(a_position, 0.0, 1.0);
   }`;
 
-let frag = (isJulia) => {
-  return `
+let frag = (isJulia) => `
     precision highp float;
 
     #define imax ${imax}
-    #define bailout ${bailout}.
+    #define exitSquare ${exitSquare}.
+    #define super_sampling ${superSampling}
     #define color_scheme ${colorScheme}
     #define is_julia ${isJulia}
-    const float loglogB = log2(log2(bailout));
+    const float logLogE = log2(log2(exitSquare));
 
     varying vec2 delta;
+    uniform vec2 rotator;
+    uniform vec2 size;
+    uniform vec2 resolution;
+    uniform float zoom;
     uniform float texsize;
     uniform sampler2D orbittex;
-    uniform float zoom;
-
-    /*  Catmull–Rom interpolation  */
-    float interpolate(float s, float s1, float s2, float s3, float d) {
-      float d2 = d * d, d3 = d * d2;
-      return 0.5 * (s * (d3 - d2) + s1 * (d + 4.*d2 - 3.*d3) + s2 * (2. - 5.*d2 + 3.*d3) + s3 * (-d + 2.*d2 - d3));
-    }
 
     vec4 unpackOrbit(int i) {
       float fi = float(i);
@@ -47,62 +43,102 @@ let frag = (isJulia) => {
       return texture2D(orbittex, texcoord);
     }
 
-    void main() {
-      float u = delta.x, v = delta.y, du = 0., dv = 0.;
-      float zz, time, temp;
+    float interpolate(float s, float s1, float s2, float s3, float d) {
+      float d2 = d * d, d3 = d * d2;
+      return 0.5 * (s * (d3 - d2) + s1 * (d + 4.*d2 - 3.*d3) + s2 * (2. - 5.*d2 + 3.*d3) + s3 * (-d + 2.*d2 - d3));
+    }
+
+    struct result {
+      float time;
+      float zz;
+      float dzdz;
+      float stripe;
+    };
+
+    /*  fractal calculator with perturbation theory for mandelbrot & julia set */
+    result calculator(vec2 AA) {
+      float u = delta.x + AA.x, v = delta.y + AA.y;
+      float zz, time, temp, du = 0., dv = 0.;
       float s1, s2, s3, stripe;
       vec2 z, dz, O, dO;
 
-      /*  calculating perturbation regarding main orbit for mandelbrot or julia set */
       for (int i = 0; i < imax; i++) {
-
-        /*  recall global coordinates: Z = O + W, Z' = O' + W'  */
-        vec4 iorbit = unpackOrbit(i);
-        O = iorbit.xy;
-        dO = iorbit.zw;
+        /*  Recall global coordinates: Z = O + W, Z' = O' + W'  */
+        vec4 uO = unpackOrbit(i);
+        O = uO.xy;
+        dO = uO.zw;
         z = O + vec2(u, v);
         dz = dO + vec2(du, dv);
         zz = dot(z, z);
 
-        /*  calc derivative:  dW'(u,v) -> 2 * (O' * W + Z * W')  */
+        /*  Calc derivative:  dW'(u,v) -> 2 * (O' * W + Z * W')  */
         temp = 2. * (dO.x * u - dO.y * v + z.x * du - z.y * dv);
         dv =   2. * (dO.x * v + dO.y * u + z.x * dv + z.y * du);
         du = temp;
 
-        /*  next step in the iterative process:  W(u,v) -> W^2 + 2 * O * W + delta  */
+        /*  Next step in the iterative process:  W(u,v) -> W^2 + 2 * O * W + <delta>  */
         temp = u * u - v * v + 2. * (u * O.x - v * O.y); 
         v =    u * v + u * v + 2. * (v * O.x + u * O.y);
         u = temp;
-        #if !is_julia
+        #if (!is_julia)
           u += delta.x;
           v += delta.y;
         #endif
         
-        /*  stripe average, a color algo based on statistcs  */
-        #if color_scheme == 0 
-          stripe += z.x * z.y / zz * step(1.0, time);
+        /*  Stripe average, a color algo based on statistcs  */
+        #if (color_scheme == 0)
+          stripe += z.x * z.y / zz * step(0.0, time);
           s3 = s2; s2 = s1; s1 = stripe;
         #endif
 
-        /*  loop in webgl1  */
+        /*  Loop in webgl1  */
         time += 1.;
-        if (zz > bailout) { break; }
+        if (zz > exitSquare) { break; }
       }
-           
-      /*  exterior distance estimation = 2.0 * |Z / Z'| * ln(|Z|)  */
-      float dem = sqrt(zz / dot(dz,dz)) * log(zz);
-      vec3 col;
 
-      /*  final coloring  */
-      #if color_scheme == 0
-        time += clamp(1.0 + loglogB - log2(log2(zz)), 0., 4.);
-        col += 0.7 + 2.5 * (interpolate(stripe, s1, s2, s3, fract(time)) / clamp(time, 0., 200.)) * (1.0 - 0.6 * step(float(imax), 1. + time));
-        col = 0.5 + 0.5 * sin(col + vec3(4.0, 4.6, 5.2) + 50.0 * time / float(imax));
-      #else
-        time += 1.0 + clamp(loglogB - log2(log2(zz)), 0., 4.);
-        col += 1.0 - clamp(-log(dem / zoom * 500.), 0., 1.);
+      time += clamp(1.0 + logLogE - log2(log2(zz)), 0., 1.);
+      stripe = interpolate(stripe, s1, s2, s3, fract(time));
+      return result(time, zz, dot(dz,dz), stripe);
+    }
+
+    void main() {
+      result R = calculator(vec2(0));
+      float zoom = 1. / min(size.x, size.y);
+
+      /*  Distance Estimation = 2.0 * |Z / Z'| * ln(|Z|)  */
+      float dem = sqrt(R.zz / R.dzdz) * log(R.zz);
+
+      /*  Adaptive supersampling with additional 4 points  */
+      #if (super_sampling == 1 && color_scheme != 1)
+        if (-log(dem * zoom * 800.) > 0.5) {
+          const float AA = 4.0;
+          const float weight = 1. / (2.*AA + 1.);
+          R.time *= weight;
+          R.zz *= weight;
+          R.dzdz *= weight;
+          R.stripe *= weight;
+          vec2 pixelsize = size / resolution * 2.0 / 3.0 * sqrt(2.0);
+          for (int i = 0; i < int(AA); i++) {
+            vec2 offset = vec2( pixelsize.x * cos(2. * 3.14159265 * (float(i) + 0.5) / 4.),
+                                pixelsize.y * sin(2. * 3.14159265 * (float(i) + 0.5) / 4.));
+            offset = vec2(offset.x * rotator.y - offset.y * rotator.x, dot(offset, rotator));
+            result RI = calculator(offset);
+            R.time += RI.time * weight * 2.;
+            R.zz += RI.zz * weight * 2.;
+            R.dzdz += RI.dzdz * weight * 2.;
+            R.stripe += RI.stripe * weight * 2.;
+          }
+        }
       #endif
 
-      gl_FragColor = vec4(col, 1.);
-    }`
-  };
+      /*  Final coloring  */
+      vec3 color;
+      #if (color_scheme == 0)
+        color += 0.7 + 2.5 * (R.stripe / clamp(R.time, 0., 200.)) * (1.0 - 0.6 * step(float(imax), 1. + R.time));
+        color = 0.5 + 0.5 * sin(color + vec3(4.0, 4.6, 5.2) + 50.0 * R.time / float(imax));
+      #else
+        color += 1.0 - clamp(-log(dem * zoom * 800.), 0., 1.);
+      #endif
+
+      gl_FragColor = vec4(color, 1.);
+    }`;

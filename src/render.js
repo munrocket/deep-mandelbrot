@@ -4,8 +4,9 @@
  * State managment
  */
 let imax = 1024;
-let bailout = 5000;
+let exitSquare = 5000;
 let colorScheme = 0;
+let superSampling = 0;
 let aim = { x: new Double(-0.75), y: new Double(0), hx: new Double(1.25), hy: new Double(1.15), phi: 0 };
 let programGetter = (() => {
   let savedGl = null, savedVert = null, savedFrag = null, savedProgramInfo = null;
@@ -36,7 +37,7 @@ function calcOrbit(c, c0, returnIteration) {
   let xx = x.sqr(), yy = y.sqr(), xy = x.mul(y);
   let dx = Double.One, dy = Double.Zero, temp;
   let i, orbit = [x.toNumber(), y.toNumber(), dx.toNumber(), dy.toNumber()]
-  for (i = 1; i < imax && xx.add(yy).lt(bailout); i++) {
+  for (i = 1; i < imax && xx.add(yy).lt(exitSquare); i++) {
     temp = x.mul(dx).sub(y.mul(dy)).mul(2).add(1);
     dy = x.mul(dy).add(y.mul(dx)).mul(2);
     dx = temp;
@@ -57,7 +58,7 @@ function calcOrbit(c, c0, returnIteration) {
  * Logarithmic search of new reference point.
  */
 function searchOrigin(aim, julia) {
-  let repeat = 6, n = 12, m = 3;
+  let repeat = 15, n = 12, m = 3;
   let z = {}, zbest = {}, newAim = Object.assign({}, aim), f, fbest = -Infinity;
   for (let k = 0; k < repeat; k++) {
     for (let i = 0; i <= n; i++) {
@@ -87,7 +88,7 @@ function draw(aim, julia) {
   try {
     const gl = (julia) ? glJulia : glMandel;
     twgl.resizeCanvasToDisplaySize(gl.canvas, window.devicePixelRatio || 1);
-    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+    gl.viewport(0, 0, gl.canvas.clientWidth, gl.canvas.clientHeight);
     const ratio = gl.canvas.width / gl.canvas.height;
     if (ratio > 1) {
       aim.hx = aim.hy.mul(ratio);
@@ -113,12 +114,12 @@ function draw(aim, julia) {
     twgl.setBuffersAndAttributes(gl, programInfo, bufferInfo);
 
     const uniforms = {
+      rotator: [Math.sin(aim.phi), Math.cos(aim.phi)],
       center: [aim.x.sub(origin.x).toNumber(), aim.y.sub(origin.y).toNumber()],
       size: [aim.hx.toNumber(), aim.hy.toNumber()],
-      phi: aim.phi,
+      resolution: [gl.canvas.clientWidth, gl.canvas.clientHeight],
       texsize: texsize,
       orbittex: orbittex,
-      zoom: 1.5 * aim.hx.inv().toNumber(),
     };
     twgl.setUniforms(programInfo, uniforms);
 

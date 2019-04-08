@@ -8,8 +8,7 @@ Deep mandelbrot viewer in [webapp](https://munrocket.github.io/deep-fractal/). I
 - [X] Julia set minimap with Ctrl key
 - [X] Webgl parallel processing
 - [X] Perturbation theory
-- [X] Double.js as a library for arbitrary precision
-- [X] Logarithmic search for reference point
+- [X] Supersampling
 - [X] Progressive web application
 
 ![Deep Mandelbrot](https://i.imgur.com/EfIDzxt.png)
@@ -26,10 +25,12 @@ and restore the rest of the picture with float precision in GPU.
 4. Using arbitrary precision library based on *floating point expation* which is heavily optimized for geometric calculation.
 
 ### 2do
-
-- [ ] New feature (ping-pong rendering for deeper zoom, log color time, router, super-sampling, new formulas)
+- [X] Double.js as a library for arbitrary precision
+- [X] Ping-pong rendering for deeper zoom
+- [X] Logarithmic search for reference point
+- [ ] Better optimization (SDF serach, progressive render, bigfloat)
 - [ ] Better platform support (add pinch on mobile devices)
-- [ ] Better optimization (julia render, Mariani algorithm / progressive render / dem)
+- [ ] New feature (log color time, router)
 
 ### Lighthouse report
 ![audit](https://i.imgur.com/RweUezL.png?1)
