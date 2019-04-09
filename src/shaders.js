@@ -12,7 +12,7 @@ let vert = `
 
   void main() {
 
-    /*  window coordinates in complex space with new origin  */
+    /*  window coordinates with new origin in complex space  */
     vec2 z = size * a_position;
     delta = center + vec2(z.x * rotator.y - z.y * rotator.x, dot(z, rotator));
     
@@ -27,7 +27,7 @@ let frag = (isJulia) => `
     #define super_sampling ${superSampling}
     #define color_scheme ${colorScheme}
     #define is_julia ${isJulia}
-    const float logLogE = log2(log2(square_radius));
+    const float logLogRR = log2(log2(square_radius));
 
     varying vec2 delta;
     uniform vec2 rotator;
@@ -59,14 +59,14 @@ let frag = (isJulia) => `
     result calculator(vec2 AA) {
       float u = delta.x + AA.x, v = delta.y + AA.y;
       float zz, time, temp, du = 0., dv = 0.;
-      float s1, s2, s3, stripe;
+      float stripe, s1, s2, s3;
       vec2 z, dz, O, dO;
 
       for (int i = 0; i < imax; i++) {
         /*  Recall global coordinates: Z = O + W, Z' = O' + W'  */
-        vec4 uO = unpackOrbit(i);
-        O = uO.xy;
-        dO = uO.zw;
+        vec4 values = unpackOrbit(i);
+        O = values.xy;
+        dO = values.zw;
         z = O + vec2(u, v);
         dz = dO + vec2(du, dv);
         zz = dot(z, z);
@@ -96,7 +96,7 @@ let frag = (isJulia) => `
         if (zz > square_radius) { break; }
       }
 
-      time += clamp(1.0 + logLogE - log2(log2(zz)), 0., 1.);
+      time += clamp(1.0 + logLogRR - log2(log2(zz)), 0., 1.);
       stripe = interpolate(stripe, s1, s2, s3, fract(time));
       return result(time, zz, dot(dz,dz), stripe);
     }
@@ -105,10 +105,10 @@ let frag = (isJulia) => `
       result R = calculator(vec2(0));
       float zoom = 1. / min(size.x, size.y);
 
-      /*  Distance Estimation = 2.0 * |Z / Z'| * ln(|Z|)  */
+      /*  DEM (Distance Estimation) = 2.0 * |Z / Z'| * ln(|Z|)  */
       float dem = sqrt(R.zz / R.dzdz) * log(R.zz);
 
-      /*  Adaptive supersampling with additional 4 points  */
+      /*  Adaptive supersampling with additional 4 points in SSAAx4 pattern */
       #if (super_sampling == 1 && color_scheme != 1)
         if (-log(dem * zoom * 800.) > 0.5) {
           R.time /= 5.;

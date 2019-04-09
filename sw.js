@@ -1,7 +1,7 @@
 //Stale-while-revalidate strategy
 
 // Fill here with your cache name-version.
-const CACHE_NAME = 'deepfractal-0.2'
+const CACHE_NAME = 'deepfractal-0.3'
 
 // This is the list of URLs to be cached by your Progressive Web App URLs.
 const CACHED_URLS = [
@@ -24,7 +24,6 @@ self.addEventListener('install', event => {
       .then(currentCache => {
         // Store a reference to current cache, to be used on fetch event handler.
         cache = currentCache
-
         cache.addAll(CACHED_URLS)
       })
       .then(self.skipWaiting())

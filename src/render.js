@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * State managment
+ * Monkey state managment
  */
 let imax = 1024;
 let squareRadius = 5000;

@@ -1,15 +1,15 @@
-# Deep Fractal
+# DeepFractal
 
 Deep mandelbrot viewer in [webapp](https://munrocket.github.io/deep-fractal/). It uses WebGL and perturbation theory acceleration.
 
 ### Features
 
-- [X] Deep zoom (beta version 10^-31)
-- [X] Julia set minimap with Ctrl key
+- [X] Deep zoom (beta version 10^-31, 1024 iteration)
 - [X] Webgl parallel processing
 - [X] Perturbation theory
-- [X] Supersampling
+- [X] Adaptive super-sampling
 - [X] Progressive web application
+- [X] Julia set with Ctrl key
 
 ![Deep Mandelbrot](https://i.imgur.com/EfIDzxt.png)
 
@@ -30,7 +30,7 @@ and restore the rest of the picture with float precision in GPU.
 - [X] Logarithmic search for reference point
 - [ ] Better optimization (SDF serach, progressive render, bigfloat)
 - [ ] Better platform support (add pinch on mobile devices)
-- [ ] New feature (log color time, router)
+- [ ] New feature (log color time, router, save button)
 
 ### Lighthouse report
 ![audit](https://i.imgur.com/RweUezL.png?1)

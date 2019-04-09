@@ -186,8 +186,9 @@ const Events = {
 
   glcontrol.addEventListener('contextmenu', e => e.preventDefault());
   document.getElementById('glmandel').addEventListener('webglcontextlost', e => {
-    Events.showError("WebGL context lost!",
-      "GPU calculation was too long and browser or OS decides to reset the GPU. Try to off supersampling.")
+    Events.showError('WebGL context lost!',
+      `GPU calculation was too long and browser or OS decides to reset the GPU. 
+      ${superSampling ? '\nTry to off supersampling.' : ''}`);
     e.preventDefault();
   });
   
