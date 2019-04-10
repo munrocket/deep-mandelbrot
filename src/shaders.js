@@ -7,7 +7,6 @@ let vert = `
   uniform vec2 rotator;
   uniform vec2 center;
   uniform vec2 size;
-
   varying vec2 delta;
 
   void main() {
@@ -15,7 +14,7 @@ let vert = `
     /*  window coordinates with new origin in complex space  */
     vec2 z = size * a_position;
     delta = center + vec2(z.x * rotator.y - z.y * rotator.x, dot(z, rotator));
-    
+
     gl_Position = vec4(a_position, 0.0, 1.0);
   }`;
 
@@ -28,13 +27,16 @@ let frag = (isJulia) => `
     #define color_scheme ${colorScheme}
     #define is_julia ${isJulia}
     const float logLogRR = log2(log2(square_radius));
-
+    
     varying vec2 delta;
+    varying vec2 texcoord;
+
     uniform vec2 rotator;
     uniform vec2 size;
     uniform vec2 pixelsize;
     uniform float texsize;
-    uniform highp sampler2D orbittex;
+    uniform sampler2D orbittex;
+    uniform sampler2D exteriortex;
 
     vec4 unpackOrbit(int i) {
       float fi = float(i);
@@ -52,6 +54,7 @@ let frag = (isJulia) => `
       float zz;
       float dzdz;
       float stripe;
+      float argZ;
     };
 
     /*  fractal calculator with perturbation theory for mandelbrot & julia set */
@@ -99,7 +102,7 @@ let frag = (isJulia) => `
       #if (color_scheme == 0)
         stripe = interpolate(stripe, s1, s2, s3, fract(time));
       #endif
-      return result(time, zz, dot(dz,dz), stripe);
+      return result(time, zz, dot(dz,dz), stripe, atan(z.y, z.x));
     }
 
     void main() {
@@ -107,12 +110,12 @@ let frag = (isJulia) => `
       result R = calculator(vec2(0));
 
       /*  DEM (Distance Estimation) = 2 * |Z / Z'| * ln(|Z|)  */
-      float dem = sqrt(R.zz / R.dzdz) * log(R.zz);
+      float dem = sqrt(R.zz / R.dzdz) * log2(R.zz);
       float dem_weight = 800. / min(size.x, size.y);
 
       /*  Adaptive supersampling with additional 4 points in SSAAx4 pattern */
       #if (super_sampling == 1 && color_scheme != 1)
-        if (-log(dem * dem_weight) > 0.5) {
+        if (-log2(dem * dem_weight) > 0.5) {
           R.time /= 5.;
           R.zz /= 5.;
           R.dzdz /= 5.;
@@ -132,10 +135,11 @@ let frag = (isJulia) => `
       /*  Final coloring  */
       vec3 color;
       #if (color_scheme == 0)
-        color += 0.7 + 2.5 * (R.stripe / clamp(R.time, 0., 200.)) * (1.0 - 0.6 * step(float(imax), 1. + R.time));
+        color += 0.7 + 2.5 * (R.stripe / clamp(R.time, 0., 200.)) * (1. - 0.6 * step(float(imax), 1. + R.time));
         color = 0.5 + 0.5 * sin(color + vec3(4.0, 4.6, 5.2) + 50.0 * R.time / float(imax));
       #else
-        color += 1.0 - clamp(-log(dem * dem_weight), 0., 1.);
+        vec2 texcoord = vec2(R.argZ / 2. / 3.14159265, log2(R.zz) / log2(square_radius) - 1.0);
+        color = texture2D(exteriortex, texcoord).xyz;
       #endif
 
       gl_FragColor = vec4(color, 1.);

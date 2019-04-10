@@ -30,7 +30,7 @@ and restore the rest of the picture with float precision in GPU.
 - [X] Logarithmic search for reference point
 - [ ] Better optimization (SDF serach, progressive render, bigfloat)
 - [ ] Better platform support (add pinch on mobile devices)
-- [ ] New feature (log color time, router, save button)
+- [ ] New feature (color potential, router, save button)
 
 ### Lighthouse report
 ![audit](https://i.imgur.com/RweUezL.png?1)

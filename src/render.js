@@ -19,13 +19,18 @@ let programGetter = (() => {
     return savedProgramInfo;
   }
 })();
-const glMandel = twgl.getWebGLContext(document.getElementById('glmandel'), { antialias: false, depth: false });
+
+/* Initialization */
+let glMandel = twgl.getWebGLContext(document.getElementById('glmandel'), { antialias: false, depth: false });
 twgl.addExtensionsToContext(glMandel);
 const glJulia = twgl.getWebGLContext(document.getElementById('gljulia'), { antialias: false, depth: false });
 twgl.addExtensionsToContext(glJulia);
 if (!glMandel || !glJulia ) {
   Events.showError('This viewer requires WebGL', 'WebGL is turned off or not supported by this device.');
 };
+const dogetex = twgl.createTexture(glMandel, { src: 'img/doge.jpg' });
+const lolitex = twgl.createTexture(glMandel, { src: 'img/loli.jpg' });
+let exteriortex = dogetex;
 
 /**
  * Calculating orbit for one point in Mandelbrot/Julia fractal.
@@ -86,7 +91,7 @@ function searchOrigin(aim, julia) {
  */
 function draw(aim, julia) {
   try {
-    const gl = (julia) ? glJulia : glMandel;
+    let gl = (julia) ? glJulia : glMandel;
     twgl.resizeCanvasToDisplaySize(gl.canvas, window.devicePixelRatio || 1);
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
     const ratio = gl.canvas.width / gl.canvas.height;
@@ -120,6 +125,7 @@ function draw(aim, julia) {
       pixelsize: [aim.hx.toNumber() / gl.canvas.width, aim.hy.toNumber() / gl.canvas.height],
       texsize: texsize,
       orbittex: orbittex,
+      exteriortex: exteriortex,
     };
     twgl.setUniforms(programInfo, uniforms);
 
