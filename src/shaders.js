@@ -33,9 +33,8 @@ let frag = (isJulia) => `
     uniform vec2 rotator;
     uniform vec2 size;
     uniform vec2 pixelsize;
-    uniform float zoom;
     uniform float texsize;
-    uniform sampler2D orbittex;
+    uniform highp sampler2D orbittex;
 
     vec4 unpackOrbit(int i) {
       float fi = float(i);
@@ -97,20 +96,23 @@ let frag = (isJulia) => `
       }
 
       time += clamp(1.0 + logLogRR - log2(log2(zz)), 0., 1.);
-      stripe = interpolate(stripe, s1, s2, s3, fract(time));
+      #if (color_scheme == 0)
+        stripe = interpolate(stripe, s1, s2, s3, fract(time));
+      #endif
       return result(time, zz, dot(dz,dz), stripe);
     }
 
     void main() {
+      /*  Get result  */
       result R = calculator(vec2(0));
-      float zoom = 1. / min(size.x, size.y);
 
-      /*  DEM (Distance Estimation) = 2.0 * |Z / Z'| * ln(|Z|)  */
+      /*  DEM (Distance Estimation) = 2 * |Z / Z'| * ln(|Z|)  */
       float dem = sqrt(R.zz / R.dzdz) * log(R.zz);
+      float dem_weight = 800. / min(size.x, size.y);
 
       /*  Adaptive supersampling with additional 4 points in SSAAx4 pattern */
       #if (super_sampling == 1 && color_scheme != 1)
-        if (-log(dem * zoom * 800.) > 0.5) {
+        if (-log(dem * dem_weight) > 0.5) {
           R.time /= 5.;
           R.zz /= 5.;
           R.dzdz /= 5.;
@@ -133,7 +135,7 @@ let frag = (isJulia) => `
         color += 0.7 + 2.5 * (R.stripe / clamp(R.time, 0., 200.)) * (1.0 - 0.6 * step(float(imax), 1. + R.time));
         color = 0.5 + 0.5 * sin(color + vec3(4.0, 4.6, 5.2) + 50.0 * R.time / float(imax));
       #else
-        color += 1.0 - clamp(-log(dem * zoom * 800.), 0., 1.);
+        color += 1.0 - clamp(-log(dem * dem_weight), 0., 1.);
       #endif
 
       gl_FragColor = vec4(color, 1.);

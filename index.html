@@ -48,18 +48,18 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css">
   <style>
     html, body { overflow: hidden; background-color: #0a0a0a; }
-    .wrapper { display: flex; flex-direction: column; height: 100vh; min-height: 100%; }
-    main { flex: 1; position: relative; display: flex; flex-direction: column; background-color: #0a0a0a; }
-    #mainMenu.is-active { position: fixed; width: 100%; top: 3.25em; }
-    .patreon-button { background-color: rgb(250, 116, 94); border-color: rgb(250, 116, 94); color: #FFFFFF; }
-    .patreon-button:hover { background-color: rgb(238, 109, 89); border-color: rgb(238, 109, 89); color: #FFFFFF;}
+    main { display: flex; flex-direction: column; height: 100vh; min-height: 100%; }
+    .viewer { flex: 1; position: relative; display: flex; flex-direction: column; background-color: #0a0a0a; }
+    #menu.is-active { position: fixed; width: 100%; top: 3.25em; }
+    .patreon-button { background-color: rgb(250, 116, 94); border-color: rgb(250, 116, 94); color: #ffffff; }
+    .patreon-button:hover { background-color: rgb(238, 109, 89); border-color: rgb(238, 109, 89); color: #ffffff;}
     .supersamling-check:hover { color: #ffffff; }
     canvas { position: absolute; width: 100%; height: 100%; }
     #gljulia { left: 0; bottom: 0; height: 400px; width: 400px;}
     #glcontrol { cursor: crosshair; }
     #zoomOut { position: absolute; bottom: .4em; left: .4em; width: 2.3em; font-size: 1em;}
     @media screen and (min-width: 1088px) {
-      #mainMenu.is-active { position: static; width: auto; }
+      #menu.is-active { position: static; width: auto; }
       #zoomOut { display: none; }
     }
   </style>
@@ -67,20 +67,20 @@
 </head>
 <body>
 
-  <main class="wrapper">
+  <main>
 
     <!-- Header -->
     <header>
       <nav class="navbar is-black" role="navigation" aria-label="main navigation">
         <div class="navbar-brand">
           <h1 class="navbar-item has-text-weight-bold">DeepFractal</h1>
-          <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="mainMenu">
+          <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="menu">
             <span aria-hidden="true"></span>
             <span aria-hidden="true"></span>
             <span aria-hidden="true"></span>
           </a>
         </div>
-        <div id="mainMenu" class="navbar-menu">
+        <div id="menu" class="navbar-menu">
           <div class="navbar-start">
             <div class="navbar-item has-dropdown is-hoverable">
               <a class="navbar-link">Color</a>
@@ -92,7 +92,7 @@
             <!-- <a class="navbar-item" onclick="Events.savePng();">Save</a> -->
             <div class="navbar-item">
               <label class="checkbox supersamling-check">
-                <input type="checkbox" onclick="superSampling = superSampling == 0 ? 1 : 0; draw(aim);" checked>
+                <input type="checkbox" onclick="superSampling = superSampling == 0 ? 1 : 0; draw(aim);">
                 Supersamling
               </label>
             </div>
@@ -101,7 +101,7 @@
             <div class="navbar-item">
               <div class="buttons">
                 <a class="button patreon-button" target="_blank" rel="noopener" href="https://www.patreon.com/deepfractal" target="_blank">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 180 180">
+                  <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180">
                     <path fill="#ffffff" d="M108.8135992 26.06720125c-26.468266 0-48.00213212 21.53066613-48.00213212 47.99733213
                       0 26.38653268 21.53386613 47.85426547 48.00213213 47.85426547 26.38639937 0 47.8530655-21.4677328
                       47.8530655-47.85426547 0-26.466666-21.46666613-47.99733213-47.85306547-47.99733213" />
@@ -110,7 +110,7 @@
                   <span>Become a Patron</span>
                 </a>
                 <a class="button is-primary" rel="noopener" href="https://github.com/munrocket/deep-fractal" target="_blank">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="-2 -2 20 20">
+                  <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 20 20">
                     <path fill="#ffffff" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38
                       0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01
                       1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95
@@ -127,12 +127,17 @@
       </nav>
     </header>
 
-    <!-- Magic canvas -->
+    <!-- Main viewer -->
     <section class="viewer">
       <canvas id="glmandel"></canvas>
       <canvas id="gljulia"></canvas>
       <canvas id="glcontrol"></canvas>
-      <a id="zoomOut" class="button is-black is-rounded" onclick="Events.simpleZoom(aim,15);"><span class="icon"><i class="fa fa-minus"></i></span></a>
+
+      <a id="zoomOut" class="button is-black is-rounded" onclick="Events.simpleZoom(aim,15);">
+        <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+          <path fill="#ffffff" d="M24,11c0-0.6-0.4-1-1-1H1c-0.6,0-1,0.4-1,1v2c0,0.6,0.4,1,1,1h22c0.6,0,1-0.4,1-1V11z"/>
+        </svg>
+      </a>
     </section>
 
   </main>

@@ -6,7 +6,7 @@
 let imax = 1024;
 let squareRadius = 5000;
 let colorScheme = 0;
-let superSampling = 1;
+let superSampling = 0;
 let aim = { x: new Double(-0.75), y: new Double(0), hx: new Double(1.25), hy: new Double(1.15), phi: 0 };
 let programGetter = (() => {
   let savedGl = null, savedVert = null, savedFrag = null, savedProgramInfo = null;
