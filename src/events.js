@@ -182,7 +182,7 @@ const Events = {
       setTimeout(() => wheelZoom(getPos(e)), 100);
     }
     wheelAccum += e.deltaY;
-  });
+  }, {passive: true});
 
   glcontrol.addEventListener('contextmenu', e => e.preventDefault());
   document.getElementById('glmandel').addEventListener('webglcontextlost', e => {
