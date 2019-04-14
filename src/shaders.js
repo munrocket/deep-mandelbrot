@@ -94,8 +94,8 @@ let frag = (isJulia) => `
         #endif
 
         /*  Loop in webgl1  */
-        time += 1.;
-        if (zz > square_radius) { break; }
+          time += 1.;
+          if (zz > square_radius) { break; }
       }
 
       time += clamp(1.0 + logLogRR - log2(log2(zz)), 0., 1.);

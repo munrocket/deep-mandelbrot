@@ -28,8 +28,8 @@ twgl.addExtensionsToContext(glJulia);
 if (!glMandel || !glJulia ) {
   Events.showError('This viewer requires WebGL', 'WebGL is turned off or not supported by this device.');
 };
-const dogetex = twgl.createTexture(glMandel, { src: 'img/doge.jpg' });
-const lolitex = twgl.createTexture(glMandel, { src: 'img/loli.jpg' });
+const dogetex = twgl.createTexture(glMandel, { src: 'img/doge.jpg', minMag: glMandel.NEAREST });
+const lolitex = twgl.createTexture(glMandel, { src: 'img/loli.jpg', minMag: glMandel.NEAREST });
 let exteriortex = dogetex;
 
 /**

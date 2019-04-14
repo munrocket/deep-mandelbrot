@@ -29,8 +29,7 @@ and restore the rest of the picture with float precision in GPU.
 - [X] Ping-pong rendering for deeper zoom
 - [X] Logarithmic search for reference point
 - [ ] Better optimization (SDF serach, progressive render, bigfloat)
-- [ ] Better platform support (add pinch on mobile devices)
-- [ ] New feature (color potential, router, save button)
+- [ ] New feature (pinch zooming on mobile devices, router, save picture button)
 
 ### Lighthouse report
 ![audit](https://i.imgur.com/RweUezL.png?1)
@@ -48,6 +47,8 @@ and restore the rest of the picture with float precision in GPU.
 
 [//]: # "*Numerical Methods for Finding Periodic Orbits* [[url](http://www.scholarpedia.org/article/Periodic_orbit#Numerical_Methods_for_Finding_Periodic_Orbits)]"
 [//]: # "Claude Heiland-Allen. *Perturbation techniques applied to the Mandelbrot set* page 9. [[url](https://mathr.co.uk/mandelbrot/perturbation.pdf)]"
+[//]: # "*Practical interior distance rendering* http://mathr.co.uk/blog/2014-11-02_practical_interior_distance_rendering.html"
+[//]: # "*Creating a real-time Mandelbrot/Julia fractal explorer* https://www.inf.ed.ac.uk/publications/thesis/online/IM080583.pdf"
 [//]: # "https://mathr.co.uk/mandelbrot/book-draft-2017-11-10.pdf"
 [//]: # "http://roy.red/fractal-droste-images-.html#fractal-droste-images"
 [//]: # " Posible coloring: gaussian integer distance
