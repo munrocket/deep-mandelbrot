@@ -230,10 +230,11 @@ const Events = {
   }, false);
   
   let hammerjs = new Hammer.Manager(glcontrol);
+  let pan = new Hammer.Pan();
   let rotate = new Hammer.Rotate();
   let pinch = new Hammer.Pinch();
   
-  hammerjs.add([pinch, rotate]);
+  hammerjs.add([pan, pinch, rotate]);
   hammerjs.get('pinch').set({ enable: true });
   hammerjs.get('rotate').set({ enable: true });
   
@@ -247,38 +248,44 @@ const Events = {
   let currentScale = null;
   let currentRotation = null;
   
-  hammerjs.on("pinchstart rotatestart", function(e) {
-    adjustRotation -= e.rotation;
+  hammerjs.on("panstart pinchstart rotatestart", function(e) {
+    if (e.pointerType === 'touch') {
+      adjustRotation -= e.rotation;
+    }
   });
   
-  hammerjs.on("pinchmove rotatemove", function(e) {
-    currentRotation = adjustRotation + e.rotation;
-    currentScale = adjustScale * e.scale;
-    currentDeltaX = adjustDeltaX + e.deltaX / currentScale;
-    currentDeltaY = adjustDeltaY + e.deltaY / currentScale;
+  hammerjs.on("panmove pinchmove rotatemove", function(e) {
+    if (e.pointerType === 'touch') {
+      currentRotation = adjustRotation + e.rotation;
+      currentScale = adjustScale * e.scale;
+      currentDeltaX = adjustDeltaX + e.deltaX / currentScale;
+      currentDeltaY = adjustDeltaY + e.deltaY / currentScale;
+    }
   });
   
-  hammerjs.on("pinchend rotateend", function(e) {
-    adjustScale = currentScale;
-    adjustRotation = currentRotation;
-    adjustDeltaX = currentDeltaX;
-    adjustDeltaY = currentDeltaY;
-    
-    const dx = aim.hx.mul(-2 * adjustDeltaX / glcontrol.width);
-    const dy = aim.hy.mul(-2 * adjustDeltaY / glcontrol.height);
-    const cosPhi = Math.cos(aim.phi);
-    const sinPhi = Math.sin(aim.phi);
-    aim.x = aim.x.add(dx.mul(cosPhi).add(dy.mul(sinPhi)));
-    aim.y = aim.y.add(dx.mul(sinPhi).sub(dy.mul(cosPhi)));
-    aim.hx = aim.hx.div(adjustScale);
-    aim.hy = aim.hy.div(adjustScale);
-    aim.phi = aim.phi + adjustRotation / 360;
-    draw(aim);
+  hammerjs.on("panend pinchend rotateend", function(e) {
+    if (e.pointerType === 'touch') {
+      adjustScale = currentScale;
+      adjustRotation = currentRotation;
+      adjustDeltaX = currentDeltaX;
+      adjustDeltaY = currentDeltaY;
+      
+      const dx = aim.hx.mul(-2 * adjustDeltaX / glcontrol.width);
+      const dy = aim.hy.mul(-2 * adjustDeltaY / glcontrol.height);
+      const cosPhi = Math.cos(aim.phi);
+      const sinPhi = Math.sin(aim.phi);
+      aim.x = aim.x.add(dx.mul(cosPhi).add(dy.mul(sinPhi)));
+      aim.y = aim.y.add(dx.mul(sinPhi).sub(dy.mul(cosPhi)));
+      aim.hx = aim.hx.div(adjustScale);
+      aim.hy = aim.hy.div(adjustScale);
+      aim.phi = aim.phi + adjustRotation / 360;
+      draw(aim);
 
-    adjustScale = 1;
-    adjustRotation = 0;
-    adjustDeltaX = 0;
-    adjustDeltaY = 0;
+      adjustScale = 1;
+      adjustRotation = 0;
+      adjustDeltaX = 0;
+      adjustDeltaY = 0;
+    }
   });
 
   /* ============== Service worker ============== */
