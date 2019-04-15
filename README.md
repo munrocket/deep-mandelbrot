@@ -29,7 +29,7 @@ and restore the rest of the picture with float precision in GPU.
 - [X] Ping-pong rendering for deeper zoom
 - [X] Logarithmic search for reference point
 - [ ] Better optimization (SDF serach, progressive render, bigfloat)
-- [ ] New feature (pinch zooming on mobile devices, router, save picture button)
+- [ ] New feature (router, save picture button)
 
 ### Lighthouse report
 ![audit](https://i.imgur.com/RweUezL.png?1)

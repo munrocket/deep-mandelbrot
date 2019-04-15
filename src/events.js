@@ -29,6 +29,10 @@ const Events = {
     glcontrol.height = ctx.canvas.clientHeight;
     const gl = twgl.getContext(document.getElementById('gljulia'));
     gl.clear(gl.COLOR_BUFFER_BIT);
+  },
+  reset() {
+    aim = { x: new Double(-0.75), y: new Double(0), hx: new Double(1.25), hy: new Double(1.15), phi: 0 };
+    draw(aim);
   }
 };
 
@@ -42,8 +46,8 @@ const Events = {
       prevCos = Math.cos(aim.phi);
       prevSin = Math.sin(aim.phi);
     }
-    const dx = aim.hx.mul((2 * e.offsetX + 1) / glcontrol.width - 1);
-    const dy = aim.hy.mul((2 * e.offsetY + 1) / glcontrol.height - 1);
+    const dx = aim.hx.mul(2 * e.offsetX / glcontrol.width - 1);
+    const dy = aim.hy.mul(2 * e.offsetY / glcontrol.height - 1);
     return {
       x: aim.x.add(dx.mul(prevCos).add(dy.mul(prevSin))),
       y: aim.y.add(dx.mul(prevSin).sub(dy.mul(prevCos))),
@@ -182,8 +186,9 @@ const Events = {
       setTimeout(() => wheelZoom(getPos(e)), 100);
     }
     wheelAccum += e.deltaY;
-  }, {passive: true});
+  });
 
+  /* ============== Resize / context ============== */
   glcontrol.addEventListener('contextmenu', e => e.preventDefault());
   document.getElementById('glmandel').addEventListener('webglcontextlost', e => {
     Events.showError('WebGL context lost!',
@@ -191,7 +196,7 @@ const Events = {
       ${superSampling ? '\nTry to off supersampling.' : ''}`);
     e.preventDefault();
   });
-  
+
   let currentRequestId = 0;
   window.addEventListener('resize', e => {
     function requestResize(crid) {
@@ -204,6 +209,8 @@ const Events = {
     setTimeout(() => requestResize(currentRequestId), 500);
   });
 
+  /* ============== Burgermenu ============== */
+
   const burger = document.querySelector('.navbar-burger');
   const menu = document.getElementById(burger.dataset.target);
   menu.addEventListener('click', () => {
@@ -214,6 +221,64 @@ const Events = {
   burger.addEventListener('click', () => {
     menu.classList.toggle('is-active');
     burger.classList.toggle('is-active');
+  });
+
+  /* ============== Hammerjs ============== */
+
+  document.body.addEventListener('touchmove', function(event) {
+    event.preventDefault();
+  }, false);
+  
+  let hammerjs = new Hammer.Manager(glcontrol);
+  let rotate = new Hammer.Rotate();
+  let pinch = new Hammer.Pinch();
+  
+  hammerjs.add([pinch, rotate]);
+  hammerjs.get('pinch').set({ enable: true });
+  hammerjs.get('rotate').set({ enable: true });
+  
+  let adjustDeltaX = 0;
+  let adjustDeltaY = 0;
+  let adjustScale = 1;
+  let adjustRotation = 0;
+  
+  let currentDeltaX = null;
+  let currentDeltaY = null;
+  let currentScale = null;
+  let currentRotation = null;
+  
+  hammerjs.on("pinchstart rotatestart", function(e) {
+    adjustRotation -= e.rotation;
+  });
+  
+  hammerjs.on("pinchmove rotatemove", function(e) {
+    currentRotation = adjustRotation + e.rotation;
+    currentScale = adjustScale * e.scale;
+    currentDeltaX = adjustDeltaX + e.deltaX / currentScale;
+    currentDeltaY = adjustDeltaY + e.deltaY / currentScale;
+  });
+  
+  hammerjs.on("pinchend rotateend", function(e) {
+    adjustScale = currentScale;
+    adjustRotation = currentRotation;
+    adjustDeltaX = currentDeltaX;
+    adjustDeltaY = currentDeltaY;
+    
+    const dx = aim.hx.mul(-2 * adjustDeltaX / glcontrol.width);
+    const dy = aim.hy.mul(-2 * adjustDeltaY / glcontrol.height);
+    const cosPhi = Math.cos(aim.phi);
+    const sinPhi = Math.sin(aim.phi);
+    aim.x = aim.x.add(dx.mul(cosPhi).add(dy.mul(sinPhi)));
+    aim.y = aim.y.add(dx.mul(sinPhi).sub(dy.mul(cosPhi)));
+    aim.hx = aim.hx.div(adjustScale);
+    aim.hy = aim.hy.div(adjustScale);
+    aim.phi = aim.phi + adjustRotation / 360;
+    draw(aim);
+
+    adjustScale = 1;
+    adjustRotation = 0;
+    adjustDeltaX = 0;
+    adjustDeltaY = 0;
   });
 
   /* ============== Service worker ============== */
