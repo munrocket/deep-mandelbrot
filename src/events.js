@@ -66,9 +66,9 @@ const Events = {
 
   function aimZoom(pos, newAim) {
     if (!newAim.hx) {
-      Events.simpleZoom(pos, 1/15);
-    } else if (Math.abs(mouseDownPos.px - pos.px) + Math.abs(mouseDownPos.py - pos.py) < 15) {
-      Events.simpleZoom(mouseDownPos, 1/15);
+      Events.simpleZoom(pos, 1/8);
+    } else if (Math.abs(mouseDownPos.px - pos.px) + Math.abs(mouseDownPos.py - pos.py) < 10) {
+      Events.simpleZoom(mouseDownPos, 1/8);
     } else {
       aim = newAim;
       draw(aim);
@@ -123,7 +123,7 @@ const Events = {
       isDrawingAim = false;
       aimZoom(pos, newAim);
     } else if (e.button == 2) {
-      Events.simpleZoom(pos, 15);
+      Events.simpleZoom(pos, 8);
     }
   });
 

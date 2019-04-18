@@ -9,7 +9,7 @@ Deep mandelbrot viewer in [webapp](https://munrocket.github.io/deep-fractal/). I
 - [X] Perturbation theory
 - [X] Adaptive super-sampling
 - [X] Progressive web application
-- [X] Julia set with Ctrl key
+- [X] Julia set and orbits with Ctrl key
 
 ![Deep Mandelbrot](https://i.imgur.com/EfIDzxt.png)
 
@@ -29,7 +29,7 @@ and restore the rest of the picture with float precision in GPU.
 - [X] Ping-pong rendering for deeper zoom
 - [X] Logarithmic search for reference point
 - [ ] Better optimization (SDF serach, progressive render, bigfloat)
-- [ ] New feature (router, save picture button)
+- [ ] New feature (internal coord, router, save picture button)
 
 ### Lighthouse report
 ![audit](https://i.imgur.com/RweUezL.png?1)
@@ -46,11 +46,10 @@ and restore the rest of the picture with float precision in GPU.
 8. Heinz-Otto Peitgen, Dietmar Saupe, Benoit Mandelbrot etc. *The Science of Fractal Images.* Appendix D. [[pdf](https://becca.ooo/i-c-the-light/resources/the_science_of_fractal_images.pdf)]
 
 [//]: # "*Numerical Methods for Finding Periodic Orbits* [[url](http://www.scholarpedia.org/article/Periodic_orbit#Numerical_Methods_for_Finding_Periodic_Orbits)]"
-[//]: # "Claude Heiland-Allen. *Perturbation techniques applied to the Mandelbrot set* page 9. [[url](https://mathr.co.uk/mandelbrot/perturbation.pdf)]"
 [//]: # "*Practical interior distance rendering* http://mathr.co.uk/blog/2014-11-02_practical_interior_distance_rendering.html"
-[//]: # "*Creating a real-time Mandelbrot/Julia fractal explorer* https://www.inf.ed.ac.uk/publications/thesis/online/IM080583.pdf"
 [//]: # "https://mathr.co.uk/mandelbrot/book-draft-2017-11-10.pdf"
 [//]: # "http://roy.red/fractal-droste-images-.html#fractal-droste-images"
+[//]: # "http://ibiblio.org/e-notes/MSet/ru/cont_r.htm"
 [//]: # " Posible coloring: gaussian integer distance
           Intresting modifications:
             drop: z -> z^2 + 1/c
