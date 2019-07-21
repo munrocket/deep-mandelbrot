@@ -43,7 +43,7 @@ and restore the rest of the picture with float precision in GPU.
 5. Robert Munafo. *Speed Improvements* [[url](https://mrob.com/pub/muency/speedimprovements.html)]
 6. Claude Heiland-Allen. *Adaptive super-sampling using distance estimate.* [[url](http://mathr.co.uk/blog/2014-11-22_adaptive_supersampling_using_distance_estimate.html)]
 7. Arnaud Cheritat. *Mandelbrot set* [[url](https://www.math.univ-toulouse.fr/~cheritat/wiki-draw/index.php/Mandelbrot_set)]
-8. Heinz-Otto Peitgen, Dietmar Saupe, Benoit Mandelbrot etc. *The Science of Fractal Images.* Appendix D. [[pdf](https://becca.ooo/i-c-the-light/resources/the_science_of_fractal_images.pdf)]
+8. Heinz-Otto Peitgen, Dietmar Saupe, Benoit Mandelbrot etc. *The Science of Fractal Images.* Appendix D.
 
 [//]: # "*Numerical Methods for Finding Periodic Orbits* [[url](http://www.scholarpedia.org/article/Periodic_orbit#Numerical_Methods_for_Finding_Periodic_Orbits)]"
 [//]: # "*Practical interior distance rendering* http://mathr.co.uk/blog/2014-11-02_practical_interior_distance_rendering.html"
