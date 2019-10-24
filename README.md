@@ -13,26 +13,13 @@ Deep mandelbrot viewer in [webapp](https://munrocket.github.io/deep-fractal/). I
 
 ![Deep Mandelbrot](https://i.imgur.com/EfIDzxt.png)
 
-### How it works
-
-1. Since each pixel in a fractal is calculated independantly we can parallize it with GPU.
-2. Using the perturbation method, we can calculate only one point with an arbitrary precision in CPU
-and restore the rest of the picture with float precision in GPU.
-   - Finding a new reference point *O* (origin) where orbit sequence *O(n) < B* and calculate it with arbitrary precision.
-   - Pass truncated to float precision orbit sequence to GPU and restore rest of points *Z(n) = O(n) + W(n)* with equation
-     *W(n+1) -> W(n)^2 + 2 * O(n) * W(n) + delta*, where *delta* is coordinates relative to the new coordinate system and *Z(0) = O(0) + delta*.
-3. Since this orbit sequence too big for GPU uniforms we need to use ping-pong rendering.
-4. Using arbitrary precision library based on *floating point expation* which is heavily optimized for geometric calculation.
-
 ### 2do
 - [X] Double.js as a library for arbitrary precision
 - [X] Ping-pong rendering for deeper zoom
 - [X] Logarithmic search for reference point
-- [ ] Better optimization (SDF serach, progressive render, bigfloat)
-- [ ] New feature (internal coord, router, save picture button)
-
-### Lighthouse report
-![audit](https://i.imgur.com/RweUezL.png?1)
+- [ ] Infinite zoom
+- [ ] Better optimization (progressive render, SDF serach)
+- [ ] UI features (router, save picture button)
 
 ### References
 
