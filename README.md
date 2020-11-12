@@ -1,6 +1,14 @@
 # DeepFractal
 
-Deep mandelbrot viewer in [webapp](https://munrocket.github.io/deep-fractal/). It uses WebGL and perturbation theory acceleration.
+Deep mandelbrot viewer. It is in active development right now.
+
+### 2do
+- [X] Ping-pong rendering for deeper zoom
+- [X] Logarithmic search for reference point
+- [X] New arbitrary precision library - [Jampary](https://github.com/munrocket/jampary)
+- [ ] Infinite zoom
+- [ ] Better optimization (progressive render, SDF serach)
+- [ ] UI features (router, save picture button, etc.)
 
 ### Features
 
@@ -10,16 +18,6 @@ Deep mandelbrot viewer in [webapp](https://munrocket.github.io/deep-fractal/). I
 - [X] Adaptive super-sampling
 - [X] Progressive web application
 - [X] Julia set and orbits with Ctrl key
-
-![Deep Mandelbrot](https://i.imgur.com/EfIDzxt.png)
-
-### 2do
-- [X] Double.js as a library for arbitrary precision
-- [X] Ping-pong rendering for deeper zoom
-- [X] Logarithmic search for reference point
-- [ ] Infinite zoom
-- [ ] Better optimization (progressive render, SDF serach)
-- [ ] UI features (router, save picture button)
 
 ### References
 
