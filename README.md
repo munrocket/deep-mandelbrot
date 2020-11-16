@@ -1,4 +1,4 @@
-# DeepFractal
+# DeepMandel
 
 Deep mandelbrot viewer. It is in active development right now.
 

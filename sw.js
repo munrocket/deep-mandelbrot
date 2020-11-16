@@ -1,7 +1,7 @@
 //Stale-while-revalidate strategy
 
 // Fill here with your cache name-version.
-const CACHE_NAME = 'deepfractal-0.6.2'
+const CACHE_NAME = 'deepmandel-0.0.0'
 
 // This is the list of URLs to be cached by your Progressive Web App URLs.
 const CACHED_URLS = [
@@ -12,10 +12,10 @@ const CACHED_URLS = [
   '/src/events.js',
   '/src/render.js',
   '/src/shaders.js',
-  '/img/icons/android-chrome-192x192.png',
-  '/img/icons/android-chrome-512x512.png',
-  '/img/doge.jpg',
-  '/img/loli.jpg',
+  '/public/images/icons/android-chrome-192x192.png',
+  '/public/images/icons/android-chrome-512x512.png',
+  '/public/images/doge.jpg',
+  '/public/images/loli.jpg',
 ]
 
 let cache = null
