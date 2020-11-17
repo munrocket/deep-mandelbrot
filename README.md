@@ -1,6 +1,6 @@
-# DeepMandel
+# DeepMandelbrot
 
-Deep mandelbrot viewer. It is in active development right now.
+Deep mandelbrot explorer. It is in active development right now.
 
 ### 2do
 - [X] Ping-pong rendering for deeper zoom
