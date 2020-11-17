@@ -1,32 +1,88 @@
 <script>
-	export let name;
+  import * as twgl from 'twgl.js';
+  import { onMount } from 'svelte';
+
+  onMount(() => {
+
+    const vsource = `
+      precision mediump float;
+      uniform vec2 size;
+      uniform vec2 center;
+      uniform float phi;
+      uniform float zoom;
+      attribute vec2 position;
+      varying vec2 c;
+      void main() {
+        vec2 rot = vec2(sin(phi), cos(phi));
+        vec2 p = size * position * zoom;
+        c = center + vec2(p.x * rot.y - p.y * rot.x, dot(p, rot));
+        gl_Position = vec4(position, 0.0, 1.0);
+      }`;
+
+    const fsource = `
+      precision mediump float;
+      #define imax 50
+      varying vec2 c;
+      
+      void main() {
+        float x, y, t, col;
+        for (int i = 0; i < imax; i++) {
+          t = x * x - y * y + c.x;
+          y = 2.0 * x * y + c.y;
+          x = t;
+          if (x * x + y * y > 16.0) break;
+          else col += 1.0;
+        }
+        gl_FragColor = vec4(vec3(0.9 - 0.9 * col/float(imax)), 1.0);
+      }`;
+
+
+    const canvas = document.getElementById('c');
+    const gl = twgl.getContext(canvas, {depth: false });
+    const programInfo = twgl.createProgramInfo(gl, [vsource, fsource]);
+
+    gl.useProgram(programInfo.program);
+
+    const arrays = { position: { data: [-1, 1, 1, 1, 1, -1, 1, -1, -1, -1, -1, 1], numComponents: 2 } };
+    const bufferInfo = twgl.createBufferInfoFromArrays(gl, arrays);
+    twgl.setBuffersAndAttributes(gl, programInfo, bufferInfo);
+
+    function draw(gl, programInfo, timePassed) {
+      twgl.resizeCanvasToDisplaySize(gl.canvas);
+      gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+
+      const uniforms = {
+        center: [-0.75, 0],
+        size: [2, 2 / gl.canvas.width * gl.canvas.height],
+        phi: timePassed,
+        zoom: 1.3 + Math.sin(timePassed),
+      };
+
+      twgl.setUniforms(programInfo, uniforms);
+      twgl.drawBufferInfo(gl, bufferInfo);
+    }
+
+    (function animate(now) {
+      draw(gl, programInfo, now / 1000);
+      requestAnimationFrame(animate);
+    })(0);
+
+  });
 </script>
 
 <main>
-	<h1>Hello {name}!</h1>
-	<p>This is a starter template for a Svelte PWA, based in the <a href="https://github.com/sveltejs/template" target="_blank">Svelte template</a></p>
-	<p>You will find the manifest.json file and the service-worker.js file in the public folder</p>
-	<p>To update the proper icons for the PWA check <i>/public/images/icons</i></p>
+	<canvas id="c"></canvas>
 </main>
 
 <style>
 	main {
-		text-align: center;
-		padding: 1em;
-		max-width: 240px;
-		margin: 0 auto;
+		background-color: pink;
 	}
-
-	h1 {
-		color: #ff3e00;
-		text-transform: uppercase;
-		font-size: 4em;
-		font-weight: 100;
-	}
-
-	@media (min-width: 640px) {
-		main {
-			max-width: none;
-		}
+	#c {
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: 100%;
+		height: 100%;
 	}
 </style>

@@ -1,7 +1,7 @@
 //Stale-while-revalidate strategy
 
 // Fill here with your cache name-version.
-const CACHE_NAME = 'deepmandel-0.0.0'
+const CACHE_NAME = 'deepmandel-0.0.1'
 
 // This is the list of URLs to be cached by your Progressive Web App URLs.
 const CACHED_URLS = [
