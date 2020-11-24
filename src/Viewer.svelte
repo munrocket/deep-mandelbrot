@@ -80,5 +80,38 @@
 		top: 0;
 		width: 100%;
 		height: 100%;
-	}
+  }
+  
+  .viewer {
+    flex: 1;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background-color: #0a0a0a;
+  }
+
+  canvas {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+  }
+
+  #gljulia {
+    left: 0;
+    bottom: 0;
+    height: 400px;
+    width: 400px;
+  }
+
+  #glcontrol {
+    cursor: crosshair;
+  }
+
+  #zoomOut {
+    position: absolute;
+    bottom: .4em;
+    left: .4em;
+    width: 2.3em;
+    font-size: 1em;
+  }
 </style>

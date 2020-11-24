@@ -1,13 +1,24 @@
 <script>
-  import Render from './Render.svelte';
+	import Header from './Header.svelte';
+	import Viewer from './Viewer.svelte';
+	import Popup from './Popup.svelte';
 </script>
 
 <main>
-	<Render />
+	<Header />
+	<Viewer />
+	<Popup />
 </main>
 
 <style>
+	html, body {
+		overflow: hidden;
+		background-color: #0a0a0a;
+	}
 	main {
-		background-color: pink;
+		display: flex;
+		flex-direction: column;
+		height: 100vh;
+		min-height: 100%;
 	}
 </style>
