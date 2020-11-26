@@ -4,8 +4,8 @@
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -cw",
-    "start": "sirv public",
-    "start-old": "sirv .",
+    "start": "sirv public --host",
+    "start-old": "sirv . --host",
     "deploy": "npm run build && cp CNAME public && gh-pages -d public"
   },
   "dependencies": {

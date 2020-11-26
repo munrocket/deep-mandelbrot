@@ -1,21 +1,21 @@
 //Stale-while-revalidate strategy
 
 // Fill here with your cache name-version.
-const CACHE_NAME = 'deepmandel-0.0.0'
+const CACHE_NAME = 'deepmandel-0.0.4'
 
 // This is the list of URLs to be cached by your Progressive Web App URLs.
 const CACHED_URLS = [
-  '/',
-  '/build/bundle.css',
-  '/build/bundle.js',
-  '/images/icons/android-chrome-192x192.png',
-  '/images/icons/android-chrome-512x512.png',
-  '/images/doge.jpg',
-  '/images/loli.jpg',
-  '/images/rick.jpg',
-  '/index.html',
-  '/manifest.json',
-  'https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css',
+  // '/',
+  // '/build/bundle.css',
+  // '/build/bundle.js',
+  // '/images/icons/android-chrome-192x192.png',
+  // '/images/icons/android-chrome-512x512.png',
+  // '/images/doge.jpg',
+  // '/images/loli.jpg',
+  // '/images/rick.jpg',
+  // '/index.html',
+  // '/manifest.json',
+  // 'https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css',
 ]
 
 let cache = null

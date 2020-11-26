@@ -11,9 +11,9 @@
 </main>
 
 <style>
-	html, body {
-		overflow: hidden;
-		background-color: #0a0a0a;
+	:global(html, body) {
+  	overflow: hidden;
+  	background-color: #0a0a0a;
 	}
 	main {
 		display: flex;
