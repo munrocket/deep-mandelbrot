@@ -7,8 +7,8 @@ Deep mandelbrot explorer. It is in active development right now.
 - [X] Logarithmic search for reference point
 - [X] New arbitrary precision library - [Jampary](https://github.com/munrocket/jampary)
 - [ ] Infinite zoom
-- [ ] Better optimization (progressive render, SDF serach)
-- [ ] UI features (router, save picture button, etc.)
+- [ ] New search for reference point, progressive render
+- [ ] UI/UX (events, router, save picture)
 
 ### Features
 
