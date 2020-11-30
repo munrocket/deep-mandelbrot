@@ -5,7 +5,7 @@ const CACHE_NAME = 'deepmandel-0.0.4'
 
 // This is the list of URLs to be cached by your Progressive Web App URLs.
 const CACHED_URLS = [
-  // '/',
+  '/',
   // '/build/bundle.css',
   // '/build/bundle.js',
   // '/images/icons/android-chrome-192x192.png',
