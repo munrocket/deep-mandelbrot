@@ -1,11 +1,11 @@
 # DeepMandelbrot
 
-Deep mandelbrot explorer. It is in active development right now.
+Deep mandelbrot explorer. Site: https://deep-mandelbrot.js.org/
 
 ### 2do
 - [X] Ping-pong rendering for deeper zoom
 - [X] Logarithmic search for reference point
-- [X] New arbitrary precision library - [Jampary](https://github.com/munrocket/jampary)
+- [X] New arbitrary precision library - [Jampary](https://github.com/munsocket/jampary)
 - [ ] Infinite zoom
 - [ ] New search for reference point, progressive render
 - [ ] UI/UX (events, router, save picture)

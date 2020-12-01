@@ -7,7 +7,7 @@
         <button class="delete" aria-label="delete" onclick="document.getElementById('errorBox').classList.toggle('is-active');"></button>
       </div>
       <div id="errorMsg" class="message-body">
-        Please check console and consider submit a bug report on <a href="https://github.com/munrocket//issues">github</a>.
+        Please check console and consider submit a bug report on <a href="https://github.com/munsocket//issues">github</a>.
       </div>
     </article>
   </div>
