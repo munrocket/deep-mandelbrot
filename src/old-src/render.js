@@ -28,9 +28,9 @@ twgl.addExtensionsToContext(glJulia);
 if (!glMandel || !glJulia ) {
   Events.showError('This viewer requires WebGL', 'WebGL is turned off or not supported by this device.');
 };
-const dogetex = twgl.createTexture(glMandel, { src: 'images/doge.jpg', minMag: glMandel.NEAREST });
-const lolitex = twgl.createTexture(glMandel, { src: 'images/loli.jpg', minMag: glMandel.NEAREST });
-const ricktex = twgl.createTexture(glMandel, { src: 'images/rick.jpg', minMag: glMandel.NEAREST });
+const dogetex = twgl.createTexture(glMandel, { src: 'public/images/doge.jpg', minMag: glMandel.NEAREST });
+const lolitex = twgl.createTexture(glMandel, { src: 'public/images/loli.jpg', minMag: glMandel.NEAREST });
+const ricktex = twgl.createTexture(glMandel, { src: 'public/images/rick.jpg', minMag: glMandel.NEAREST });
 let exteriortex = dogetex;
 
 /**
